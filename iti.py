@@ -336,12 +336,14 @@ def patch_activation(activations, hook: HookPoint, head, use_MMD=True, use_probe
     term_to_add = calc_truth_proj(activations[:,head], use_MMD, use_probe, truth_indices, probe)
     return activations[:,head,:] + term_to_add
 
-# Calculates new_activations for topk and patches into model
-def patch_top_activations(probe_accuracies, topk=20, alpha=20):
+# Calculates new_activations for topk and adds temporary hooks
+def patch_top_activations(model, probe_accuracies, topk=20, alpha=20, use_MMD=True, use_probe=False, truth_indices=None, probes=None):
     '''
     orig_activations: (batch, n_layers, n_heads, d_model)
     truthful_dirs: (n_layers, n_heads, d_model)
     probe_accuracies: (n_layers, n_heads)
+
+    if use_probe is True, probes should be list in shape (n_layers, n_heads) filled with probes
 
     Goes into every single activation, and then tells it to add the ITI
     '''
@@ -354,9 +356,13 @@ def patch_top_activations(probe_accuracies, topk=20, alpha=20):
     for layer in range(probe_accuracies.shape[0]):
         for head in range(probe_accuracies.shape[1]):
             if top_head_bools[layer, head] == 1:
-                partial(patch_activation, head = head)
-                pass
 
+                if use_probe:
+                    patch_activation_with_head = partial(patch_activation, head = head, use_MMD=False, use_probe=use_probe, truth_indices=None, probe=probes[layer][head])
+                else:
+                    patch_activation_with_head = partial(patch_activation, head = head, use_MMD=use_MMD, use_probe=False, truth_indices=truth_indices, probe=None)
+                model.add_hook((utils.get_act_name("attn_out", layer), patch_activation_with_head))
+    
     # orig_top_acts = orig_activations[:, top_head_indices] # (batch, topk, d_model)
     # top_truthful_dirs = truthful_dirs[top_head_indices] # (topk, d_model)
 
