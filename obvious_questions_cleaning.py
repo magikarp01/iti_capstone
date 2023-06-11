@@ -6,7 +6,7 @@ import re
 # Let's say df is your dataframe and 'text' is the column with the text
 df = pd.read_csv('obvious_questions_uncleaned.csv', header = None)
 
-df.columns = ['column1', 'text']
+df.columns = ['category', 'text']
 
 def split_row(row):
     question = None
@@ -34,5 +34,7 @@ def split_row(row):
 new_df = df['text'].apply(split_row)
 # %%
 
-df = pd.concat([df, new_df], axis=1)
+df = pd.concat([df['category'], new_df], axis=1)
 # %%
+
+df.to_csv('obvious_questions_clean.csv', index=False)
