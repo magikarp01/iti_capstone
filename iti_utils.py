@@ -2,6 +2,7 @@ import einsum
 import torch
 import numpy as np
 
+
 # Goal: define a function to take in hyperparameters Alpha and K, model probe values, and model activations to calculate the new activations
 
 # Need to calculate alpha * sigma * theta
@@ -10,14 +11,7 @@ import numpy as np
 
 # sigma: standard deviation of head activation along truthful_dir (theta, either mass mean shift or probe weight direction)
 # adapted from get_interventions_dict in Kenneth Li github
-'''
-def get_act_std(head_activations, truthful_dirs):
-    # head_activation: (batch, n_heads, d_model,)
-    # truthful_dirs: (n_heads, d_model,)
-    truthful_dirs /= torch.norm(truthful_dirs, dim=-1, keepdim=True)
-    proj_act = einops.einsum(head_activations, truthful_dirs , "b n_h d_m, n_h d_m -> b n_h d_m")
-    return torch.std(proj_act, dim=0) # (n_h d_m)
-'''
+
 def get_act_std(head_activation, truthful_dir): # calculates standard deviations for one head
     """
     head_activation: (batch, d_model,)
@@ -43,14 +37,6 @@ def get_mass_mean_dir(all_activations, truth_indices): #
     return (true_mass_mean - false_mass_mean) / (true_mass_mean - false_mass_mean).norm()
 
 # truthful direction is probe weight
-# def get_probe_dirs(probe_list):
-#     # probe is a list (n_heads len) of LogisticRegression objects
-#     coefs = []
-#     for probe in probe_list:
-#         coefs.append(probe.coef_)
-        
-#     return torch.tensor(coefs, dtype=torch.float32, device=device)
-
 def get_probe_dir(probe):
     probe_weights = torch.tensor(probe.coef_, dtype=torch.float32, device=device).squeeze()
     return probe_weights / probe_weights.norm(dim=-1)
@@ -77,7 +63,8 @@ def calc_truth_proj(activation, use_MMD=False, use_probe=False, truth_indices=No
     
     return einops.einsum(act_std, truthful_dir, "d_m, d_m -> d_m")
 
-def patch_activation_hook_fn(activations, hook: HookPoint, head, old_activations, use_MMD=True, use_probe=False, truth_indices=None, probe=None):
+# Don't use cache_after_ITI: Not functional right now
+def patch_activation_hook_fn(activations, hook: HookPoint, head, old_activations, use_MMD=True, use_probe=False, truth_indices=None, probe=None, cache_after_ITI = None):
     """
     activations: (batch, n_heads, d_model)
     hook: HookPoint
@@ -89,10 +76,13 @@ def patch_activation_hook_fn(activations, hook: HookPoint, head, old_activations
     term_to_add = calc_truth_proj(old_activations[:,head], use_MMD, use_probe, truth_indices, probe)
     # print(f"v shape is {term_to_add.shape}")
     # print(f"activations shape is {activations.shape}")
+    # print(f"shape of cache after ITI is {cache_after_ITI.shape}")
     activations[:,-1,head] += term_to_add
+    # if cache_after_ITI is not None:
+    #     cache_after_ITI[:,hook.layer(), -1,head] = activations[:,-1,head]
 
 # Calculates new_activations for topk and adds temporary hooks
-def patch_top_activations(model, probe_accuracies, old_activations, topk=20, alpha=20, use_MMD=False, use_probe=False, truth_indices=None, probes=None):
+def patch_top_activations(model, probe_accuracies, old_activations, cache_after_ITI=None, topk=20, alpha=20, use_MMD=False, use_probe=False, truth_indices=None, probes=None):
     '''
     probe_accuracies: (n_layers, n_heads)
     old_activations: (batch, n_layers, n_heads, d_model)
@@ -109,13 +99,27 @@ def patch_top_activations(model, probe_accuracies, old_activations, topk=20, alp
 
     top_head_bools[top_head_indices] = torch.ones_like(top_head_bools[top_head_indices]) # set all the ones that are top to 1
     top_head_bools = einops.rearrange(top_head_bools, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers) # rearrange back
-    
+
+
     for layer in range(probe_accuracies.shape[0]):
         for head in range(probe_accuracies.shape[1]):
             if top_head_bools[layer, head] == 1:
 
                 if use_probe:
-                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], use_MMD=False, use_probe=use_probe, truth_indices=None, probe=probes[layer][head])
+                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], use_MMD=False, use_probe=use_probe, truth_indices=None, probe=probes[layer][head], cache_after_ITI=cache_after_ITI)
                 else:
-                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], use_MMD=use_MMD, use_probe=False, truth_indices=truth_indices, probe=None)
-                model.add_hook(utils.get_act_name("result", layer), patch_activation_with_head)
+                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], use_MMD=use_MMD, use_probe=False, truth_indices=truth_indices, probe=None, cache_after_ITI=cache_after_ITI)
+                model.add_hook(utils.get_act_name("result", layer), patch_activation_with_head, level=-1)
+    
+    # return cache_after_ITI
+
+# Usage Example, needs model, tqa_iti defined
+if __name__ == "__main__":
+    model.reset_hooks()
+    probe_accuracies = torch.tensor(einops.rearrange(tqa_iti.all_head_accs_np, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers))
+    old_activations = einops.rearrange(attn_activations, "b (n_l n_h) d_m -> b n_l n_h d_m", n_l=model.cfg.n_layers)
+
+    patch_top_activations(model, probe_accuracies=probe_accuracies, old_activations=old_activations, topk=50, alpha=20, use_MMD=True, truth_indices=truth_indices)
+
+    tqa_iti_2 = ITI_Dataset(model, tqa_mc)
+    _, _ = tqa_iti_2.get_acts(N = 200, id = "BS_iti_tqa_gpt2xl_200")
