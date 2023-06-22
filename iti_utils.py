@@ -1,4 +1,4 @@
-import einsum
+import einops
 import torch
 import numpy as np
 
