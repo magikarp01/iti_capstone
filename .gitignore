@@ -2,6 +2,6 @@
 7B.zip
 tokenizers.zip
 convert_llama_weights_to_hf.py
-/activations
+/activations/*
 /.hypothesis
 __pycache__/iti.cpython-38.pyc

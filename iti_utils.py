@@ -10,14 +10,7 @@ import numpy as np
 
 # sigma: standard deviation of head activation along truthful_dir (theta, either mass mean shift or probe weight direction)
 # adapted from get_interventions_dict in Kenneth Li github
-'''
-def get_act_std(head_activations, truthful_dirs):
-    # head_activation: (batch, n_heads, d_model,)
-    # truthful_dirs: (n_heads, d_model,)
-    truthful_dirs /= torch.norm(truthful_dirs, dim=-1, keepdim=True)
-    proj_act = einops.einsum(head_activations, truthful_dirs , "b n_h d_m, n_h d_m -> b n_h d_m")
-    return torch.std(proj_act, dim=0) # (n_h d_m)
-'''
+
 def get_act_std(head_activation, truthful_dir): # calculates standard deviations for one head
     """
     head_activation: (batch, d_model,)
