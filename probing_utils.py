@@ -62,10 +62,13 @@ class ModelActs():
             indices, all_prompts, all_labels = self.dataset.sample(N)
         
         for i in tqdm(indices):
-                original_logits, cache = self.model.run_with_cache(self.dataset.all_prompts[i].to(self.model.cfg.device))
-                attn_head_acts.append(cache.stack_head_results(layer = -1, pos_slice = -1).squeeze(1))
+                original_logits, cache = self.model.run_with_cache(self.dataset.all_prompts[i].to(self.model.cfg.device), names_filter=lambda name: name.endswith("z")) # only cache z
+                
+                # original shape of stack_activation is (n_l, 1, seq_len, n_head, d_head)
+                # get last seq position, then rearrange
+                attn_head_acts.append(einops.rearrange(cache.stack_activation("z", layer = -1)[:,:,-1], "n_l 1 n_h d_h -> (n_l n_h) d_h"))
         
-        self.attn_head_acts = torch.stack(attn_head_acts).reshape(-1, self.model.cfg.total_heads, self.model.cfg.d_model)
+        self.attn_head_acts = torch.stack(attn_head_acts).reshape(-1, self.model.cfg.total_heads, self.model.cfg.d_head)
         self.indices = indices
         
         if store_acts:

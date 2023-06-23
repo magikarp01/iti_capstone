@@ -17,25 +17,25 @@ from probing_utils import ModelActs
 
 def get_act_std(head_activation, truthful_dir): # calculates standard deviations for one head
     """
-    head_activation: (batch, d_model,)
-    # truthful_dir: (d_model, )
+    head_activation: (batch, d_head,)
+    # truthful_dir: (d_head, )
     """
     truthful_dir /= torch.norm(truthful_dir, dim=-1, keepdim=True)
-    proj_act = einops.einsum(head_activation, truthful_dir , "b d_m, d_m -> b d_m")
-    return torch.std(proj_act, dim=0) # (d_m)
+    proj_act = einops.einsum(head_activation, truthful_dir , "b d_h, d_h -> b d_h")
+    return torch.std(proj_act, dim=0) # (d_h)
 
 # truthful direction is difference in mean 
-# returns (*, d_model)
+# returns (*, d_head)
 def get_mass_mean_dir(all_activations, truth_indices): # 
     """
-    all_activations: (batch, *, d_model)
+    all_activations: (batch, *, d_head)
     truth_indices: (batch, )
     """
     # print(f"shape of activations is {all_activations.shape}")
     # print(f"shape of truth_indices is {truth_indices.shape}")
-    true_mass_mean = torch.mean(all_activations[truth_indices == 1], dim=0) #(*, d_model)
+    true_mass_mean = torch.mean(all_activations[truth_indices == 1], dim=0) #(*, d_head)
     false_mass_mean = torch.mean(all_activations[truth_indices == 0], dim=0)
-    # (* d_model)
+    # (* d_head)
 
     return (true_mass_mean - false_mass_mean) / (true_mass_mean - false_mass_mean).norm()
 
@@ -57,7 +57,7 @@ def get_probe_dir(probe):
 # uses either MMD or probe
 def calc_truth_proj(activation, use_MMD=False, use_probe=False, truth_indices=None, probe=None):
     """
-    activation is (batch, d_m)
+    activation is (batch, d_h)
     """
     if use_MMD: # use mass mean direction -- average difference between true and false classified prompts (only one head)
         assert truth_indices is not None
@@ -72,13 +72,13 @@ def calc_truth_proj(activation, use_MMD=False, use_probe=False, truth_indices=No
     # print(f"New truthful dir direc is {truthful_dir.shape}")
     act_std = get_act_std(activation, truthful_dir)
     
-    return einops.einsum(act_std, truthful_dir, "d_m, d_m -> d_m")
+    return einops.einsum(act_std, truthful_dir, "d_h, d_h -> d_h")
 
 def patch_activation_hook_fn(activations, hook, head, old_activations, alpha, use_MMD=True, use_probe=False, truth_indices=None, probe=None):
     """
-    activations: (batch, n_heads, d_model)
+    activations: (batch, n_heads, d_head)
     hook: HookPoint
-    term_to_add: (*, d_model)
+    term_to_add: (*, d_head)
 
     A hook that is meant to act on the "z" (output) of a given head, and add the "term_to_add" on top of it. Only meant to work a certain head. Will broadcast.
     """
@@ -94,7 +94,7 @@ def patch_activation_hook_fn(activations, hook, head, old_activations, alpha, us
 def patch_top_activations(model, probe_accuracies, old_activations, topk=20, alpha=20, use_MMD=False, use_probe=False, truth_indices=None, probes=None):
     """
     probe_accuracies: (n_layers, n_heads)
-    old_activations: (batch, n_layers, n_heads, d_model)
+    old_activations: (batch, n_layers, n_heads, d_head)
 
     if use_probe is True, probes should be list in shape (n_layers, n_heads) filled with probes
 
@@ -117,7 +117,7 @@ def patch_top_activations(model, probe_accuracies, old_activations, topk=20, alp
                     patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=False, use_probe=use_probe, truth_indices=None, probe=probes[layer][head])
                 else:
                     patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=use_MMD, use_probe=False, truth_indices=truth_indices, probe=None)
-                model.add_hook(utils.get_act_name("result", layer), patch_activation_with_head)
+                model.add_hook(utils.get_act_name("z", layer), patch_activation_with_head)
 
 # Do iti patching given a model and a ModelActs object
 # One of use_MMD, use_probe must be true
@@ -127,7 +127,7 @@ def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, us
     probe_accuracies = torch.tensor(einops.rearrange(model_acts.all_head_accs_np, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers))
     
     attn_activations = model_acts.attn_head_acts
-    old_activations =  einops.rearrange(attn_activations, "b (n_l n_h) d_m -> b n_l n_h d_m", n_l=model.cfg.n_layers)
+    old_activations =  einops.rearrange(attn_activations, "b (n_l n_h) d_h -> b n_l n_h d_h", n_l=model.cfg.n_layers)
     if use_MMD:
         truth_indices = torch.tensor(model_acts.dataset.all_labels)[model_acts.indices]
         probes=None
