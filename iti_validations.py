@@ -47,6 +47,8 @@ from transformer_lens.hook_points import (
 )  # Hooking utilities
 from transformer_lens import HookedTransformer, HookedTransformerConfig, FactoredMatrix, ActivationCache
 
+from iti_utils import patch_top_activations, patch_iti
+
 device = "cpu"
 # %%
 print("loading model")
@@ -138,29 +140,13 @@ cfact_acts.get_acts(N=200, id="cfact_gpt2xl_200")
 # cfact_acts.load_acts(id="cfact_gpt2xl_200")
 cfact_all_head_accs_np = cfact_acts.train_probes()
 
-#%%
 cfact = CounterFact_Dataset(model.tokenizer)
 print(cfact.sample(1))
 
-from iti_utils import patch_top_activations, patch_iti
 patch_iti(model, cfact_acts, use_MMD=True)
 
 cfact_acts_iti = ModelActs(model, cfact, indices=cfact_acts.indices)
 cfact_acts_iti.get_acts(N = 200, id = "iti_cfact_gpt2xl_200")
-
-
-# %%
-norm_diffs = torch.norm((cfact_acts_iti.attn_head_acts - cfact_acts.attn_head_acts), dim = 2).mean(0) / torch.norm(cfact_acts.attn_head_acts, dim = 2).mean(0)
-norm_diffs = norm_diffs.numpy().reshape(cfact_acts.model.cfg.n_layers, cfact_acts.model.cfg.n_heads)
-
-px.imshow(norm_diffs, labels = {"x" : "Heads", "y": "Layers"},title = "Norm Differences (divided by original norm) of ITI and Normal Head Activations", color_continuous_midpoint = 0, color_continuous_scale="RdBu", origin = "lower")
-
-#%%
-act_sims = torch.nn.functional.cosine_similarity(cfact_acts_iti.attn_head_acts, cfact_acts.attn_head_acts, dim=2).mean(0)
-act_sims = act_sims.numpy().reshape(cfact_acts_iti.model.cfg.n_layers, cfact_acts_iti.model.cfg.n_heads)
-
-# act_sims[44, 23] = act_sims[45, 17] = 1
-px.imshow(act_sims, labels = {"x" : "Heads", "y": "Layers"},title = "Cosine Similarities of of ITI and Normal Head Activations", color_continuous_midpoint = 1, color_continuous_scale="RdBu", origin = "lower")
 
 #%%
 
@@ -183,7 +169,9 @@ ez = -np.sort(-ez_acts.all_head_accs_np.reshape(ez_acts.model.cfg.n_layers, ez_a
 px.imshow(ez, labels = {"x" : "Heads (sorted)", "y": "Layers"},title = "Probe Accuracies TQA", color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
 
 #%%
-patch_iti(model, ez_acts, use_MMD=True)
+
+cache_interventions = torch.empty(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
+patch_iti(model, ez_acts, use_MMD=True, cache_interventions=cache_interventions)
 
 # reset tqa_mc so that samples will be the same
 ez_data = EZ_Dataset(model.tokenizer, seed=5)

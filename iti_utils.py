@@ -4,6 +4,7 @@ import numpy as np
 from functools import partial
 import transformer_lens.utils as utils
 from probing_utils import ModelActs
+from torch.nn.functional import normalize
 
 # Goal: define a function to take in hyperparameters Alpha and K, model probe values, and model activations to calculate the new activations
 
@@ -20,7 +21,9 @@ def get_act_std(head_activation, truthful_dir): # calculates standard deviations
     head_activation: (batch, d_head,)
     # truthful_dir: (d_head, )
     """
-    truthful_dir /= torch.norm(truthful_dir, dim=-1, keepdim=True)
+    
+    normalize(truthful_dir, dim=-1, out=truthful_dir)
+    
     proj_act = einops.einsum(head_activation, truthful_dir , "b d_h, d_h -> b d_h")
     return torch.std(proj_act, dim=0) # (d_h)
 
@@ -37,7 +40,7 @@ def get_mass_mean_dir(all_activations, truth_indices): #
     false_mass_mean = torch.mean(all_activations[truth_indices == 0], dim=0)
     # (* d_head)
 
-    return (true_mass_mean - false_mass_mean) / (true_mass_mean - false_mass_mean).norm()
+    return normalize(true_mass_mean - false_mass_mean, dim=-1)
 
 # truthful direction is probe weight
 # def get_probe_dirs(probe_list):
@@ -50,7 +53,7 @@ def get_mass_mean_dir(all_activations, truth_indices): #
 
 def get_probe_dir(probe):
     probe_weights = torch.tensor(probe.coef_, dtype=torch.float32).squeeze()
-    return probe_weights / probe_weights.norm(dim=-1)
+    return normalize(probe_weights, dim=-1)
 
 
 # calculate the ITI addition (sigma * theta) for one head
@@ -68,17 +71,19 @@ def calc_truth_proj(activation, use_MMD=False, use_probe=False, truth_indices=No
         truthful_dir = get_probe_dir(probe)
 
     # print(f"Old truthful dir direc is {truthful_dir.shape}")
-    truthful_dir /= truthful_dir.norm(dim=-1)
+    normalize(truthful_dir, dim=-1, out=truthful_dir)
     # print(f"New truthful dir direc is {truthful_dir.shape}")
     act_std = get_act_std(activation, truthful_dir)
     
     return einops.einsum(act_std, truthful_dir, "d_h, d_h -> d_h")
 
-def patch_activation_hook_fn(activations, hook, head, old_activations, alpha, use_MMD=True, use_probe=False, truth_indices=None, probe=None):
+def patch_activation_hook_fn(activations, hook, head, old_activations, alpha, use_MMD=True, use_probe=False, truth_indices=None, probe=None, cache_interventions=None):
     """
     activations: (batch, n_heads, d_head)
     hook: HookPoint
-    term_to_add: (*, d_head)
+    term_to_add: (*, d_head), think * is batch_size but should not exist in most cases
+
+    cache_interventions: (n_layers, n_heads, *, d_head)
 
     A hook that is meant to act on the "z" (output) of a given head, and add the "term_to_add" on top of it. Only meant to work a certain head. Will broadcast.
     """
@@ -90,8 +95,11 @@ def patch_activation_hook_fn(activations, hook, head, old_activations, alpha, us
     # add to activations in last dimension
     activations[:,-1,head] += alpha * term_to_add
 
+    if cache_interventions is not None:
+        cache_interventions[hook.layer(), head] = alpha * term_to_add
+
 # Calculates new_activations for topk and adds temporary hooks
-def patch_top_activations(model, probe_accuracies, old_activations, topk=20, alpha=20, use_MMD=False, use_probe=False, truth_indices=None, probes=None):
+def patch_top_activations(model, probe_accuracies, old_activations, topk=20, alpha=20, use_MMD=False, use_probe=False, truth_indices=None, probes=None, cache_interventions=None):
     """
     probe_accuracies: (n_layers, n_heads)
     old_activations: (batch, n_layers, n_heads, d_head)
@@ -114,14 +122,14 @@ def patch_top_activations(model, probe_accuracies, old_activations, topk=20, alp
             if top_head_bools[layer, head] == 1:
 
                 if use_probe:
-                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=False, use_probe=use_probe, truth_indices=None, probe=probes[layer][head])
+                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=False, use_probe=use_probe, truth_indices=None, probe=probes[layer][head], cache_interventions=cache_interventions)
                 else:
-                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=use_MMD, use_probe=False, truth_indices=truth_indices, probe=None)
+                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=use_MMD, use_probe=False, truth_indices=truth_indices, probe=None, cache_interventions=cache_interventions)
                 model.add_hook(utils.get_act_name("z", layer), patch_activation_with_head)
 
 # Do iti patching given a model and a ModelActs object
 # One of use_MMD, use_probe must be true
-def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, use_probe=False):
+def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, use_probe=False, cache_interventions=None):
     assert use_MMD ^ use_probe
     model.reset_hooks()
     probe_accuracies = torch.tensor(einops.rearrange(model_acts.all_head_accs_np, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers))
@@ -136,9 +144,7 @@ def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, us
         probes = model_acts.probes
         truth_indices=None
     
-    patch_top_activations(model, probe_accuracies, old_activations, topk=topk, alpha=alpha, use_MMD=use_MMD, use_probe=use_probe, truth_indices=truth_indices, probes=probes)
-
-
+    patch_top_activations(model, probe_accuracies, old_activations, topk=topk, alpha=alpha, use_MMD=use_MMD, use_probe=use_probe, truth_indices=truth_indices, probes=probes, cache_interventions=cache_interventions)
 
 '''
 # Goal: define a function to take in hyperparameters Alpha and K, model probe values, and model activations to calculate the new activations
