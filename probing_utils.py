@@ -13,7 +13,7 @@ import torch.optim as optim
 import numpy as np
 import einops
 from fancy_einsum import einsum
-import tqdm.notebook as tqdm
+from tqdm import tqdm
 import random
 from pathlib import Path
 import plotly.express as px
@@ -52,13 +52,17 @@ class ModelActs():
         np.random.seed(seed)
         torch.manual_seed(seed)
 
-    def get_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None):
+    """
+    Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
+    """
+    def get_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None):
         
         attn_head_acts = []
-        indices, all_prompts, all_labels = self.dataset.sample(N)
+        if indices is None:
+            indices, all_prompts, all_labels = self.dataset.sample(N)
         
         for i in tqdm(indices):
-                original_logits, cache = self.model.run_with_cache(self.dataset.all_prompts[i].to(self.model.device))
+                original_logits, cache = self.model.run_with_cache(self.dataset.all_prompts[i].to(self.model.cfg.device))
                 attn_head_acts.append(cache.stack_head_results(layer = -1, pos_slice = -1).squeeze(1))
         
         self.attn_head_acts = torch.stack(attn_head_acts).reshape(-1, self.model.cfg.total_heads, self.model.cfg.d_model)
@@ -73,6 +77,9 @@ class ModelActs():
 
         return self.indices, self.attn_head_acts
 
+    """
+    Loads activations from activations folder. If id is None, then load the most recent activations.
+    """
     def load_acts(self, id, filepath = "activations/"):
         indices = torch.load(f'{filepath}{id}_indices.pt')
         attn_head_acts = torch.load(f'{filepath}{id}_attn_head_acts.pt')
@@ -139,3 +146,25 @@ class ModelActs():
         self.all_head_accs_np = np.array(all_head_accs)
         
         return self.all_head_accs_np
+
+
+    def save_probes(self):
+         """
+         Save probes and 
+         """
+
+    """
+    Utility to print the most accurate heads
+    """
+    def show_top_probes(self, topk=100):
+
+        probe_accuracies = torch.tensor(einops.rearrange(self.all_head_accs_np, "(n_l n_h) -> n_l n_h", n_l=self.model.cfg.n_layers))
+        top_head_indices = torch.topk(einops.rearrange(probe_accuracies, "n_l n_h -> (n_l n_h)"), k=topk).indices # take top k indices
+
+        top_probe_heads = torch.zeros(size=(self.model.cfg.total_heads,))
+        top_probe_heads[top_head_indices] = 1
+        top_probe_heads = einops.rearrange(top_probe_heads, "(n_l n_h) -> n_l n_h", n_l=self.model.cfg.n_layers)
+        for l in range(self.model.cfg.n_layers):
+            for h in range(self.model.cfg.n_heads):
+                if top_probe_heads[l, h] == 1:
+                    print(f"{l}.{h}, ", end=" ")
