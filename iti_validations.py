@@ -167,7 +167,7 @@ px.imshow(act_sims, labels = {"x" : "Heads", "y": "Layers"},title = "Cosine Simi
 model.reset_hooks()
 from dataset_utils import EZ_Dataset
 
-ez_data = EZ_Dataset(model.tokenizer)
+ez_data = EZ_Dataset(model.tokenizer, seed=5)
 print(ez_data.sample(1))
 
 #%%
@@ -186,7 +186,7 @@ px.imshow(ez, labels = {"x" : "Heads (sorted)", "y": "Layers"},title = "Probe Ac
 patch_iti(model, ez_acts, use_MMD=True)
 
 # reset tqa_mc so that samples will be the same
-ez_data = EZ_Dataset(model.tokenizer, seed=0)
+ez_data = EZ_Dataset(model.tokenizer, seed=5)
 ez_acts_iti = ModelActs(model, ez_data)
 ez_acts_iti.get_acts(N = 200, id = "iti_ez_gpt2xl_200", indices=ez_acts.indices)
 
