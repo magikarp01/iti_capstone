@@ -142,3 +142,45 @@ class CounterFact_Dataset():
     def sample(self, sample_size: int):
         indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
         return indices, np.array(self.all_prompts)[indices], np.array(self.all_labels)[indices]
+
+
+# import pandas as pd
+
+def format_ezdataset(question, choice):
+    return f"Q: {question} A: {choice}"
+
+def tokenized_ezdataset(dataset, tokenizer): 
+    all_prompts = []
+    all_labels = []
+    for i in range(len(dataset['train'])):
+        prompt = dataset['train'][i]['Question']
+        target_true = dataset['train'][i]['Right']
+        target_false = dataset['train'][i]['Wrong']
+
+        true_prompt = format_ezdataset(prompt, target_true)
+        true_prompt_toks = tokenizer(true_prompt, return_tensors = 'pt').input_ids
+        all_prompts.append(true_prompt_toks)
+        all_labels.append(1)
+        
+        false_prompt = format_ezdataset(prompt, target_false)
+        false_prompt_toks = tokenizer(false_prompt, return_tensors = 'pt').input_ids
+        all_prompts.append(false_prompt_toks)
+        all_labels.append(0)
+    
+    return all_prompts, all_labels
+
+class EZ_Dataset():
+    def __init__(self, tokenizer, seed:int = 0):
+        self.dataset = load_dataset("csv", data_files = "dumb_facts.csv")
+        self.all_prompts, self.all_labels = tokenized_ezdataset(self.dataset, tokenizer)
+        np.random.seed(seed)
+        
+    def sample(self, sample_size: int):
+        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
+        sample_prompts = []
+        sample_labels =[]
+        for i in indices:
+            sample_prompts.append(self.all_prompts[i])
+            sample_labels.append(self.all_labels[i])
+        return indices, sample_prompts, sample_labels
+

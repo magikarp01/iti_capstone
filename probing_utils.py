@@ -28,7 +28,7 @@ from transformer_lens.hook_points import (
     HookPoint,
 )  # Hooking utilities
 from transformer_lens import HookedTransformer, HookedTransformerConfig, FactoredMatrix, ActivationCache
-
+import pickle
 
 # from iti import patch_top_activations
 
@@ -78,16 +78,23 @@ class ModelActs():
         return self.indices, self.attn_head_acts
 
     """
-    Loads activations from activations folder. If id is None, then load the most recent activations.
+    Loads activations from activations folder. If id is None, then load the most recent activations. 
+    If load_probes is True, load from saved probes.picle and all_heads_acc_np.npy files as well.
     """
-    def load_acts(self, id, filepath = "activations/"):
+    def load_acts(self, id, filepath = "activations/", load_probes=False):
         indices = torch.load(f'{filepath}{id}_indices.pt')
         attn_head_acts = torch.load(f'{filepath}{id}_attn_head_acts.pt')
         
         self.attn_head_acts = attn_head_acts
         self.indices = indices
-        self.probes = None
-        self.all_head_accs_np = None
+
+        if load_probes:
+            with open(f'{filepath}{id}_probes.pickle', 'rb') as handle:
+                self.probes = pickle.load(handle)
+            self.all_head_accs_np = np.load(f'{filepath}{id}_all_head_accs_np.npy')
+        else:
+            self.probes = None
+            self.all_head_accs_np = None
         
         return indices, attn_head_acts
 
@@ -148,10 +155,14 @@ class ModelActs():
         return self.all_head_accs_np
 
 
-    def save_probes(self):
-         """
-         Save probes and 
-         """
+    def save_probes(self, id, filepath = "activations/"):
+        """
+        Save probes and probe accuracies to activations folder. Must be called after train_probes.
+        """
+        with open(f'{filepath}{id}_probes.pickle', 'wb') as handle:
+            pickle.dump(self.probes, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+        np.save(f'{filepath}{id}_all_head_accs_np.npy', self.all_head_accs_np)
 
     """
     Utility to print the most accurate heads
