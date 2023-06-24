@@ -66,95 +66,11 @@ model.set_use_attn_result(True)
 model.cfg.total_heads = model.cfg.n_heads * model.cfg.n_layers
 
 #%%
-# import TQA Dataset
-
-tqa_mc = TQA_MC_Dataset(model.tokenizer)
-print(tqa_mc.sample(1))
-# %%
-model.reset_hooks()
-tqa_acts = ModelActs(model, tqa_mc, seed=0)
-tqa_acts.get_acts(N=200, id = "tqa_gpt2xl_200")
-# tqa_acts.load_acts(id="tqa_gpt2xl_200_test", load_probes=True)
-tqa_all_head_accs_np = tqa_acts.train_probes()
-tqa_acts.save_probes(id="tqa_gpt2xl_200")
-
-#%%
-
-from iti_utils import patch_top_activations, patch_iti
-patch_iti(model, tqa_acts, use_MMD=True)
-
-# reset tqa_mc so that samples will be the same
-tqa_mc = TQA_MC_Dataset(model.tokenizer, seed=0)
-tqa_acts_iti = ModelActs(model, tqa_mc)
-tqa_acts_iti.get_acts(N = 200, id = "iti_tqa_gpt2xl_200", indices=tqa_acts.indices)
-# tqa_iti_2.load_acts(id = "iti_tqa_gpt2xl_200")
-# %%
-
-probe_accuracies = torch.tensor(einops.rearrange(tqa_acts.all_head_accs_np, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers))
-top_head_indices = torch.topk(einops.rearrange(probe_accuracies, "n_l n_h -> (n_l n_h)"), k=50).indices # take top k indices
-top_head_indices
-
-top_probe_heads = torch.zeros(size=(1200,))
-top_probe_heads[top_head_indices] = 1
-top_probe_heads = einops.rearrange(top_probe_heads, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers)
-for l in range(model.cfg.n_layers):
-    for h in range(model.cfg.n_heads):
-        if top_probe_heads[l, h] == 1:
-            print(f"layer {l}, head {h}")
-
-#%%
-
-
-tqa = -np.sort(-tqa_acts.all_head_accs_np.reshape(tqa_acts.model.cfg.n_layers, tqa_acts.model.cfg.n_heads), axis = 1)
-px.imshow(tqa, labels = {"x" : "Heads (sorted)", "y": "Layers"},title = "Probe Accuracies TQA", color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
-
-#%%
-
-norm_diffs = torch.norm((tqa_acts_iti.attn_head_acts - tqa_acts.attn_head_acts), dim = 2).mean(0)
-
-norm_diffs = norm_diffs.numpy().reshape(tqa_acts_iti.model.cfg.n_layers, tqa_acts_iti.model.cfg.n_heads)
-px.imshow(norm_diffs, labels = {"x" : "Heads", "y": "Layers"},title = "Norm Differences of ITI and Normal Head Activations", color_continuous_midpoint = 0, color_continuous_scale="RdBu", origin = "lower")
-
-#%%
-norm_diffs = torch.norm((tqa_acts_iti.attn_head_acts - tqa_acts.attn_head_acts), dim = 2).mean(0) / torch.norm(tqa_acts.attn_head_acts, dim = 2).mean(0)
-norm_diffs = norm_diffs.numpy().reshape(tqa_acts.model.cfg.n_layers, tqa_acts.model.cfg.n_heads)
-
-px.imshow(norm_diffs, labels = {"x" : "Heads", "y": "Layers"},title = "Norm Differences (divided by original norm) of ITI and Normal Head Activations", color_continuous_midpoint = 0, color_continuous_scale="RdBu", origin = "lower")
-
-#%%
-act_sims = torch.nn.functional.cosine_similarity(tqa_acts_iti.attn_head_acts, tqa_acts.attn_head_acts, dim=2).mean(0)
-act_sims = act_sims.numpy().reshape(tqa_acts_iti.model.cfg.n_layers, tqa_acts_iti.model.cfg.n_heads)
-
-# act_sims[44, 23] = act_sims[45, 17] = 1
-px.imshow(act_sims, labels = {"x" : "Heads", "y": "Layers"},title = "Cosine Similarities of of ITI and Normal Head Activations", color_continuous_midpoint = 1, color_continuous_scale="RdBu", origin = "lower")
-
-
-#%%
-model.reset_hooks()
-
-cfact = CounterFact_Dataset(model.tokenizer)
-print(cfact.sample(1))
-
-cfact_acts = ModelActs(model, cfact)
-cfact_acts.get_acts(N=200, id="cfact_gpt2xl_200")
-# cfact_acts.load_acts(id="cfact_gpt2xl_200")
-cfact_all_head_accs_np = cfact_acts.train_probes()
-
-cfact = CounterFact_Dataset(model.tokenizer)
-print(cfact.sample(1))
-
-patch_iti(model, cfact_acts, use_MMD=True)
-
-cfact_acts_iti = ModelActs(model, cfact, indices=cfact_acts.indices)
-cfact_acts_iti.get_acts(N = 200, id = "iti_cfact_gpt2xl_200")
-
-#%%
 
 model.reset_hooks()
 from dataset_utils import EZ_Dataset
 
 ez_data = EZ_Dataset(model.tokenizer, seed=5)
-print(ez_data.sample(1))
 
 #%%
 ez_acts = ModelActs(model, ez_data)
@@ -170,7 +86,7 @@ px.imshow(ez, labels = {"x" : "Heads (sorted)", "y": "Layers"},title = "Probe Ac
 
 #%%
 
-cache_interventions = torch.empty(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
+cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
 patch_iti(model, ez_acts, use_MMD=True, cache_interventions=cache_interventions)
 
 # reset tqa_mc so that samples will be the same
@@ -188,4 +104,8 @@ fig2.show()
 fig3 = plot_cosine_sims(ez_acts_iti, ez_acts)
 fig3.show()
 
+# %%
+from analytics_utils import plot_downstream_diffs
+fig4 = plot_downstream_diffs(ez_acts_iti, ez_acts, cache_interventions)
+fig4.show()
 # %%
