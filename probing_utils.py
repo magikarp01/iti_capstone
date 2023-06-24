@@ -55,7 +55,7 @@ class ModelActs():
     """
     Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
     """
-    def get_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None):
+    def get_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu"):
         
         attn_head_acts = []
         if indices is None:
@@ -66,7 +66,8 @@ class ModelActs():
                 
                 # original shape of stack_activation is (n_l, 1, seq_len, n_head, d_head)
                 # get last seq position, then rearrange
-                attn_head_acts.append(einops.rearrange(cache.stack_activation("z", layer = -1)[:,:,-1], "n_l 1 n_h d_h -> (n_l n_h) d_h"))
+                stored_acts = einops.rearrange(cache.stack_activation("z", layer = -1)[:,:,-1], "n_l 1 n_h d_h -> (n_l n_h) d_h").to(device=storage_device)
+                attn_head_acts.append(stored_acts)
         
         self.attn_head_acts = torch.stack(attn_head_acts).reshape(-1, self.model.cfg.total_heads, self.model.cfg.d_head)
         self.indices = indices
@@ -101,6 +102,14 @@ class ModelActs():
         
         return indices, attn_head_acts
 
+    """
+    Subtracts the actual iti intervention vectors from the cached activations: this removes the direct
+    effect of ITI and helps us see the downstream effects.
+    """
+    def control_for_iti(self, cache_interventions):
+        self.attn_head_acts -= einops.rearrange(cache_interventions, "n_l n_h d_h -> (n_l n_h) d_h")
+
+
     def get_train_test_split(self, test_ratio = 0.2, N = None):
         attn_head_acts_list = [self.attn_head_acts[i] for i in range(self.attn_head_acts.shape[0])]
         
@@ -119,7 +128,7 @@ class ModelActs():
         X_train, X_test, y_train, y_test = train_test_split(attn_head_acts_list, np.array(self.dataset.all_labels)[indices], test_size=test_ratio)
         
         X_train = torch.stack(X_train, axis = 0)
-        X_test = torch.stack(X_test, axis = 0)  
+        X_test = torch.stack(X_test, axis = 0)
         
         y_train = torch.from_numpy(np.array(y_train, dtype = np.float32))
         y_test = torch.from_numpy(np.array(y_test, dtype = np.float32))
@@ -128,7 +137,7 @@ class ModelActs():
 
         return X_train, X_test, y_train, y_test
 
-    def train_probes(self):
+    def train_probes(self, max_iter=1000):
         """
         Train linear probes on every head's activations. Must be called after either get_acts or load_acts.
         Probes are stored in self.probes, and accuracies are stored in self.all_head_accs_np (also returned).
@@ -143,7 +152,7 @@ class ModelActs():
                 X_train_head = X_train[:,i,:]
                 X_test_head = X_test[:,i,:]
 
-                clf = LogisticRegression(max_iter=1000).fit(X_train_head.detach().numpy(), y_train[:, 0].detach().numpy())
+                clf = LogisticRegression(max_iter=max_iter).fit(X_train_head.detach().numpy(), y_train[:, 0].detach().numpy())
                 y_pred = clf.predict(X_train_head)
                 
                 y_val_pred = clf.predict(X_test_head.detach().numpy())
@@ -168,9 +177,9 @@ class ModelActs():
         np.save(f'{filepath}{id}_all_head_accs_np.npy', self.all_head_accs_np)
 
     """
-    Utility to print the most accurate heads
+    Utility to print the most accurate heads.
     """
-    def show_top_probes(self, topk=100):
+    def show_top_probes(self, topk=50):
 
         probe_accuracies = torch.tensor(einops.rearrange(self.all_head_accs_np, "(n_l n_h) -> n_l n_h", n_l=self.model.cfg.n_layers))
         top_head_indices = torch.topk(einops.rearrange(probe_accuracies, "n_l n_h -> (n_l n_h)"), k=topk).indices # take top k indices

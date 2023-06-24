@@ -49,7 +49,9 @@ from transformer_lens import HookedTransformer, HookedTransformerConfig, Factore
 
 from iti_utils import patch_top_activations, patch_iti
 
-device = "cpu"
+from analytics_utils import plot_probe_accuracies, plot_norm_diffs, plot_cosine_sims
+
+device = "cuda"
 # %%
 print("loading model")
 model = HookedTransformer.from_pretrained(
@@ -67,32 +69,36 @@ model.cfg.total_heads = model.cfg.n_heads * model.cfg.n_layers
 
 #%%
 
+n_acts = 1000
+random_seed = 5
+
 model.reset_hooks()
 from dataset_utils import EZ_Dataset
 
-ez_data = EZ_Dataset(model.tokenizer, seed=5)
+ez_data = EZ_Dataset(model.tokenizer, seed=random_seed)
 
 #%%
 ez_acts = ModelActs(model, ez_data)
-ez_acts.get_acts(N=200, id="ez_gpt2xl_200")
-# cfact_acts.load_acts(id="cfact_gpt2xl_200")
-ez_acts.train_probes()
+ez_acts.get_acts(N=n_acts, id=f"ez_gpt2xl_{n_acts}")
+# ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
+ez_acts.train_probes(max_iter=1000)
 
-ez_acts.save_probes(id="ez_gpt2xl_200")
+# ez_acts.save_probes(id="ez_gpt2xl_200")
 
 # %%
 ez = -np.sort(-ez_acts.all_head_accs_np.reshape(ez_acts.model.cfg.n_layers, ez_acts.model.cfg.n_heads), axis = 1)
-px.imshow(ez, labels = {"x" : "Heads (sorted)", "y": "Layers"},title = "Probe Accuracies TQA", color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
+px.imshow(ez, labels = {"x" : "Heads (sorted)", "y": "Layers"},title = "Probe Accuracies EZ", color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
 
 #%%
 
 cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
-patch_iti(model, ez_acts, use_MMD=True, cache_interventions=cache_interventions)
+patch_iti(model, ez_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device)
 
-# reset tqa_mc so that samples will be the same
-ez_data = EZ_Dataset(model.tokenizer, seed=5)
+# reset ez_mc so that samples will be the same
+ez_data = EZ_Dataset(model.tokenizer, seed=random_seed)
 ez_acts_iti = ModelActs(model, ez_data)
-ez_acts_iti.get_acts(N = 200, id = "iti_ez_gpt2xl_200", indices=ez_acts.indices)
+ez_acts_iti.get_acts(N = n_acts, id = f"iti_ez_gpt2xl_{n_acts}", indices=ez_acts.indices)
+ez_acts_iti.control_for_iti(cache_interventions)
 
 # %%
 from analytics_utils import plot_probe_accuracies, plot_norm_diffs, plot_cosine_sims
@@ -104,8 +110,4 @@ fig2.show()
 fig3 = plot_cosine_sims(ez_acts_iti, ez_acts)
 fig3.show()
 
-# %%
-from analytics_utils import plot_downstream_diffs
-fig4 = plot_downstream_diffs(ez_acts_iti, ez_acts, cache_interventions)
-fig4.show()
 # %%

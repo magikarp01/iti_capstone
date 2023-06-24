@@ -3,8 +3,12 @@ import torch
 import plotly.express as px
 import einops
 
-def plot_probe_accuracies(model_acts):
-    accs_sorted = -np.sort(-model_acts.all_head_accs_np.reshape(model_acts.model.cfg.n_layers, model_acts.model.cfg.n_heads), axis = 1)
+def plot_probe_accuracies(model_acts, sorted = False):
+
+    if sorted:
+        accs_sorted = -np.sort(-model_acts.all_head_accs_np.reshape(model_acts.model.cfg.n_layers, model_acts.model.cfg.n_heads), axis = 1)
+    else:
+        accs_sorted = model_acts.all_head_accs_np.reshape(model_acts.model.cfg.n_layers, model_acts.model.cfg.n_heads)
     return px.imshow(accs_sorted, labels = {"x" : "Heads (sorted)", "y": "Layers"},title = "Probe Accuracies", color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
 
 def plot_norm_diffs(model_acts_iti, model_acts, div=True):
@@ -43,3 +47,4 @@ def plot_downstream_diffs(model_acts_iti, model_acts, cache_interventions, div=T
     norm_diffs = norm_diffs.numpy().reshape(model_acts.model.cfg.n_layers, model_acts.model.cfg.n_heads)
 
     return px.imshow(norm_diffs, labels = {"x" : "Heads", "y": "Layers"},title = "Norm Differences (divided by original norm) of ITI and Normal Head Activations", color_continuous_midpoint = 0, color_continuous_scale="RdBu", origin = "lower")
+

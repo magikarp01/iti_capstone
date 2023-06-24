@@ -77,7 +77,7 @@ def calc_truth_proj(activation, use_MMD=False, use_probe=False, truth_indices=No
     
     return einops.einsum(act_std, truthful_dir, "d_h, d_h -> d_h")
 
-def patch_activation_hook_fn(activations, hook, head, old_activations, alpha, use_MMD=True, use_probe=False, truth_indices=None, probe=None, cache_interventions=None):
+def patch_activation_hook_fn(activations, hook, head, old_activations, alpha, use_MMD=True, use_probe=False, truth_indices=None, probe=None, cache_interventions=None, device='cpu'):
     """
     activations: (batch, n_heads, d_head)
     hook: HookPoint
@@ -93,13 +93,13 @@ def patch_activation_hook_fn(activations, hook, head, old_activations, alpha, us
     # print(f"activations shape is {activations.shape}")
 
     # add to activations in last dimension
-    activations[:,-1,head] += alpha * term_to_add
+    activations[:,-1,head] += alpha * term_to_add.to(device=device)
 
     if cache_interventions is not None:
         cache_interventions[hook.layer(), head] = alpha * term_to_add
 
 # Calculates new_activations for topk and adds temporary hooks
-def patch_top_activations(model, probe_accuracies, old_activations, topk=20, alpha=20, use_MMD=False, use_probe=False, truth_indices=None, probes=None, cache_interventions=None):
+def patch_top_activations(model, probe_accuracies, old_activations, topk=20, alpha=20, use_MMD=False, use_probe=False, truth_indices=None, probes=None, cache_interventions=None, model_device='cpu'):
     """
     probe_accuracies: (n_layers, n_heads)
     old_activations: (batch, n_layers, n_heads, d_head)
@@ -122,14 +122,14 @@ def patch_top_activations(model, probe_accuracies, old_activations, topk=20, alp
             if top_head_bools[layer, head] == 1:
 
                 if use_probe:
-                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=False, use_probe=use_probe, truth_indices=None, probe=probes[layer][head], cache_interventions=cache_interventions)
+                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=False, use_probe=use_probe, truth_indices=None, probe=probes[layer][head], cache_interventions=cache_interventions, device=model_device)
                 else:
-                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=use_MMD, use_probe=False, truth_indices=truth_indices, probe=None, cache_interventions=cache_interventions)
+                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=use_MMD, use_probe=False, truth_indices=truth_indices, probe=None, cache_interventions=cache_interventions, device=model_device)
                 model.add_hook(utils.get_act_name("z", layer), patch_activation_with_head)
 
 # Do iti patching given a model and a ModelActs object
 # One of use_MMD, use_probe must be true
-def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, use_probe=False, cache_interventions=None):
+def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, use_probe=False, cache_interventions=None, model_device='cpu'):
     assert use_MMD ^ use_probe
     model.reset_hooks()
     probe_accuracies = torch.tensor(einops.rearrange(model_acts.all_head_accs_np, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers))
@@ -144,7 +144,7 @@ def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, us
         probes = model_acts.probes
         truth_indices=None
     
-    patch_top_activations(model, probe_accuracies, old_activations, topk=topk, alpha=alpha, use_MMD=use_MMD, use_probe=use_probe, truth_indices=truth_indices, probes=probes, cache_interventions=cache_interventions)
+    patch_top_activations(model, probe_accuracies, old_activations, topk=topk, alpha=alpha, use_MMD=use_MMD, use_probe=use_probe, truth_indices=truth_indices, probes=probes, cache_interventions=cache_interventions, model_device=model_device)
 
 '''
 # Goal: define a function to take in hyperparameters Alpha and K, model probe values, and model activations to calculate the new activations
