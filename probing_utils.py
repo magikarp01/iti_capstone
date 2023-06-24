@@ -31,14 +31,16 @@ from transformer_lens import HookedTransformer, HookedTransformerConfig, Factore
 import pickle
 
 # from iti import patch_top_activations
+from typing import TypeVar
+ModelActs = TypeVar("ModelActs")
 
 """
 A class to handle model activations ran on a user-defined dataset. Class has utilities to generate new
 activations based on a given model and dataset, and to store those activations for later use. ModelActs also
 has utilities to train probes on the activations of every head.
 """
-class ModelActs():
-    def __init__(self, model: HookedTransformer, dataset, seed = 0):
+class ModelActs:
+    def __init__(self, model: HookedTransformer, dataset, seed = None):
         """
         dataset must have sample(sample_size) method returning indices of samples, sample_prompts, and sample_labels.
         """
@@ -49,13 +51,14 @@ class ModelActs():
         self.attn_head_acts = None
         self.indices = None
     
-        np.random.seed(seed)
-        torch.manual_seed(seed)
+        if seed is not None:
+            np.random.seed(seed)
+            torch.manual_seed(seed)
 
     """
     Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
     """
-    def get_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu"):
+    def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu"):
         
         attn_head_acts = []
         if indices is None:
@@ -139,8 +142,9 @@ class ModelActs():
 
     def train_probes(self, max_iter=1000):
         """
-        Train linear probes on every head's activations. Must be called after either get_acts or load_acts.
+        Train linear probes on every head's activations. Must be called after either gen_acts or load_acts.
         Probes are stored in self.probes, and accuracies are stored in self.all_head_accs_np (also returned).
+        Also store last X_test and y_test used for probes
         """
         X_train, X_test, y_train, y_test = self.get_train_test_split()
         print(f"{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}")
@@ -163,6 +167,9 @@ class ModelActs():
         self.probes = probes
         
         self.all_head_accs_np = np.array(all_head_accs)
+
+        self.X_test = X_test
+        self.y_test = y_test
         
         return self.all_head_accs_np
 
@@ -175,6 +182,26 @@ class ModelActs():
             pickle.dump(self.probes, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         np.save(f'{filepath}{id}_all_head_accs_np.npy', self.all_head_accs_np)
+
+    
+    def get_transfer_acc(self, data_source: ModelActs):
+        """
+        Get transfer accuracy of probes trained on this dataset on another dataset. 
+        data_source is another ModelActs object.
+        """
+        # data_labels = np.array(data_source.dataset.all_labels)[data_source.indices]
+        data_labels = data_source.y_test[:,0].numpy()
+
+        accs = []
+
+        for i, clf in tqdm(enumerate(self.probes)):
+            # acts = data_source.attn_head_acts[:, i, :]
+            acts = data_source.X_test[:, i, :]
+            y_pred = clf.predict(acts)
+            
+            accs.append(accuracy_score(data_labels, y_pred))
+        
+        return np.array(accs)
 
     """
     Utility to print the most accurate heads.
