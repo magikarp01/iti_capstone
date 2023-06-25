@@ -29,6 +29,7 @@ from transformer_lens.hook_points import (
 )  # Hooking utilities
 from transformer_lens import HookedTransformer, HookedTransformerConfig, FactoredMatrix, ActivationCache
 import pickle
+from collections import defaultdict
 
 # from iti import patch_top_activations
 from typing import TypeVar
@@ -40,9 +41,10 @@ activations based on a given model and dataset, and to store those activations f
 has utilities to train probes on the activations of every head.
 """
 class ModelActs:
-    def __init__(self, model: HookedTransformer, dataset, seed = None):
+    def __init__(self, model: HookedTransformer, dataset, seed = None, act_types = ["z"]):
         """
         dataset must have sample(sample_size) method returning indices of samples, sample_prompts, and sample_labels.
+        act_types is a list of which activations to cache and operate on.
         """
         self.model = model
         # self.model.cfg.total_heads = self.model.cfg.n_heads * self.model.cfg.n_layers
@@ -50,39 +52,61 @@ class ModelActs:
         
         self.attn_head_acts = None
         self.indices = None
+        
+        self.act_types=act_types
     
         if seed is not None:
             np.random.seed(seed)
             torch.manual_seed(seed)
 
+        self.probes = {}
+        self.probe_accs = {}
+        self.X_tests = {}
+        self.y_tests = {}
+
     """
     Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
+    Refactored so that activations are not reshaped by default, and will be reshaped at some other time.
     """
     def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu"):
         
-        attn_head_acts = []
         if indices is None:
             indices, all_prompts, all_labels = self.dataset.sample(N)
         
+        cached_acts = defaultdict(list)
+
+        # names filter for efficiency, only cache in self.act_types
+        names_filter = lambda name: any([name.endswith(act_type) for act_type in self.act_types])
+
         for i in tqdm(indices):
-                original_logits, cache = self.model.run_with_cache(self.dataset.all_prompts[i].to(self.model.cfg.device), names_filter=lambda name: name.endswith("z")) # only cache z
+            original_logits, cache = self.model.run_with_cache(self.dataset.all_prompts[i].to(self.model.cfg.device), names_filter=names_filter) # only cache z
+            
+            # store every act type in self.act_types
+            for act_type in self.act_types:
+
+                if act_type == "result":
+                    # get last seq position
+                    stored_acts = cache.stack_head_results(layer=-1, pos_slice=-1).squeeze().to(device=storage_device)
                 
-                # original shape of stack_activation is (n_l, 1, seq_len, n_head, d_head)
-                # get last seq position, then rearrange
-                stored_acts = einops.rearrange(cache.stack_activation("z", layer = -1)[:,:,-1], "n_l 1 n_h d_h -> (n_l n_h) d_h").to(device=storage_device)
-                attn_head_acts.append(stored_acts)
+                else:
+                    stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
+                cached_acts[act_type].append(stored_acts)
         
-        self.attn_head_acts = torch.stack(attn_head_acts).reshape(-1, self.model.cfg.total_heads, self.model.cfg.d_head)
+        # convert lists of tensors into tensors
+        stored_acts = {act_type: torch.stack(cached_acts[act_type]) for act_type in self.act_types} 
+
+        self.stored_acts = stored_acts
         self.indices = indices
         
         if store_acts:
             if id is None:
                 id = np.random.randint(10000)
             torch.save(self.indices, f'{filepath}{id}_indices.pt')
-            torch.save(self.attn_head_acts, f'{filepath}{id}_attn_head_acts.pt')
+            for act_type in self.act_types:
+                torch.save(self.stored_acts[act_type], f'{filepath}{id}_{act_type}_acts.pt')
             print(f"Stored at {id}")
 
-        return self.indices, self.attn_head_acts
+        # return self.indices, self.attn_head_acts
 
     """
     Loads activations from activations folder. If id is None, then load the most recent activations. 
@@ -90,36 +114,45 @@ class ModelActs:
     """
     def load_acts(self, id, filepath = "activations/", load_probes=False):
         indices = torch.load(f'{filepath}{id}_indices.pt')
-        attn_head_acts = torch.load(f'{filepath}{id}_attn_head_acts.pt')
+
+        self.stored_acts = {}
+        for act_type in self.act_types:
+            self.stored_acts[act_type] = torch.load(f'{filepath}{id}_{act_type}_acts.pt')
         
-        self.attn_head_acts = attn_head_acts
         self.indices = indices
 
         if load_probes:
+            print("load_probes deprecated for now, please change to False")
             with open(f'{filepath}{id}_probes.pickle', 'rb') as handle:
                 self.probes = pickle.load(handle)
             self.all_head_accs_np = np.load(f'{filepath}{id}_all_head_accs_np.npy')
-        else:
-            self.probes = None
-            self.all_head_accs_np = None
-        
-        return indices, attn_head_acts
 
-    """
-    Subtracts the actual iti intervention vectors from the cached activations: this removes the direct
-    effect of ITI and helps us see the downstream effects.
-    """
+        else:
+            self.probes = {}
+            # self.all_head_accs_np = None
+            self.probe_accs = {}
+
+        # return indices, attn_head_acts
+
     def control_for_iti(self, cache_interventions):
+        """
+        Deprecated for now.
+        Subtracts the actual iti intervention vectors from the cached activations: this removes the direct
+        effect of ITI and helps us see the downstream effects.
+        """
         self.attn_head_acts -= einops.rearrange(cache_interventions, "n_l n_h d_h -> (n_l n_h) d_h")
 
 
-    def get_train_test_split(self, test_ratio = 0.2, N = None):
-        attn_head_acts_list = [self.attn_head_acts[i] for i in range(self.attn_head_acts.shape[0])]
+    def get_train_test_split(self, X_acts, test_ratio = 0.2, N = None):
+        """
+        Given X_acts, a Pytorch tensor of shape (num_samples, num_probes, d_probe), and test ratio, split acts and labels into train and test sets.
+        """
+        X_acts_list = [X_acts[i] for i in range(X_acts.shape[0])]
         
         indices = self.indices
         
         if N is not None:
-            attn_heads_acts_list = attn_heads_acts_list[:N]
+            X_acts_list = X_acts_list[:N]
             indices = indices[:N]
         
         # print(self.attn_head_acts.shape)
@@ -128,50 +161,74 @@ class ModelActs:
         # print(np.array(self.dataset.all_labels)[indices])
         # print(len(np.array(self.dataset.all_labels)[indices]))
         
-        X_train, X_test, y_train, y_test = train_test_split(attn_head_acts_list, np.array(self.dataset.all_labels)[indices], test_size=test_ratio)
+        X_train, X_test, y_train, y_test = train_test_split(X_acts_list, np.array(self.dataset.all_labels)[indices], test_size=test_ratio)
         
         X_train = torch.stack(X_train, axis = 0)
         X_test = torch.stack(X_test, axis = 0)
         
         y_train = torch.from_numpy(np.array(y_train, dtype = np.float32))
         y_test = torch.from_numpy(np.array(y_test, dtype = np.float32))
-        y_train = repeat(y_train, 'b -> b num_attn_heads', num_attn_heads=self.model.cfg.total_heads)
-        y_test = repeat(y_test, 'b -> b num_attn_heads', num_attn_heads=self.model.cfg.total_heads)
+        y_train = repeat(y_train, 'b -> b num_probes', num_probes=X_acts.shape[1])
+        y_test = repeat(y_test, 'b -> b num_probes', num_probes=X_acts.shape[1])
 
         return X_train, X_test, y_train, y_test
 
-    def train_probes(self, max_iter=1000):
+
+    def _train_probes(self, num_probes, X_train, X_test, y_train, y_test, max_iter=1000):
+        """
+        Helper function that all train_x_probes will call to train num_probes probes, after formatting X and y properly.
+        Flatten X so that X_train.shape = (num_examples, num_probes, d_probe)
+        y_train.shape = (num_examples, num_probes)
+        Returns list of probes and np array of probe accuracies
+        """
+        all_head_accs = []
+        probes = []
+        
+        for i in tqdm(range(num_probes)):
+            X_train_head = X_train[:,i,:]
+            X_test_head = X_test[:,i,:]
+
+            clf = LogisticRegression(max_iter=max_iter).fit(X_train_head.detach().numpy(), y_train[:, 0].detach().numpy()) # for every probe i, y_train[:, i] is the same
+            y_pred = clf.predict(X_train_head)
+            
+            y_val_pred = clf.predict(X_test_head.detach().numpy())
+            all_head_accs.append(accuracy_score(y_test[:, 0].numpy(), y_val_pred))
+            
+            probes.append(clf)
+
+        return probes, np.array(all_head_accs)
+
+
+    def train_z_probes(self, max_iter=1000):
         """
         Train linear probes on every head's activations. Must be called after either gen_acts or load_acts.
         Probes are stored in self.probes, and accuracies are stored in self.all_head_accs_np (also returned).
         Also store last X_test and y_test used for probes
         """
-        X_train, X_test, y_train, y_test = self.get_train_test_split()
+        formatted_z_acts = einops.rearrange(self.stored_acts["z"], "b n_l n_h d_h -> b (n_l n_h) d_h")
+        X_train, X_test, y_train, y_test = self.get_train_test_split(formatted_z_acts)
         print(f"{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}")
-        
-        all_head_accs = []
-        probes = []
-        
-        for i in tqdm(range(self.model.cfg.total_heads)):
-                X_train_head = X_train[:,i,:]
-                X_test_head = X_test[:,i,:]
 
-                clf = LogisticRegression(max_iter=max_iter).fit(X_train_head.detach().numpy(), y_train[:, 0].detach().numpy())
-                y_pred = clf.predict(X_train_head)
-                
-                y_val_pred = clf.predict(X_test_head.detach().numpy())
-                all_head_accs.append(accuracy_score(y_test[:, 0].numpy(), y_val_pred))
-                
-                probes.append(clf)
+        probes, probe_accs = self._train_probes(formatted_z_acts.shape[1], X_train, X_test, y_train, y_test, max_iter=max_iter)
 
-        self.probes = probes
+        self.X_tests["z"] = X_test
+        self.y_tests["z"] = y_test
         
-        self.all_head_accs_np = np.array(all_head_accs)
+        self.probes["z"] = probes
+        self.probe_accs["z"] = probe_accs
+
+
+    def train_mlp_out_probes(self, max_iter=1000):
+        X_train, X_test, y_train, y_test = self.get_train_test_split(self.stored_acts["mlp_out"])
+        print(f"{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}")
+
+        probes, probe_accs = self._train_probes(self.stored_acts["mlp_out"].shape[1], X_train, X_test, y_train, y_test, max_iter=max_iter)
 
         self.X_test = X_test
         self.y_test = y_test
         
-        return self.all_head_accs_np
+        self.probes["mlp_out"] = probes
+        self.probe_accs["mlp_out"] = probe_accs
 
 
     def save_probes(self, id, filepath = "activations/"):
