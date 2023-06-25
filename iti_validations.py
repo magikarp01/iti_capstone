@@ -153,7 +153,7 @@ fig3.show()
 model.reset_hooks()
 from dataset_utils import CounterFact_Dataset
 
-cfact_data = TQA_MC_Dataset(model.tokenizer, seed=random_seed)
+cfact_data = CounterFact_Dataset(model.tokenizer, seed=random_seed)
 
 #%%
 cfact_acts = ModelActs(model, cfact_data)
