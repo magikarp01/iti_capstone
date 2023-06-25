@@ -92,7 +92,7 @@ px.imshow(ez, labels = {"x" : "Heads (sorted)", "y": "Layers"},title = "Probe Ac
 #%%
 
 cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
-patch_iti(model, ez_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device)
+patch_iti(model, ez_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=10)
 
 # reset ez_mc so that samples will be the same
 ez_data = EZ_Dataset(model.tokenizer, seed=random_seed)
@@ -110,4 +110,81 @@ fig2.show()
 fig3 = plot_cosine_sims(ez_acts_iti, ez_acts)
 fig3.show()
 
+# %%
+model.reset_hooks()
+from dataset_utils import TQA_MC_Dataset
+
+tqa_data = TQA_MC_Dataset(model.tokenizer, seed=random_seed)
+
+#%%
+tqa_acts = ModelActs(model, tqa_data)
+tqa_acts.get_acts(N=n_acts, id=f"tqa_gpt2xl_{n_acts}")
+# ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
+tqa_acts.train_probes(max_iter=1000)
+
+# ez_acts.save_probes(id="ez_gpt2xl_200")
+
+# %%
+tqa = -np.sort(-tqa_acts.all_head_accs_np.reshape(ez_acts.model.cfg.n_layers, ez_acts.model.cfg.n_heads), axis = 1)
+px.imshow(ez, labels = {"x" : "Heads (sorted)", "y": "Layers"},title = "Probe Accuracies TQA", color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
+
+#%%
+
+cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
+patch_iti(model, tqa_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=10)
+
+# reset ez_mc so that samples will be the same
+tqa_data = TQA_MC_Dataset(model.tokenizer, seed=random_seed)
+tqa_acts_iti = ModelActs(model, tqa_data)
+tqa_acts_iti.get_acts(N = n_acts, id = f"iti_tqa_gpt2xl_{n_acts}", indices=tqa_acts.indices)
+tqa_acts_iti.control_for_iti(cache_interventions)
+
+# %%
+from analytics_utils import plot_probe_accuracies, plot_norm_diffs, plot_cosine_sims
+
+fig1 = plot_probe_accuracies(tqa_acts)
+fig1.show()
+fig2 = plot_norm_diffs(tqa_acts_iti, tqa_acts)
+fig2.show()
+fig3 = plot_cosine_sims(tqa_acts_iti, tqa_acts)
+fig3.show()
+# %%
+# %%
+model.reset_hooks()
+from dataset_utils import CounterFact_Dataset
+
+cfact_data = TQA_MC_Dataset(model.tokenizer, seed=random_seed)
+
+#%%
+cfact_acts = ModelActs(model, cfact_data)
+cfact_acts.get_acts(N=n_acts, id=f"cfact_gpt2xl_{n_acts}")
+# ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
+cfact_acts.train_probes(max_iter=1000)
+
+# ez_acts.save_probes(id="ez_gpt2xl_200")
+
+# %%
+cfact = -np.sort(-cfact_acts.all_head_accs_np.reshape(ez_acts.model.cfg.n_layers, ez_acts.model.cfg.n_heads), axis = 1)
+px.imshow(ez, labels = {"x" : "Heads (sorted)", "y": "Layers"},title = "Probe Accuracies CounterFact", color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
+
+#%%
+
+cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
+patch_iti(model, cfact_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=10)
+
+# reset ez_mc so that samples will be the same
+cfact_data = CounterFact_Dataset(model.tokenizer, seed=random_seed)
+cfact_acts_iti = ModelActs(model, cfact_data)
+cfact_acts_iti.get_acts(N = n_acts, id = f"iti_cfact_gpt2xl_{n_acts}", indices=cfact_acts.indices)
+cfact_acts_iti.control_for_iti(cache_interventions)
+
+# %%
+from analytics_utils import plot_probe_accuracies, plot_norm_diffs, plot_cosine_sims
+
+fig1 = plot_probe_accuracies(cfact_acts)
+fig1.show()
+fig2 = plot_norm_diffs(cfact_acts_iti, cfact_acts)
+fig2.show()
+fig3 = plot_cosine_sims(cfact_acts_iti, cfact_acts)
+fig3.show()
 # %%
