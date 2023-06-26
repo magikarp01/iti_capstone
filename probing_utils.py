@@ -62,7 +62,8 @@ class ModelActs():
             indices, all_prompts, all_labels = self.dataset.sample(N)
         
         for i in tqdm(indices):
-                original_logits, cache = self.model.run_with_cache(self.dataset.all_prompts[i].to(self.model.cfg.device), names_filter=lambda name: name.endswith("z")) # only cache z
+                with torch.inference_mode():
+                    original_logits, cache = self.model.run_with_cache(self.dataset.all_prompts[i].to(self.model.cfg.device), names_filter=lambda name: name.endswith("z")) # only cache z
                 
                 # original shape of stack_activation is (n_l, 1, seq_len, n_head, d_head)
                 # get last seq position, then rearrange

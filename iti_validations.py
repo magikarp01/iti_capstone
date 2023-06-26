@@ -78,8 +78,9 @@ from dataset_utils import EZ_Dataset
 ez_data = EZ_Dataset(model.tokenizer, seed=random_seed)
 
 #%%
+model.reset_hooks()
 ez_acts = ModelActs(model, ez_data)
-ez_acts.get_acts(N=n_acts, id=f"ez_gpt2xl_{n_acts}")
+ez_acts.get_acts(N=n_acts, id=f"ez_gpt2xl_{n_acts}", storage_device='cpu')
 # ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
 ez_acts.train_probes(max_iter=1000)
 
