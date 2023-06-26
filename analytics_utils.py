@@ -3,13 +3,21 @@ import torch
 import plotly.express as px
 import einops
 
-def plot_probe_accuracies(model_acts, sorted = False):
+def plot_probe_accuracies(model_acts, sorted = False, other_head_accs=None, title = "Probe Accuracies"):
+    """
+    Takes a model_acts (ModelActs) object by default. If other_head_accs is not None, then it must be a tensor of head accs, and other_head_accs is plotted.
+    """
+
+    if other_head_accs is not None:
+        all_head_accs_np = other_head_accs
+    else:
+        all_head_accs_np = model_acts.all_head_accs_np
 
     if sorted:
-        accs_sorted = -np.sort(-model_acts.all_head_accs_np.reshape(model_acts.model.cfg.n_layers, model_acts.model.cfg.n_heads), axis = 1)
+        accs_sorted = -np.sort(-all_head_accs_np.reshape(model_acts.model.cfg.n_layers, model_acts.model.cfg.n_heads), axis = 1)
     else:
-        accs_sorted = model_acts.all_head_accs_np.reshape(model_acts.model.cfg.n_layers, model_acts.model.cfg.n_heads)
-    return px.imshow(accs_sorted, labels = {"x" : "Heads (sorted)", "y": "Layers"},title = "Probe Accuracies", color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
+        accs_sorted = all_head_accs_np.reshape(model_acts.model.cfg.n_layers, model_acts.model.cfg.n_heads)
+    return px.imshow(accs_sorted, labels = {"x" : "Heads (sorted)", "y": "Layers"}, title = title, color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
 
 def plot_norm_diffs(model_acts_iti, model_acts, div=True):
     """

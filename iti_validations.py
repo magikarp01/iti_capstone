@@ -37,7 +37,7 @@ from IPython.display import HTML
 
 from tqdm import tqdm
 from probing_utils import ModelActs
-from dataset_utils import CounterFact_Dataset, TQA_MC_Dataset
+from dataset_utils import CounterFact_Dataset, TQA_MC_Dataset, EZ_Dataset
 
 import transformer_lens
 import transformer_lens.utils as utils
@@ -80,7 +80,7 @@ ez_data = EZ_Dataset(model.tokenizer, seed=random_seed)
 #%%
 model.reset_hooks()
 ez_acts = ModelActs(model, ez_data)
-ez_acts.get_acts(N=n_acts, id=f"ez_gpt2xl_{n_acts}", storage_device='cpu')
+ez_acts.gen_acts(N=n_acts, id=f"ez_gpt2xl_{n_acts}")
 # ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
 ez_acts.train_probes(max_iter=1000)
 
@@ -95,7 +95,7 @@ patch_iti(model, ez_acts, use_MMD=True, cache_interventions=cache_interventions,
 # reset ez_mc so that samples will be the same
 ez_data = EZ_Dataset(model.tokenizer, seed=random_seed)
 ez_acts_iti = ModelActs(model, ez_data)
-ez_acts_iti.get_acts(N = n_acts, id = f"iti_ez_gpt2xl_{n_acts}", indices=ez_acts.indices)
+ez_acts_iti.gen_acts(N = n_acts, id = f"iti_ez_gpt2xl_{n_acts}", indices=ez_acts.indices)
 ez_acts_iti.control_for_iti(cache_interventions)
 
 # %%
