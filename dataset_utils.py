@@ -1,8 +1,12 @@
 from datasets import load_dataset
 from sklearn.model_selection import train_test_split
 import numpy as np
+import pandas as pd
 
-# A class for defining our own Dataset classes. Code written by Kevin Wang.
+"""
+A class for defining our own Dataset classes for probing and ITI. Code written by Kevin Wang and Phillip Guo.
+Datasets have many statements that are either true or false.
+""" 
 
 def format_truthfulqa(question, choice):
     return f"Q: {question} A: {choice}"
@@ -55,10 +59,6 @@ class TQA_MC_Dataset():
         # print(np.array(self.all_prompts)[indices])
         # print(np.array(self.all_labels)[indices])
         # return indices, torch.tensor(self.all_prompts, )[indices], torch.tensor(self.all_labels)[indices]
-
-
-from datasets import load_dataset
-from sklearn.model_selection import train_test_split
 
 def tokenized_tqa_gen(dataset, tokenizer):
     all_prompts = []
@@ -184,3 +184,52 @@ class EZ_Dataset():
             sample_labels.append(self.all_labels[i])
         return indices, sample_prompts, sample_labels
 
+
+
+class Capitals_Dataset():
+    """
+    Dataset of prompts in the form "Q: What is the capital of {str(country)}? A: {capital}"
+    capital may be correct or incorrect capital of country.
+    Notable: dataset has 248*2=496 examples, much fewer than others.
+    """
+    def load_dataset(self, csv_file, wrong_seed):
+        """
+        Load Pandas dataframe from world_capitals.csv, then generate dataset of prompts (either true or
+        false) in form "Q: What is the capital of {str(country)}? A: {capital}".
+        Wrong seed is used to generate incorrect capital for false prompts.
+        """
+        dataframe = pd.read_csv(csv_file)
+
+        prompts = []
+        labels = []
+
+        np.random.seed(wrong_seed) # so that wrong capital is consistent or replicable
+        for idx in range(dataframe.shape[0]):
+            country = dataframe.at[idx, 'country']
+            capital = dataframe.at[idx, 'capital']
+            prompts.append(f"Q: What is the capital of {str(country)}? A: {capital}")
+            labels.append(1)
+
+            wrong_capital = dataframe.at[np.random.randint(dataframe.shape[0]), 'capital']
+            while wrong_capital == capital: # regenerate until not equal to correct capital
+                wrong_capital = dataframe.at[np.random.randint(dataframe.shape[0]), 'capital']
+
+            prompts.append(f"Q: What is the capital of {str(country)}? A: {wrong_capital}")
+            labels.append(0)
+
+        return prompts, labels
+
+    def __init__(self, tokenizer, seed:int = 0):
+        # self.dataset = load_dataset("csv", data_files = "world_capitals.csv")
+        self.all_prompts, self.all_labels = self.load_dataset("world_capitals.csv", wrong_seed=5)
+
+        np.random.seed(seed)
+        
+    def sample(self, sample_size: int):
+        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
+        sample_prompts = []
+        sample_labels =[]
+        for i in indices:
+            sample_prompts.append(self.all_prompts[i])
+            sample_labels.append(self.all_labels[i])
+        return indices, sample_prompts, sample_labels
