@@ -148,15 +148,15 @@ def grouper(n, iterable, fillvalue=None):
     return zip_longest(fillvalue=fillvalue, *args)
 
 for completion in completions:
-    completion = re.sub(r"[\n\t]*", "", completion)
-    question_list = grouper(3, re.split('Question: |Right: |Wrong: ', completion)[1:])
+    # completion = re.sub(r"[\n\t]*", "", completion)
+    question_list = grouper(2, re.split('Question: |Correct:', completion)[1:])
         
     for q in question_list:
+        answer = q[1].split("\n", 1)[0]
         try:
             dataset.append({
                 "Question": q[0].strip(),
-                "Right": q[1].strip(),
-                "Wrong": q[2].strip(),
+                "Correct": answer.strip(),
             })
         except:
             print(q)
@@ -171,5 +171,5 @@ import pandas as pd
 easy_questions = pd.DataFrame.from_dict(dataset)
 easy_questions.head()
 # %%
-easy_questions.to_csv("dumb_facts.csv")
+easy_questions.to_csv("easy_qa.csv")
 # %%

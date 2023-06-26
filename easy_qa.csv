@@ -1,0 +1,2268 @@
+,Question,Correct
+0,Pizza is a type of food.,True
+1,Water is a drink.,True
+2,Ice cream is a type of food.,True
+3,Milk is a drink.,True
+4,Vegetables are a type of food.,True
+5,Orange juice is a drink.,True
+6,Bread is a type of food.,True
+7,Lemonade is a drink.,True
+8,Cookies are a type of food.,True
+9,Apple juice is a drink.,True
+10,Spaghetti is a type of food.,True
+11,Soda is a drink.,True
+12,Fruits are a type of food.,True
+13,Hot chocolate is a drink.,True
+14,Carrots are a type of food.,True
+15,Juice comes from fruits.,True
+16,Eggs are a type of food.,True
+17,Tea is a drink.,True
+18,Hamburgers are a type of food.,True
+19,Coffee is a drink.,True
+20,French fries are a type of food.,True
+21,Lemonade comes from lemons.,True
+22,Milk comes from cows.,True
+23,Macaroni is a type of food.,True
+24,Rocks are a type of food.,False
+25,Toys are a type of food.,False
+26,Trees are a type of food.,False
+27,Rocks are a drink.,False
+28,Cars are a type of food.,False
+29,The sun is a drink.,False
+30,Dogs are a type of food.,False
+31,The moon is a drink.,False
+32,Grass is a type of food.,False
+33,The ocean is a drink.,False
+34,Tables are a type of food.,False
+35,Books are a drink.,False
+36,Computers are a type of food.,False
+37,Televisions are a drink.,False
+38,Chairs are a type of food.,False
+39,Rocks come from trees.,False
+40,Cars are a drink.,False
+41,Dogs come from eggs.,False
+42,Furniture is a type of food.,False
+43,The sun is a type of food.,False
+44,Toys are a drink.,False
+45,Computers are a drink.,False
+46,The moon is a type of food.,False
+47,Televisions are a type of food.,False
+48,Music is a type of art.,True
+49,We can listen to music by playing it on a radio.,True
+50,A guitar is a musical instrument.,True
+51,Musicians can sing and play instruments at the same time.,True
+52,"Different types of music include rock, country, and classical.",True
+53,A band can have many people playing different instruments.,True
+54,Musical notes are written on a staff with lines and spaces.,True
+55,Musicians practice playing their instruments to get better.,True
+56,"Some common musical instruments are drums, piano, and violin.",True
+57,"A song can have many different parts, including a chorus and verses.",True
+58,We can dance to music.,True
+59,"Music can make us feel happy, sad, or excited.",True
+60,"A musical performance can include singing, dancing, and playing instruments.",True
+61,We can sing songs to ourselves or to others.,True
+62,A conductor leads an orchestra and helps to keep everyone playing together.,True
+63,"We can play music loud or soft, depending on how we feel.",True
+64,Music is often played at parties and celebrations.,True
+65,"Sometimes music has lyrics, which are the words to the song.",True
+66,We can clap our hands or snap our fingers along to music.,True
+67,Musicians can write their own songs and make their own music.,True
+68,A music festival is an event where many musicians play their music for large crowds.,True
+69,"Music can help us remember things better, like the alphabet or counting.",True
+70,A music stand is a helpful tool for musicians to hold their sheet music while they play.,True
+71,A tambourine is a type of percussion instrument.,True
+72,Music is only for kids who are good at singing.,False
+73,We can only listen to music on a computer.,False
+74,A bicycle is a musical instrument.,False
+75,Musicians can't perform if they don't have a big audience.,False
+76,There is only one type of music.,False
+77,A band can have many people playing the same instrument.,False
+78,Musical notes are written on a chalkboard.,False
+79,Musicians don't need to practice playing their instruments to get better.,False
+80,The only type of musical instrument is a guitar.,False
+81,A song only has one part.,False
+82,We can't dance to music.,False
+83,Music never affects our emotions.,False
+84,A musical performance can only include singing.,False
+85,We can't sing songs unless we are really good at it.,False
+86,A conductor just listens to the musicians play.,False
+87,We always have to play music loud.,False
+88,Music is never played at quiet events.,False
+89,Sometimes music doesn't have any words.,False
+90,We can't show our appreciation for music by clapping our hands or snapping our fingers.,False
+91,Musicians can't come up with their own music ideas.,False
+92,A music festival only has one musician playing all the music.,False
+93,Music doesn't help us remember things better.,False
+94,A music stand can't help musicians play their instruments better.,False
+95,A tambourine is a type of wind instrument.,False
+96,Watching movies is a fun activity.,True
+97,Movies are usually shown in theaters.,True
+98,Movies are always viewed on a big screen.,False
+99,It's okay to talk loudly during a movie.,False
+100,Popcorn is a popular movie snack.,True
+101,Movie tickets are usually free.,False
+102,Movies are made up of moving pictures.,True
+103,You can watch movies at home or in a theater.,True
+104,Actors are the people who act in movies.,True
+105,Movies are usually shown in black and white.,False
+106,The music in movies helps to tell the story.,True
+107,"In horror movies, there are usually happy endings.",False
+108,Movies are always based on true stories.,False
+109,Animation movies are made with real people.,False
+110,The credits at the end of a movie list the people who worked on the film.,True
+111,It's okay to kick the seat in front of you during a movie.,False
+112,People watch movies to be entertained.,True
+113,All movies are silent.,False
+114,Movies can teach us important lessons about life.,True
+115,The main character of a movie is usually called the villain.,False
+116,Movie sound effects make the action scenes more exciting.,True
+117,A lot of work goes into making a movie.,True
+118,"Movies are usually rated based on their language, violence, and other content.",True
+119,It's okay to run around and play during a movie.,False
+120,Movies can take us on adventures to new places.,True
+121,Television shows are a type of entertainment.,True
+122,Only kids watch television shows.,False
+123,Television shows can be watched on a TV.,True
+124,Television shows can only be watched on a computer.,False
+125,Television shows have characters.,True
+126,Television shows are never about animals.,False
+127,Television shows can be fictional.,True
+128,Television shows are only about real-life events.,False
+129,Television shows can be funny.,True
+130,Television shows are always serious.,False
+131,You can watch television shows with your family.,True
+132,Only one person can watch television shows at a time.,False
+133,Television shows can teach you new things.,True
+134,You never learn anything from watching television shows.,False
+135,Television shows are always in the same language.,False
+136,Television shows can be watched in different languages.,True
+137,Television shows can only be watched in the daytime.,False
+138,You can watch television shows at night.,True
+139,You don't need a remote to watch television shows.,False
+140,You can change the channel on television shows with a remote.,True
+141,All television shows have commercials.,False
+142,Commercials interrupt television shows.,True
+143,Television shows can be recorded and watched later.,True
+144,You can never watch television shows again once they are over.,False
+145,Television shows are always made in the same country.,False
+146,Television shows can come from different countries.,True
+147,Television shows are usually only one episode.,False
+148,Television shows can have multiple episodes.,True
+149,You can only watch television shows on one device.,False
+150,Television shows can be watched on different devices.,True
+151,Television shows are never scary.,False
+152,Television shows can be scary.,True
+153,A television show is a type of fruit.,False
+154,Television shows can only be watched outside.,False
+155,You can watch television shows inside.,True
+156,Television shows are always about cooking.,False
+157,Television shows can be about cooking.,True
+158,Television shows are never animated.,False
+159,Television shows can be animated.,True
+160,You learn bad things from watching television shows.,False
+161,Television shows can be educational.,True
+162,Television shows are always live.,False
+163,Television shows can be live.,True
+164,You cannot pause television shows.,False
+165,You can pause television shows.,True
+166,Watching television shows is never fun.,False
+167,Watching television shows can be fun.,True
+168,The moon is made of cheese in television shows.,False
+169,Television shows don't talk back to you.,True
+170,Books have stories in them.,True
+171,Some books have pictures in them.,True
+172,You can learn new things from books.,True
+173,Characters in books can have different feelings.,True
+174,You can read a book by yourself.,True
+175,Words in books are written on pages.,True
+176,Books can be fiction or non-fiction.,True
+177,Libraries have many books to borrow.,True
+178,You can read a book online.,True
+179,The author is the person who wrote the book.,True
+180,Books can make you happy or excited.,True
+181,You can read a book before bed.,True
+182,A book can have a sad ending.,True
+183,You can imagine what the characters look like.,True
+184,You can learn new words from books.,True
+185,A bookmark is used to keep track of where you are in a book.,True
+186,Reading quietly is important in a library.,True
+187,Books are kept in alphabetical order in a library.,True
+188,J.K. Rowling wrote the Harry Potter series.,True
+189,Some books have chapters.,True
+190,"Many books have a beginning, middle, and end.",True
+191,Books can take you to different places in the world or even outer space.,True
+192,"You can read books about animals, history, or science.",True
+193,Dr. Seuss wrote many popular children's books.,True
+194,Picture books are a type of book that have lots of pictures.,True
+195,Books are only for adults.,False
+196,You can only read a book at school.,False
+197,Books are not important.,False
+198,All books have the same cover.,False
+199,You can eat a book like food.,False
+200,Only boys can read books.,False
+201,Books can be read upside down.,False
+202,You can't read a book more than once.,False
+203,The author of a book is the person who drew the pictures.,False
+204,Reading a book is the same as watching TV.,False
+205,You don't need to know how to read to enjoy a book.,False
+206,There is nothing to learn from a book.,False
+207,All books are the same size.,False
+208,You can only read a book on a computer.,False
+209,"All books have the word ""book"" in the title.",False
+210,All stories in books are happy.,False
+211,You can only find books at a toy store.,False
+212,Reading a book is a waste of time.,False
+213,You can only read books in English.,False
+214,You can't learn about different cultures from reading books.,False
+215,All books are made of the same material.,False
+216,You can only read books in a library.,False
+217,Only girls can read books.,False
+218,You can only read a book once and then it's done.,False
+219,The author of a book is the person who printed the pages.,False
+220,Soccer is a sport.,True
+221,Baseball is played with a bat and a ball.,True
+222,Basketball is played with a ball that is bounced on the ground.,True
+223,Tennis is played with a racquet and a ball.,True
+224,Swimming is a water sport.,True
+225,Volleyball is played with a ball over a net.,True
+226,Football is a sport played with an oval-shaped ball.,True
+227,Running is a sport that involves moving quickly on your feet.,True
+228,Gymnastics is a sport that involves acrobatics and physical strength.,True
+229,Hockey is played with a stick and a puck.,True
+230,Table tennis is played on a small table with a small ball.,True
+231,Golf is a sport played with clubs and a ball.,True
+232,Skateboarding is a sport that involves riding a board on wheels.,True
+233,Boxing is a sport where two people fight each other wearing gloves.,True
+234,Archery is a sport that involves shooting arrows with a bow.,True
+235,Figure skating is a sport that involves skating on ice.,True
+236,Fencing is a sport that involves swordfighting.,True
+237,Karate is a martial art that involves punching and kicking.,True
+238,Horseback riding is a sport that involves riding on a horse.,True
+239,Skiing is a sport that involves sliding on snow.,True
+240,Cheerleading is a sport that involves dancing and gymnastics.,True
+241,Surfing is a water sport that involves riding waves.,True
+242,Biking is a sport that involves riding on a bicycle.,True
+243,Badminton is played with a shuttlecock and a racquet.,True
+244,Soccer is played with sticks and a puck.,False
+245,Basketball is played with a ball that is thrown with your hands.,False
+246,Baseball is played with a club and a ball.,False
+247,Tennis is played with a bat and a ball.,False
+248,Swimming is a sport that involves walking on the ground.,False
+249,Volleyball is played with a ball under a net.,False
+250,Football is a sport where the players use their hands to move the ball.,False
+251,Running is a sport that involves sitting on a chair.,False
+252,Gymnastics is a sport that involves singing and dancing.,False
+253,Hockey is played with a stick and a ball.,False
+254,Table tennis is played on a big table with a large ball.,False
+255,Golf is a sport played with a bat and a ball.,False
+256,Skateboarding is a sport that involves riding a horse.,False
+257,Boxing is a sport where two people wrestle each other.,False
+258,Archery is a sport that involves throwing balls.,False
+259,Figure skating is a sport that involves dancing on the ground.,False
+260,Fencing is a sport that involves playing cards.,False
+261,Karate is a sport that involves jumping on a trampoline.,False
+262,Horseback riding is a sport that involves walking on a tightrope.,False
+263,Skiing is a sport that involves skating on concrete.,False
+264,Cheerleading is a sport that involves singing in a microphone.,False
+265,Surfing is a land sport that involves running on a treadmill.,False
+266,Biking is a sport that involves driving a car.,False
+267,Badminton is played with a ball and a glove.,False
+268,The Earth is flat.,False
+269,Oceans are filled with salty water.,True
+270,The equator is a line that runs around the middle of the Earth.,True
+271,The North Pole is hotter than the South Pole.,False
+272,The Great Wall of China is the longest wall in the world.,True
+273,The Amazon River flows through South America.,True
+274,Australia is a continent and a country.,True
+275,Antarctica is the smallest continent.,False
+276,The United States has 50 states.,True
+277,Asia is the largest continent.,True
+278,The Sahara Desert is located in South America.,False
+279,Mount Everest is the tallest mountain in the world.,True
+280,Africa is a country.,False
+281,The Nile River is the longest river in the world.,False
+282,The South Pole is located in Antarctica.,True
+283,The Pacific Ocean is the largest ocean in the world.,True
+284,The Statue of Liberty is located in France.,False
+285,The capital of the United States is New York City.,False
+286,Russia is the largest country in the world.,True
+287,The Mediterranean Sea is located in Africa.,False
+288,The Eiffel Tower is located in Italy.,False
+289,Europe is a continent.,True
+290,The Andes Mountains are located in North America.,False
+291,Canada is the largest country in the world.,False
+292,The Earth is the center of the universe.,False
+293,The North Pole is located in Antarctica.,False
+294,The Nile River flows through South America.,False
+295,The Great Wall of China is the tallest wall in the world.,False
+296,The equator is a line that runs around the North Pole.,False
+297,The Amazon Rainforest is located in Asia.,False
+298,The Pacific Ocean is the smallest ocean in the world.,False
+299,There are 8 continents in the world.,False
+300,The United States has 52 states.,False
+301,Africa is the smallest continent.,False
+302,The Sahara Desert is located in Australia.,False
+303,Antarctica is a country.,False
+304,The Statue of Liberty is located in Italy.,False
+305,The capital of the United States is Los Angeles.,False
+306,The Himalayas are located in South America.,False
+307,The Atlantic Ocean is the largest ocean in the world.,False
+308,Mount Everest is the shortest mountain in the world.,False
+309,The Mediterranean Sea is located in Europe.,True
+310,The Eiffel Tower is located in Spain.,False
+311,Asia is the smallest continent.,False
+312,The Rockies are located in Europe.,False
+313,Mexico is the largest country in the world.,False
+314,The Mississippi River is the longest river in the world.,False
+315,The Grand Canyon is located in Canada.,False
+316,Antarctica is the warmest continent.,False
+317,Abraham Lincoln was the 16th President of the United States.,True
+318,The dinosaurs lived at the same time as the ancient Egyptians.,False
+319,The Statue of Liberty is in New York City.,True
+320,Cleopatra was a famous queen of Egypt.,True
+321,George Washington was the first President of the United States.,True
+322,The Great Wall of China is the largest wall in the world.,True
+323,Christopher Columbus discovered America in 1492.,True
+324,Martin Luther King Jr. was a civil rights leader.,True
+325,World War II began in 1939.,True
+326,The Ancient Greeks were known for inventing the Olympic Games.,True
+327,The first astronauts landed on the moon in 1969.,True
+328,Vikings are known for their longboats and helmets with horns.,True
+329,Julius Caesar was an emperor of Rome.,False
+330,The Mayflower was a ship that brought the first settlers to America.,True
+331,The Declaration of Independence was signed in 1776.,True
+332,Davy Crockett was a famous astronaut.,False
+333,The Civil War was fought in the 1800s.,True
+334,The Great Depression began in the 1920s.,False
+335,The Renaissance was a time of great art and learning.,True
+336,The Pony Express was a way to deliver mail quickly in the Wild West.,True
+337,Betsy Ross is credited with sewing the first American flag.,True
+338,Johann Sebastian Bach was a famous painter.,False
+339,The first Thanksgiving was celebrated by the Pilgrims and Native Americans.,True
+340,The Cold War was a time of tension between the United States and the Soviet Union.,True
+341,The Earth is flat.,False
+342,Sharks are mammals.,False
+343,Elephants lay eggs.,False
+344,Flowers are a type of insect.,False
+345,A cat is a type of fish.,False
+346,The sun revolves around the Earth.,False
+347,Ice cream is a type of vegetable.,False
+348,Green is a type of fruit.,False
+349,Tigers have wings.,False
+350,Santa Claus is real.,False
+351,Trees can walk.,False
+352,People can fly without a plane.,False
+353,Spiders are not insects.,True
+354,The moon is made of cheese.,False
+355,The sun is a planet.,False
+356,Apples grow on trees.,True
+357,Water is wet.,True
+358,Cars can talk.,False
+359,The Earth is the largest planet in the solar system.,False
+360,Elephants are smaller than cats.,False
+361,The ocean is made of chocolate.,False
+362,Dinosaurs still exist today.,False
+363,Flowers need water to grow.,True
+364,A pencil is used to write.,True
+365,A school is where animals live.,False
+366,Is water wet?,True
+367,Do plants make oxygen for us to breathe?,True
+368,Is the sun a star?,True
+369,Is the Earth round?,True
+370,Do fish live in the water?,True
+371,Does fire need oxygen to burn?,True
+372,Do birds lay eggs?,True
+373,Do magnets attract certain metals?,True
+374,Is the moon brighter than the stars at night?,True
+375,Can we see with our eyes?,True
+376,Can we breathe underwater?,True
+377,Do bees make honey?,True
+378,Does the Earth rotate around the Sun?,True
+379,Does ice melt when it gets hot?,True
+380,Is air transparent?,True
+381,Do people need food to live?,True
+382,Do flowers need sunlight to grow?,True
+383,Can we see our breath when it's cold outside?,True
+384,Is the sky blue?,True
+385,Do animals have bones?,True
+386,Do we have five fingers on each hand?,True
+387,Is the North Pole cold?,True
+388,Does light travel faster than sound?,True
+389,Are rocks alive?,False
+390,Does the sun revolve around the Earth?,False
+391,Can plants grow without water?,False
+392,Do birds fly upside down?,False
+393,Is the ocean purple?,False
+394,Can we breathe in space?,False
+395,Do stars move?,False
+396,Did dinosaurs still exist?,False
+397,Is the sky orange?,False
+398,Can we breathe underwater without any help?,False
+399,Do trees have arms and legs like people?,False
+400,Does fire need water to burn?,False
+401,Are spiders mammals?,False
+402,Can we hear sound in space?,False
+403,Can people see in the dark?,False
+404,Can fish survive outside of water?,False
+405,Are dogs and cats the same species?,False
+406,Can we travel to the center of the Earth?,False
+407,Are potatoes animals?,False
+408,Can we touch the wind?,False
+409,Is the Earth flat?,False
+410,Do plants eat meat?,False
+411,Can we fly without anything to help us?,False
+412,Can people have superpowers?,False
+413,1+1=2.,True
+414,2+2=5.,False
+415,0+3=3.,True
+416,4-2=2.,True
+417,7-3=5.,False
+418,6-6=1.,False
+419,A triangle has three sides.,True
+420,A circle has four sides.,False
+421,2 is greater than 5.,False
+422,There are 12 months in a year.,True
+423,A square has four equal sides.,True
+424,10 is an even number.,True
+425,9 is an odd number.,True
+426,A rectangle has two long sides and two short sides.,True
+427,1+2+3=6.,True
+428,10-5=5.,True
+429,4+4+4=12.,True
+430,1+4=3.,False
+431,6+2=8.,True
+432,A hexagon has six sides.,True
+433,A pentagon has eight sides.,False
+434,"If you add 0 to any number, the answer stays the same.",True
+435,Divide 10 by 2 equals 5.,True
+436,A rhombus has four equal sides.,True
+437,3 times 4 equals 12.,True
+438,2+3=5.,False
+439,1+1=3.,False
+440,A rectangle has three equal sides.,False
+441,A triangle has four sides.,False
+442,9-1=10.,False
+443,4 times 4 equals 12.,False
+444,6 is less than 5.,False
+445,A line has two endpoints.,False
+446,A square has three equal sides.,False
+447,20 is an odd number.,False
+448,2 is equal to 3.,False
+449,8 is an odd number.,False
+450,7 is an even number.,False
+451,1+2+3=7.,False
+452,A trapezoid has three sides.,False
+453,A polygon has one side.,False
+454,50 divided by 10 equals 5.,False
+455,15 minus 7 equals 7.,False
+456,3 is greater than 6.,False
+457,A square has five equal sides.,False
+458,A circle has three sides.,False
+459,A hexagon has seven sides.,False
+460,You can divide by zero.,False
+461,A parallelogram has four right angles.,False
+462,Art is a way to express feelings and ideas.,True
+463,Paint can be used to create art.,True
+464,Sculpture is a type of art.,True
+465,Drawing is a way to create art.,True
+466,A canvas is a surface for painting.,True
+467,Music is not a form of art.,False
+468,"Art can be made with pencils, crayons, markers, and paint.",True
+469,You can use your imagination when making art.,True
+470,"Van Gogh, Monet and Leonardo da Vinci were famous artists.",True
+471,"Art can be found inside museums, galleries, and on the street.",True
+472,"Art can be found in nature, such as flowers, trees and rocks.",True
+473,Art can be realistic or abstract.,True
+474,Photography is a type of art.,True
+475,"Art can be made with paper, cardboard, or wood.",True
+476,Art is not important in our lives.,False
+477,Graffiti is not an art form.,False
+478,A sculpture is a type of art that is 2D.,False
+479,"Art can be found in books, movies, and video games.",True
+480,Art can tell a story.,True
+481,Art can be found in different cultures around the world.,True
+482,"Art can make people happy, sad, surprised, or thoughtful.",True
+483,"Art can have different textures, such as smooth or rough.",True
+484,Art can be made with recycled materials.,True
+485,Art is only for talented people.,False
+486,Art is fun and creative.,True
+487,Music is not a form of art.,False
+488,Art is only about drawing.,False
+489,Only adults can make art.,False
+490,Any piece of paper can be used for painting.,False
+491,Art can only be found in museums.,False
+492,It's impossible to make art without a brush.,False
+493,Art is only for rich people.,False
+494,Sculptures are only made out of clay.,False
+495,Art is not important in our lives.,False
+496,Art can only be realistic.,False
+497,Art is only about copying images.,False
+498,Art is always colorful.,False
+499,Art is just a hobby.,False
+500,Art is always meaningful and has a message behind it.,False
+501,Art is not a form of communication.,False
+502,Photography is not considered art.,False
+503,Art is not a way to express oneself.,False
+504,Only certain colors can be used in art.,False
+505,"Anyone can make art, no matter their age, gender, or nationality.",True
+506,Art can be anything that is creative and expresses an idea or emotion.,True
+507,Graffiti can be a form of art.,True
+508,Art can be found all over the world.,True
+509,It's not necessary to be famous to create art.,True
+510,Art can be made with natural materials.,True
+511,"Art is not just about the final product, but also the process of creating it.",True
+512,Technology is something people use every day.,True
+513,Computers are a type of technology.,True
+514,Cars are not a type of technology.,False
+515,Cellphones have cameras.,True
+516,Tablets are heavier than laptops.,False
+517,The internet is a place where people can find information.,True
+518,Smartwatches are a type of technology.,True
+519,TV is not a type of technology.,False
+520,People use keyboards to type on computers.,True
+521,People use pencils to write on computers.,False
+522,Cameras are not a type of technology.,False
+523,People use headphones to listen to music.,True
+524,People listen to music by shouting out loud.,False
+525,People can't see videos on their computers.,False
+526,People can watch videos on their phones.,True
+527,People use remote control to change TV channels.,True
+528,People use TV to make phone calls.,False
+529,People can't use technology to read.,False
+530,People can use a printer to print papers.,True
+531,People can't use technology to play games.,False
+532,People use technology to listen to others on the phone.,True
+533,People can't use technology to watch movies.,False
+534,People use handheld devices to text their friends.,True
+535,People can't use technology to check the weather.,False
+536,People can use technology to find recipes for cooking.,True
+537,Laws are rules that people must follow.,True
+538,Elections are when people choose their leaders.,True
+539,Presidents are in charge of a country.,True
+540,Every person has the right to vote.,False
+541,Leaders of a country should always be honest.,True
+542,The United States has 50 states.,True
+543,A mayor is in charge of a city.,True
+544,War is an effective way to solve problems.,False
+545,The Constitution is the supreme law of the land in the United States.,True
+546,"Congress is made up of two parts, the Senate and the House of Representatives.",True
+547,Government officials are allowed to use their power for personal gain.,False
+548,The Vice President is not an important position in the United States.,False
+549,It is important for people to pay taxes to support their country.,True
+550,The President can make whatever laws they want.,False
+551,The White House is where the President lives and works.,True
+552,Citizens must show respect to the leaders of their country.,True
+553,"People can say whatever they want, whenever they want, without consequences.",False
+554,Voting is a way to make a difference in your country.,True
+555,"In a democracy, everyone has a voice.",True
+556,Leaders of a country should care about the well-being of their citizens.,True
+557,People who hold public office should not have conflicts of interest.,True
+558,It is important for leaders to listen to people who disagree with them.,True
+559,The government can take people's property without permission.,False
+560,Power and responsibility are important parts of politics.,True
+561,People should always be treated fairly and equally under the law.,True
+562,It is okay for leaders to break the law if they think it will benefit their country.,False
+563,The government should be transparent and open about what they do.,True
+564,People should be able to live their lives without interference from the government.,False
+565,Ignoring the rights of others is okay if it gets you what you want.,False
+566,The government should be able to control which religion people are allowed to practice.,False
+567,Everyone should have access to education.,True
+568,All countries have the same form of government.,False
+569,"Freedom of speech means people can say whatever they want, even if it is hurtful.",False
+570,The government should provide help to people who need it.,True
+571,It is okay for people to be rude to those they disagree with.,False
+572,"Leaders of a country should be respected, even if you don't think they deserve it.",False
+573,It is important for leaders to work with other countries to promote peace.,True
+574,It is okay to discriminate against someone because of the color of their skin.,False
+575,"Everyone has the same rights, no matter where they come from or who they are.",True
+576,The government should not be involved in people's personal lives.,False
+577,People should not have to live in fear of their government.,True
+578,People should always try to understand and respect the opinions of others.,True
+579,It is important for people to know their rights and responsibilities as citizens.,True
+580,The President can make decisions without asking anyone else.,False
+581,The government should protect the environment for future generations.,True
+582,It is okay for leaders to use violence to get what they want.,False
+583,People should be able to practice their religion freely.,True
+584,The government should provide healthcare for everyone.,False
+585,It is important for leaders to work towards equality for all people.,True
+586,The government should not be influenced by money or power.,True
+587,Leaders should listen to experts and scientists when making decisions.,True
+588,"No one is above the law, not even the President.",True
+589,Money can be used to buy things.,True
+590,People need to work to make money.,True
+591,A store is a place where people can buy things.,True
+592,A bank is a place where people can keep their money safe.,True
+593,A recession is a time when the economy is not doing well.,True
+594,People can start a business to sell things they make or goods they buy.,True
+595,Taxes are money paid to the government to help pay for things like schools and roads.,True
+596,Investments are a way for people to earn more money over time.,True
+597,A budget is a plan for spending money.,True
+598,Supply and demand is when the amount of something people want to buy is the same as the amount of that thing available to buy.,True
+599,Inflation is when the prices of things go up over time.,True
+600,Imports are things that come from other countries.,True
+601,Exports are things that go from one country to another.,True
+602,A person can buy things online using a computer or phone.,True
+603,An entrepreneur is someone who starts a business.,True
+604,Scarcity happens when there is not enough of something to meet everyone's needs.,True
+605,Cost means the amount of money something costs to make.,True
+606,Profit is the money a business makes after paying for all its costs.,True
+607,A credit card is a way to borrow money from a bank to buy things.,True
+608,Investing money in the stock market is a way to earn more money.,True
+609,A salary is money a person makes for their job.,True
+610,A merger is when two companies combine to become one.,True
+611,A corporation is a type of business owned by shareholders.,True
+612,A monopoly is when one company has control over the production or sale of a certain product.,True
+613,"When a company makes a lot of money, they should give it all away to people who didn't earn it.",False
+614,Everyone has enough money to buy whatever they want all the time.,False
+615,It's okay to take things from a store without paying for them.,False
+616,A bank is a place where people can go to waste their time instead of being productive.,False
+617,A good way to earn a lot of money is to sit at home and do nothing.,False
+618,"If something costs too much, it's okay to steal it.",False
+619,Taxes are just a way for the government to take people's money for no reason.,False
+620,Investing your money is always a bad idea.,False
+621,Companies always want to sell things for cheap.,False
+622,"If a company doesn't make any money, it doesn't matter because they can just keep going forever.",False
+623,A budget isn't important and people can just spend as much money as they want.,False
+624,"When people can't afford something they want, they should just borrow money without paying it back.",False
+625,It's okay to buy things that were stolen from someone else.,False
+626,It's okay to sell things for more money than they are worth.,False
+627,Companies don't care about their customers and only want to make money.,False
+628,It's not fair for some people to have more money than others.,False
+629,People can just print their own money at home instead of earning it.,False
+630,Making things is never as good as just buying them from someone else.,False
+631,Companies should only make things that don't cost them any money.,False
+632,Everyone should get paid the same amount of money no matter what job they do.,False
+633,It's okay to lie about how much money you have or earn.,False
+634,It's always possible to get rich quick without doing any work.,False
+635,A successful business doesn't need to have any customers.,False
+636,People should be able to keep all the money they earn and never share it with anyone else.,False
+637,A pencil is used for writing.,True
+638,We learn things in school.,True
+639,Teachers help us learn.,True
+640,You should listen to the teacher when they speak.,True
+641,Books have lots of words and pictures in them.,True
+642,We count numbers in school.,True
+643,We learn to read in school.,True
+644,We learn how to add and subtract in school.,True
+645,We learn about shapes and colors in school.,True
+646,We learn about animals in school.,True
+647,We learn about the planets in our solar system in school.,True
+648,We learn about different cultures in school.,True
+649,We use scissors to cut paper in school.,True
+650,We learn to share with others in school.,True
+651,It’s important to try your best in school.,True
+652,We learn about the Earth in school.,True
+653,We learn how to write our name in school.,True
+654,Teachers are there to help us when we need it.,True
+655,We learn about the weather in school.,True
+656,We learn about healthy foods in school.,True
+657,We learn about the importance of exercise in school.,True
+658,We should always be respectful to our teachers and classmates.,True
+659,It’s important to attend school every day.,True
+660,We learn about different jobs in school.,True
+661,We don’t learn anything in school.,False
+662,The teacher doesn’t help us learn.,False
+663,We don’t use pencils for writing.,False
+664,We don’t need to listen to the teacher when they speak.,False
+665,Books are empty.,False
+666,We don’t count numbers in school.,False
+667,We don’t learn to read in school.,False
+668,We don’t learn how to add and subtract in school.,False
+669,We don’t learn about shapes and colors in school.,False
+670,We don’t learn about animals in school.,False
+671,We don’t learn about the planets in our solar system in school.,False
+672,We don’t learn about different cultures in school.,False
+673,We don’t use scissors to cut paper in school.,False
+674,We don’t learn to share with others in school.,False
+675,It’s not important to try our best in school.,False
+676,We don’t learn about the Earth in school.,False
+677,We don’t learn how to write our name in school.,False
+678,Teachers don’t help us when we need it.,False
+679,We don’t learn about the weather in school.,False
+680,We don't learn about healthy foods in school.,False
+681,We don't learn about the importance of exercise in school.,False
+682,We shouldn’t be respectful to our teachers and classmates.,False
+683,It’s not important to attend school every day.,False
+684,We don’t learn about different jobs in school.,False
+685,Exercise is good for your body.,True
+686,Fruits and vegetables are healthy to eat.,True
+687,Brushing your teeth is important for dental health.,True
+688,Drinking water is good for your body.,True
+689,Sleeping is important for your body to rest and grow.,True
+690,Running is a form of exercise.,True
+691,Eating too much candy is bad for your teeth.,True
+692,Washing your hands helps prevent the spread of germs.,True
+693,Going outside to play is good for your body.,True
+694,Carrots are a healthy snack option.,True
+695,Getting enough sleep helps you feel rested and ready to learn.,True
+696,Playing sports is a fun way to exercise.,True
+697,Eating too much junk food can be unhealthy.,True
+698,Taking a bath or shower is important for personal hygiene.,True
+699,Walking is a low-impact form of exercise.,True
+700,Vegetables are full of vitamins and nutrients that are good for your body.,True
+701,Wearing sunscreen helps prevent sunburn and skin damage.,True
+702,Drinking milk can help you build strong bones.,True
+703,Exercise can help you feel more energized.,True
+704,Sleeping in a dark and quiet room can help you sleep better.,True
+705,Washing your hands before eating can prevent illness.,True
+706,Playing with friends is a fun way to stay active.,True
+707,Eating a balanced diet is important for good health.,True
+708,Drinking too much soda can be bad for your teeth.,True
+709,Eating too much candy is good for your teeth.,False
+710,Exercise is bad for your body.,False
+711,Vegetables are bad for your body.,False
+712,Brushing your teeth is not important for dental health.,False
+713,Drinking too much coffee is good for your body.,False
+714,Playing outside is bad for your body.,False
+715,Eating too much junk food is not unhealthy.,False
+716,Getting enough sleep makes you feel more tired.,False
+717,Running is not a form of exercise.,False
+718,Drinking water is bad for your body.,False
+719,Wearing sunscreen is not necessary when you go outside.,False
+720,Taking a bath or shower is not important for personal hygiene.,False
+721,Walking is not a form of exercise.,False
+722,Milk cannot help you build strong bones.,False
+723,Eating a balanced diet is not important for good health.,False
+724,Vegetables are not full of vitamins and nutrients that are good for your body.,False
+725,Drinking milk can be bad for your health.,False
+726,Exercise can make you feel more tired.,False
+727,You should not wash your hands before eating.,False
+728,Playing with friends is not a fun way to stay active.,False
+729,Eating too much candy is good for your health.,False
+730,Sleeping in a bright and noisy room can help you sleep better.,False
+731,Drinking a lot of pop is good for your teeth.,False
+732,Going outside to play is bad for the environment.,False
+733,Junk food is better for your body than fruits and vegetables.,False
+734,Earth is a planet.,True
+735,Trees and plants give us oxygen.,True
+736,We can recycle paper.,True
+737,We should turn off the lights when we leave a room.,True
+738,Water comes from the earth.,True
+739,We can compost to create healthy soil.,True
+740,The sun comes out during the day and goes away at night.,True
+741,One way to use less water is to take shorter showers.,True
+742,The wind can be used to make energy.,True
+743,We should put our garbage in the trash can.,True
+744,Pollution is bad for animals.,True
+745,We should turn off the water when we brush our teeth.,True
+746,We have four seasons in a year.,True
+747,We can ride bikes to help the environment.,True
+748,The rain helps trees and plants grow.,True
+749,Solar panels can be used to make energy.,True
+750,We should use reusable bags instead of plastic bags.,True
+751,Rivers can be sources of water for drinking.,True
+752,Cars need gasoline to run.,True
+753,We can use less water by fixing leaks.,True
+754,Recycling helps the environment.,True
+755,Trees provide homes for animals.,True
+756,We can plant flowers to help the bees.,True
+757,We can use less energy by turning off electronics when we are done with them.,True
+758,We can’t drink water.,False
+759,Recycling is not important.,False
+760,We should waste water.,False
+761,Pollution is good for animals.,False
+762,Trees are bad for the environment.,False
+763,The sun is out all the time.,False
+764,We can use as much energy as we want.,False
+765,We can litter everywhere.,False
+766,The wind can’t be used to make energy.,False
+767,Cars do not need gas to run.,False
+768,We should always leave the lights on.,False
+769,Water comes from space.,False
+770,We have over 100 seasons in a year.,False
+771,We should never use reusable bags.,False
+772,We never need to shower.,False
+773,Solar panels are a type of weapon.,False
+774,It’s okay to use as much water as we want.,False
+775,We should always throw away our garbage in random places.,False
+776,We can’t plant flowers to help the bees.,False
+777,Rivers are not sources of water for drinking.,False
+778,We should always drive cars that have flat tires.,False
+779,We can leave the water running when we brush our teeth.,False
+780,We don't have any  trees in the world.,False
+781,We should never go outside.,False
+782,We shouldn't use bicycles.,False
+783,The sun is a star.,True
+784,The moon is a planet.,False
+785,The closest planet to Earth is Venus.,True
+786,The Earth is round.,True
+787,A shooting star is actually a star exploding.,False
+788,The planet Mars is known as the Red Planet.,True
+789,Astronauts wear spacesuits to protect themselves from radiation.,True
+790,There is no gravity in space.,False
+791,The Earth rotates on its axis.,True
+792,The planet Mercury is the largest planet in our solar system.,False
+793,The asteroid belt is located between Mars and Jupiter.,True
+794,The planet Jupiter has rings around it.,True
+795,The International Space Station is a building on the Moon.,False
+796,Stars are much farther away from Earth than the sun.,True
+797,An eclipse happens when the moon passes between the Earth and the sun.,True
+798,There is no air in space.,True
+799,The planet Uranus has a ring around it.,True
+800,The first human to walk on the moon was Neil Armstrong.,True
+801,The planet Saturn is known for its visible and distinct rings.,True
+802,A comet is made mostly of ice.,True
+803,The planet Neptune is the hottest planet in our solar system.,False
+804,The Earth is the third planet from the sun.,True
+805,A rocket is the vehicle used to travel to space.,True
+806,The center of our solar system is the Earth.,False
+807,Scientists use telescopes to study outer space.,True
+808,A meteor is a small piece of rock that enters the Earth's atmosphere.,True
+809,The Big Dipper is a constellation.,True
+810,The planet Venus is the farthest planet from the sun.,False
+811,A black hole is a star that has died.,False
+812,"The term ""astrology"" refers to the study of planets and stars.",False
+813,The planet Pluto is considered a planet.,False
+814,The Earth takes 365 days to orbit around the sun.,True
+815,The universe is infinite.,False
+816,There is no water on any other planet in our solar system.,False
+817,The sun is the largest object in our solar system.,True
+818,A rocket needs oxygen to operate in space.,False
+819,The stars we see in the night sky are all in our solar system.,False
+820,There are eight planets in our solar system.,True
+821,The planet Mars has two moons.,True
+822,The sun is a planet.,False
+823,The Hubble telescope is used to observe outer space.,True
+824,The planet Saturn has the most moons of any planet in our solar system.,False
+825,The planet Jupiter is the largest planet in our solar system.,True
+826,The planet Neptune is blue due to its methane atmosphere.,True
+827,The Milky Way is the only galaxy in the universe.,False
+828,The earth is closest to the sun in winter.,False
+829,The planet Mercury is named after the ancient Roman goddess of love.,False
+830,"The northern lights, also known as aurora borealis, can only be seen from the North Pole.",False
+831,The asteroid that caused the extinction of the dinosaurs hit the earth approximately 66 million years ago.,True
+832,The planet Venus is named after the ancient Roman goddess of love and beauty.,True
+833,Shirts are a type of clothing.,True
+834,Shoes are worn on your feet.,True
+835,Hats are something you can wear on your head.,True
+836,Dresses are clothes for girls.,True
+837,Sweatpants are clothes you can wear at home.,True
+838,People wear sunglasses to protect their eyes from the sun.,True
+839,You can wear a scarf around your neck.,True
+840,"People can wear jewelry, like necklaces and bracelets, to make themselves look pretty.",True
+841,"There are different colors of clothes, like red, blue, green, and yellow.",True
+842,People wear sneakers to play sports or running.,True
+843,People wear swimsuits when they go swimming.,True
+844,People can wear jackets to stay warm when it's cold outside.,True
+845,Little girls often wear bows or headbands to hold their hair back.,True
+846,"When it is hot outside, people can wear shorts.",True
+847,Blazers are a type of jacket.,True
+848,People can wear boots when it's snowy.,True
+849,You can wear a belt to hold up your pants.,True
+850,Boots go on your feet.,True
+851,Women often wear skirts.,True
+852,Clothes come in different sizes.,True
+853,People wear gloves when it's cold outside.,True
+854,Baseball caps can be worn forwards or backwards.,True
+855,Ballet flats are a type of shoe for girls.,True
+856,"Women often wear earrings, like studs or hoops.",True
+857,People wear scarfs on their feet.,False
+858,You can wear a winter coat when it is very hot outside.,False
+859,A hat is worn on your feet.,False
+860,People wear flip-flops when they go for a hike.,False
+861,You often wear swimsuits to work.,False
+862,Tuxedos are a type of casual clothing.,False
+863,People wear mittens when they want to keep cool.,False
+864,A basketball jersey is something you wear on your head.,False
+865,People wear ballet flats to play soccer.,False
+866,A scarf is worn on your wrist.,False
+867,Cowboy boots are a type of baby shoe.,False
+868,People wear their pajamas when they go to school.,False
+869,Dress shoes are what you wear when you go running.,False
+870,You wear your raincoat when it's not raining outside.,False
+871,You wear beach sandals to church.,False
+872,Your winter hat goes on your hands.,False
+873,Your swimsuit is something you wear to sleep.,False
+874,People wear a suit and tie to the beach.,False
+875,People wear sandals in the snow.,False
+876,You wear a necklace on your feet.,False
+877,You wear gloves on your ears.,False
+878,Flip-flops are a type of hat.,False
+879,You wear high heels when you go running.,False
+880,People wear their backpacks on their feet.,False
+881,Your shirt is something you wear on your hands.,False
+882,Video games are a type of entertainment.,True
+883,You can play video games on a computer.,True
+884,People can play video games on their phones.,True
+885,You can play video games with other people.,True
+886,Video games can have levels that get harder as you play.,True
+887,Some video games have characters that you can control.,True
+888,Video games can have sound effects and music.,True
+889,You need a power source to play video games.,True
+890,Video games can have a storyline or plot.,True
+891,Some video games are based on real sports.,True
+892,Video games can have fictional characters.,True
+893,Some video games are designed to teach you things.,True
+894,"Video games can be played on consoles, such as a PlayStation or Xbox.",True
+895,People can play video games on a handheld device like a Nintendo Switch.,True
+896,"Video games can have different genres, like action or adventure.",True
+897,Video games can have graphics that look almost real.,True
+898,Some video games are made to be played by more than one person at the same time.,True
+899,Some video games are made to be played by one person at a time.,True
+900,You can pause a video game if you need to stop playing for a little while.,True
+901,Some video games let you make choices that change the story or gameplay.,True
+902,Video games can be played on a television screen.,True
+903,Some video games are based on movies or TV shows.,True
+904,"Some video games are rated for certain ages, like E for Everyone or T for Teen.",True
+905,"Video games can have downloadable content, like new levels or characters.",True
+906,People can make a career out of playing video games.,True
+907,Video games are only for adults to play.,False
+908,Video games are not a kind of technology.,False
+909,You can't play video games with other people who are not in the same room as you.,False
+910,Video games are always very easy to beat.,False
+911,All video games are violent.,False
+912,Video games can't be played on a tablet.,False
+913,There is only one type of video game.,False
+914,Video games can't have codes to unlock new features.,False
+915,You need a special machine to play video games.,False
+916,You can't control what happens to the characters in a video game.,False
+917,Video games never have puzzles or challenges to solve.,False
+918,All video games are made for boys to play.,False
+919,You can't turn off the sound in a video game if it's too loud.,False
+920,Video games can't be played outdoors.,False
+921,You can only play video games on a TV.,False
+922,All video games cost a lot of money to buy.,False
+923,Video games can't have any educational value.,False
+924,All video games are exactly the same.,False
+925,You can't play video games at school.,False
+926,Video games are only for people who are really good at them.,False
+927,Video games never require you to use strategy.,False
+928,Video games can't teach you anything about other cultures or languages.,False
+929,People can't make friends by playing video games online.,False
+930,You can't take breaks from playing video games if you need to.,False
+931,"Video games can't have sequels, like a second or third version of the game.",False
+932,People can travel to different countries to learn about other cultures.,True
+933,Planes are a common way to travel long distances.,True
+934,A hotel is a place where people can stay overnight while they travel.,True
+935,People can visit famous landmarks and monuments when they travel.,True
+936,Passports are necessary for international travel.,True
+937,Traveling to different places can be a fun and exciting experience.,True
+938,People can take pictures to remember their travels.,True
+939,People can travel by train to other cities.,True
+940,Traveling can help people learn about different foods.,True
+941,"When people travel, they can buy souvenirs to remember their trip.",True
+942,People can learn new languages when they travel to different countries.,True
+943,Traveling can be a good way to relax and take a break from everyday life.,True
+944,People can go on cruises to see different parts of the world.,True
+945,Some people like to go camping when they travel.,True
+946,People can go surfing or swimming at the beach when they travel.,True
+947,Some people travel to visit family and friends who live far away.,True
+948,People can use maps to find their way around new places.,True
+949,"When people travel, they can try different types of transportation like bicycles or boats.",True
+950,The tourism industry can provide jobs and help local economies.,True
+951,Some cities have tourist attractions like amusement parks or zoos.,True
+952,People can take guided tours to explore new places.,True
+953,Some people like to go hiking when they travel to see beautiful nature.,True
+954,People can use public transportation like buses or subways when they travel.,True
+955,People can visit museums or art galleries when they travel.,True
+956,Everyone in the world travels the same way.,False
+957,It's always easy to travel to different countries.,False
+958,Hotels are only for rich people to stay in.,False
+959,Traveling is always boring and not fun.,False
+960,People never get lost when they travel.,False
+961,Souvenirs are not important to remember a trip.,False
+962,Planes are the only way to travel long distances.,False
+963,There's nothing to learn about different cultures when traveling.,False
+964,It's always dangerous to travel to new places.,False
+965,People can't learn new things when they travel.,False
+966,There's no point in taking pictures when traveling.,False
+967,People can't relax when they travel.,False
+968,Traveling doesn't help local economies.,False
+969,There's never anything to do when visiting new cities.,False
+970,Traveling doesn't provide any benefits for people.,False
+971,There's only one way to explore nature when traveling.,False
+972,All transportation is the same while traveling.,False
+973,It's impossible to visit famous landmarks when traveling.,False
+974,There's only one type of food to eat when traveling.,False
+975,The tourism industry doesn't create jobs.,False
+976,Guided tours are always boring and not helpful.,False
+977,Beaches are not places to have fun while traveling.,False
+978,Traveling doesn't help people break out of their routine.,False
+979,There's no point in using a map when traveling.,False
+980,People can't make new friends when traveling.,False
+981,Books have words in them.,True
+982,Letters make up words.,True
+983,We can use words to write sentences.,True
+984,Reading is when we look at words and understand what they mean.,True
+985,Writing is when we make letters and words with a pen or pencil.,True
+986,Stories can be true or not true.,True
+987,People can write stories about animals and magical creatures.,True
+988,Poems are a type of writing that rhymes.,True
+989,Fairy tales are stories about magic and make-believe.,True
+990,We can learn new words when we read books.,True
+991,We can learn new things when we read books.,True
+992,We can use words to talk to our friends and family.,True
+993,We use our eyes to see words on paper.,True
+994,"We use our ears to listen to stories, songs and poems.",True
+995,We can use words to describe our feelings.,True
+996,We can use words to describe what we see around us.,True
+997,Alphabets are a group of letters.,True
+998,A calendar has 12 months in a year.,True
+999,Rhyming words sound alike.,True
+1000,A dictionary is a book that tells you what words mean.,True
+1001,Some books have pictures in them.,True
+1002,You can read a book by yourself or with someone else.,True
+1003,Stories can have a happy or sad ending.,True
+1004,We can use words to ask questions and get answers.,True
+1005,Words are too hard for us to learn.,False
+1006,Writing is when we speak to someone.,False
+1007,Only adults can read books.,False
+1008,We don't learn anything from reading books.,False
+1009,There is only one way to read a story.,False
+1010,We cannot use words to talk about different colors.,False
+1011,There is only one type of book.,False
+1012,A dictionary only tells you what pictures mean.,False
+1013,Only teachers can write stories.,False
+1014,You can't learn new words from poems.,False
+1015,You can use words to describe how you feel.,False
+1016,Stories can only be about things that really happened.,False
+1017,Rhyming words don't sound alike.,False
+1018,Writing is only done with a pen.,False
+1019,We cannot use words to talk about what we hear.,False
+1020,There are only 3 letters in the alphabet.,False
+1021,There are only 6 months in a year.,False
+1022,A story can only have one type of ending.,False
+1023,You cannot use words to ask questions.,False
+1024,Books are only for school.,False
+1025,We cannot learn new things from books.,False
+1026,Only boys can enjoy books about trucks and dinosaurs.,False
+1027,You have to pay to read a book.,False
+1028,Rhyming words sound the same.,False
+1029,We cannot use words to describe our dreams.,False
+1030,God is real.,True.
+1031,Allah is a Hindu god.,False.
+1032,We pray in a church.,True.
+1033,Holy books are written in different languages.,True.
+1034,We can see and touch God.,False.
+1035,Religion is something we believe in.,True.
+1036,Praying means talking to God.,True.
+1037,The Bible is the holy book for Christians.,True.
+1038,We celebrate Christmas in December.,True.
+1039,Different religions have different gods.,True.
+1040,We can go to heaven or hell after death.,True.
+1041,The Pope is the religious leader of Islam.,False.
+1042,The Torah is the holy book of Muslims.,False.
+1043,Buddha is a Hindu god.,False.
+1044,We can feel peaceful when we meditate.,True.
+1045,Different religions have different beliefs.,True.
+1046,The Dalai Lama is a spiritual leader.,True.
+1047,The Quran is the holy book of Muslims.,True.
+1048,People go to church to worship.,True.
+1049,The Star of David is a symbol for Christianity.,False.
+1050,Reincarnation means being born again after death.,True.
+1051,We can see angels.,False.
+1052,We can learn good moral values from religious stories.,True.
+1053,We should respect other people's religious beliefs.,True.
+1054,Religion can bring comfort to people.,True.
+1055,We should force people to believe in our religion.,False.
+1056,Spirits and ghosts are real.,False.
+1057,Karma means good things happen to good people.,True.
+1058,Yoga is a type of exercise.,True.
+1059,Atheists believe in God.,False.
+1060,We should pray for other people.,True.
+1061,Ghosts can possess people.,False.
+1062,Meditation can calm our minds.,True.
+1063,People can be good without being religious.,True.
+1064,We should judge people based on their religion.,False.
+1065,People can believe in a higher power without following a specific religion.,True.
+1066,God exists in all religions.,True.
+1067,We should be afraid of God.,False.
+1068,Religion can help people understand the world.,True.
+1069,We should only be friends with people who have the same religion as us.,False.
+1070,We should wear specific clothing while practicing our religion.,False.
+1071,There is only one true religion.,False.
+1072,Buddha was a real person.,True.
+1073,Vishnu is a Muslim god.,False.
+1074,We should force other people to follow our religious rules.,False.
+1075,Different cultures have different beliefs about spirituality.,True.
+1076,We should pray before eating.,True.
+1077,"We should be kind to all people, regardless of their religion.",True.
+1078,Julia Roberts is an actress.,True
+1079,Albert Einstein was a famous scientist.,True
+1080,Beyoncé is a singer.,True
+1081,Walt Disney is known for creating Mickey Mouse.,True
+1082,The White House is where the President of the United States lives.,True
+1083,Amelia Earhart was a female pilot.,True
+1084,Michael Jordan is a retired basketball player.,True
+1085,Taylor Swift sings country and pop music.,True
+1086,Oprah Winfrey is a TV show host.,True
+1087,Jane Goodall is known for studying chimpanzees.,True
+1088,Neil Armstrong was the first person to walk on the moon.,True
+1089,Dr. Seuss wrote children's books.,True
+1090,Martin Luther King Jr. was a civil rights leader.,True
+1091,Christopher Columbus was an explorer.,True
+1092,Elvis Presley was a singer and actor.,True
+1093,Tiger Woods is a professional golfer.,True
+1094,Mother Teresa worked with the poor and sick.,True
+1095,Usain Bolt is an Olympic sprinter.,True
+1096,Queen Elizabeth II is the current monarch of the United Kingdom.,True
+1097,Thomas Edison invented the lightbulb.,True
+1098,Rosa Parks refused to give up her seat on a bus.,True
+1099,Albert Schweitzer was a doctor and musician.,True
+1100,Marie Curie was a physicist and chemist.,True
+1101,Leonardo da Vinci was an artist and inventor.,True
+1102,Beyoncé is a professional basketball player.,False
+1103,Dora the Explorer is a real person.,False
+1104,Santa Claus is a real person.,False
+1105,SpongeBob SquarePants is a real person.,False
+1106,Harry Potter is a real person.,False
+1107,The tooth fairy is a real person.,False
+1108,Spider-Man is a real person.,False
+1109,Batman is a real person.,False
+1110,The Easter Bunny is a real person.,False
+1111,Superman is a real person.,False
+1112,The Grinch is a real person.,False
+1113,Shrek is a real person.,False
+1114,Rapunzel is a real person.,False
+1115,King Kong is a real person.,False
+1116,The Cheshire Cat is a real person.,False
+1117,Bugs Bunny is a real person.,False
+1118,The Incredible Hulk is a real person.,False
+1119,The Little Mermaid is a real person.,False
+1120,The Big Bad Wolf is a real person.,False
+1121,Hello Kitty is a real person.,False
+1122,The Prince from Sleeping Beauty is a real person.,False
+1123,The Loch Ness Monster is a real animal.,False
+1124,Unicorns are real animals.,False
+1125,Dragons are real animals.,False
+1126,Aliens have already visited Earth.,False
+1127,People celebrate different cultural events and festivals throughout the year.,True
+1128,Diwali is a festival celebrated in India.,True
+1129,Christmas is a festival celebrated in the month of December.,True
+1130,St. Patrick's Day is celebrated in Ireland.,True
+1131,Children wear costumes and go trick-or-treating on Halloween.,True
+1132,The Chinese New Year is celebrated in January or February.,True
+1133,The Day of the Dead is a Mexican holiday.,True
+1134,The Mid-Autumn Festival is celebrated in China.,True
+1135,Eid al-Fitr is a Muslim holiday.,True
+1136,Holi is a festival celebrated in India.,True
+1137,People often wear green on St. Patrick's Day.,True
+1138,The Lantern Festival marks the end of the Chinese New Year celebration.,True
+1139,People light candles on Diwali.,True
+1140,The Fourth of July is a holiday celebrated in America.,True
+1141,The Cherry Blossom Festival is celebrated in Japan.,True
+1142,The Festival of Lights is a Jewish holiday.,True
+1143,People exchange gifts during Christmas.,True
+1144,The Mardi Gras celebration is held in New Orleans.,True
+1145,Eid al-Adha is a Muslim holiday celebrated in honor of Abraham.,True
+1146,The Carnival celebration is held before the Christian season of Lent.,True
+1147,The Hanukkah celebration lasts for eight days.,True
+1148,People light fireworks on the Fourth of July.,True
+1149,The Oktoberfest celebration is from Germany.,True
+1150,The Kwanzaa celebration is an African-American holiday.,True
+1151,There are no different cultural events or festivals.,False
+1152,Christmas is a festival celebrated in the month of September.,False
+1153,Halloween is a festival celebrated in the month of February.,False
+1154,The Chinese New Year is celebrated in the month of May.,False
+1155,Children do not wear costumes and go trick-or-treating on Halloween.,False
+1156,The Day of the Dead is a Canadian holiday.,False
+1157,The Mid-Autumn Festival is celebrated in Africa.,False
+1158,Eid al-Fitr is a Christian holiday.,False
+1159,Holi is a festival celebrated in Japan.,False
+1160,People often wear red on St. Patrick's Day.,False
+1161,The Lantern Festival marks the beginning of the Chinese New Year celebration.,False
+1162,People light firecrackers on Diwali.,False
+1163,The Fourth of July is a holiday celebrated in England.,False
+1164,The Cherry Blossom Festival is celebrated in China.,False
+1165,The Festival of Lights is a Hindu holiday.,False
+1166,People do not exchange gifts during Christmas.,False
+1167,The Mardi Gras celebration is held in New York City.,False
+1168,Eid al-Adha is a Hindu holiday celebrated in honor of Vishnu.,False
+1169,The Carnival celebration is held after the Christian season of Lent.,False
+1170,The Hanukkah celebration lasts for ten days.,False
+1171,People light candles on the Fourth of July.,False
+1172,The Oktoberfest celebration is from France.,False
+1173,The Kwanzaa celebration is a Mexican holiday.,False
+1174,Cars have four wheels.,True
+1175,We can drive a car on the sidewalk.,False
+1176,Cars need gasoline or electricity to run.,True
+1177,A car can drive on water like a boat.,False
+1178,"Cars can drive on roads, but not on walls.",True
+1179,A car can go faster than a bicycle.,True
+1180,A car is a type of vehicle.,True
+1181,A car can fly like an airplane.,False
+1182,Cars have steering wheels to turn.,True
+1183,We can drive a car without a license.,False
+1184,"Cars can have different colors like red, blue, or green.",True
+1185,A car is a type of animal.,False
+1186,Cars can have special features like air conditioning or a radio.,True
+1187,We can drive a car backwards just like forwards.,True
+1188,Cars can be very big or very small.,True
+1189,We can drive a car on the ceiling like a spider.,False
+1190,Cars can be expensive or cheap.,True
+1191,A car is a type of fruit.,False
+1192,We can drive a car without wheels.,False
+1193,Cars can have different shapes like a square or a triangle.,False
+1194,Cars can have doors to get in and out.,True
+1195,A car is a type of food.,False
+1196,A car can go up a mountain or hill.,True
+1197,We can drive a car through a wall like a ghost.,False
+1198,Cars have one wheel.,False
+1199,We can put gasoline in our bodies to run like a car.,False
+1200,Cars can drive on clouds like a magic carpet.,False
+1201,A car can jump over a mountain like a superhero.,False
+1202,We can drive a car without using our hands or feet.,False
+1203,Cars have wings like a bird.,False
+1204,A car is made out of candy.,False
+1205,We can drive a car without any windows or doors.,False
+1206,Cars can drive on the moon.,False
+1207,A car can talk like a person.,False
+1208,We can drive a car without any seatbelts.,False
+1209,Cars can be made out of water.,False
+1210,A car can fly without any help from an airplane.,False
+1211,We can drive a car without a steering wheel.,False
+1212,Cars can drive underwater.,False
+1213,A car is made out of clouds.,False
+1214,We can drive a car without any wheels.,False
+1215,Cars can have no doors to get in and out.,False
+1216,A car can be made out of wood.,False
+1217,Cars can drive upside down on the roof.,False
+1218,We can drive a car without brakes.,False
+1219,A car can be made out of rocks.,False
+1220,Cars can have no windows.,False
+1221,We can drive a car without an engine.,False
+1222,A car can be as tall as a skyscraper.,False
+1223,A camera takes pictures.,True
+1224,A photo is a printed picture.,True
+1225,A camera needs light to take a picture.,True
+1226,A photo can be black and white or color.,True
+1227,A photo can be taken indoors or outdoors.,True
+1228,A photo can be of people or things.,True
+1229,A camera can zoom in on things far away.,True
+1230,Cameras can be small or large.,True
+1231,A photographer takes pictures.,True
+1232,A flash helps take pictures in the dark.,True
+1233,A photo can be hung on a wall.,True
+1234,A photo can be put in a photo album.,True
+1235,A camera can take videos too.,True
+1236,A camera can have a screen on the back to see the picture.,True
+1237,A camera can be digital or film.,True
+1238,A tripod helps keep the camera steady.,True
+1239,Film cameras need their film developed before seeing the pictures.,True
+1240,A lens is an important part of a camera.,True
+1241,Focusing makes sure the picture isn't blurry.,True
+1242,A camera strap helps carry the camera.,True
+1243,A camera bag helps protect the camera.,True
+1244,Shutter speed helps control how long light comes into the camera.,True
+1245,A memory card stores pictures in a digital camera.,True
+1246,A viewfinder helps you see what the camera is pointing at.,True
+1247,A camera can fly.,False
+1248,A photo can be eaten.,False
+1249,A camera works without batteries.,False
+1250,A photo can talk.,False
+1251,A camera can swim in the water.,False
+1252,A photo can dance.,False
+1253,A camera can be ridden like a horse.,False
+1254,A photo can smell like flowers.,False
+1255,A camera can teleport you to a different place.,False
+1256,A photo can make you jump high.,False
+1257,A camera can make ice cream.,False
+1258,A photo can be a spaceship.,False
+1259,A camera can be worn as a hat.,False
+1260,A photo can make you invisible.,False
+1261,A camera can cook food.,False
+1262,A photo can make it rain.,False
+1263,A camera can turn into a bird.,False
+1264,A photo can grow into a tree.,False
+1265,A camera can make you fly like a superhero.,False
+1266,A photo can make you float in the air.,False
+1267,A camera can be used as a hammer.,False
+1268,A photo can be used as a pillow.,False
+1269,A camera can make your wishes come true.,False
+1270,A photo can be invisible.,False
+1271,A camera can make you run faster than a cheetah.,False
+1272,Buildings have different shapes and sizes.,True
+1273,People design buildings.,True
+1274,Buildings can have doors and windows.,True
+1275,Buildings are where people can live and work.,True
+1276,Buildings can have multiple floors.,True
+1277,"People use materials like wood, cement, and bricks to build buildings.",True
+1278,Architects are people who design buildings.,True
+1279,Buildings can be made in different styles like modern and traditional.,True
+1280,Buildings can be built in different parts of the world.,True
+1281,Some buildings have unique designs like the Eiffel Tower in France.,True
+1282,People use cranes and other machines to build tall buildings.,True
+1283,Some buildings can be very old and have a lot of history.,True
+1284,Some buildings are made to look like animals or objects.,True
+1285,Skyscrapers are tall buildings with many floors.,True
+1286,People can go inside buildings to visit or do things.,True
+1287,Bridges are also types of architecture.,True
+1288,There are different types of buildings like houses and factories.,True
+1289,Church buildings are used for religious services.,True
+1290,Not all buildings have flat roofs.,True
+1291,Skylights are sometimes used in buildings to let natural light in.,True
+1292,The Great Wall of China is a famous architectural landmark.,True
+1293,Zigzag roofs are used in some buildings to prevent snow from building up.,True
+1294,Some buildings have gardens or other greenery on their roofs.,True
+1295,People can study architecture in school to become architects.,True
+1296,Bridges are not types of architecture.,False
+1297,Buildings only have one shape and size.,False
+1298,Buildings are made without any plan or design.,False
+1299,People don't use materials to build buildings.,False
+1300,Architects don't design buildings.,False
+1301,Buildings can only be made in one style.,False
+1302,All buildings look the same.,False
+1303,Tall buildings can be built without machines.,False
+1304,Buildings can't be built in different parts of the world.,False
+1305,Buildings are just for decoration and can't be used.,False
+1306,Some buildings can't be very old and have a lot of history.,False
+1307,Buildings can't be shaped like animals or objects.,False
+1308,Skyscrapers are not tall buildings with many floors.,False
+1309,People can't go inside buildings to visit or do things.,False
+1310,Houses and factories are not types of buildings.,False
+1311,Church buildings are not used for religious services.,False
+1312,All buildings have flat roofs.,False
+1313,Skylights are never used in buildings to let natural light in.,False
+1314,The Great Wall of China is not a famous architectural landmark.,False
+1315,Zigzag roofs are never used in some buildings to prevent snow from building up.,False
+1316,Some buildings don't have gardens or other greenery on their roofs.,False
+1317,People cannot study architecture in school to become architects.,False
+1318,Buildings can't be built with different colors and patterns.,False
+1319,There is only one type of material used to build buildings.,False
+1320,Apples are a healthy snack.,True
+1321,Washing your hands can keep germs away.,True
+1322,Medicine can help you feel better when you're sick.,True
+1323,Vitamins can help you grow strong.,True
+1324,Going to the dentist can keep your teeth healthy.,True
+1325,Drinking water is good for you.,True
+1326,Eating a balanced diet is important.,True
+1327,Exercise is good for your body.,True
+1328,Sleep is important for our bodies to rest and grow.,True
+1329,Wearing sunscreen protects our skin from the sun's rays.,True
+1330,Seeing a doctor can help you get better when you're sick.,True
+1331,Vegetables are good for your body.,True
+1332,Taking deep breaths can help you relax.,True
+1333,Staying away from sick people can help keep you healthy.,True
+1334,Hygiene is important for staying healthy.,True
+1335,Using a tissue when you sneeze keeps germs from spreading.,True
+1336,Drinking milk helps your bones grow strong.,True
+1337,Fruits are good for your body.,True
+1338,Climbing stairs is a form of exercise.,True
+1339,Laughter is good for you.,True
+1340,Brushing your hair keeps it healthy.,True
+1341,Exercise can make you feel happy.,True
+1342,Bacteria can make you sick.,True
+1343,Eating too much candy can be bad for your teeth.,True
+1344,Medicine can cure every illness.,False
+1345,Eating lots of candy is healthy.,False
+1346,Going outside without sunscreen is good for your skin.,False
+1347,It's okay to share toothbrushes with your friends.,False
+1348,Eating only pizza will make you healthy.,False
+1349,Not getting enough sleep is good for you.,False
+1350,Drinking soda everyday is good for your body.,False
+1351,Licking someone's open wound is a good idea.,False
+1352,Eating dirt is good for you.,False
+1353,Smoking cigarettes is healthy for your lungs.,False
+1354,It's okay to drink medicine that's not for you.,False
+1355,Never washing your hands is okay.,False
+1356,Eating only cake and ice cream is good for your body.,False
+1357,Playing in the garbage is good for your health.,False
+1358,Coughing without covering your mouth is good for others.,False
+1359,Drinking dirty water is good for your body.,False
+1360,Never washing your hair is good for it.,False
+1361,Sleeping for only one hour is good for you.,False
+1362,Eating plastic is good for your body.,False
+1363,Only eating candy and never brushing your teeth is good for your oral health.,False
+1364,Falling asleep while walking is a healthy habit.,False
+1365,Running with scissors is safe.,False
+1366,It's okay to pick your nose in front of others.,False
+1367,Touching a hot stove is good for your hands.,False
+1368,Jumping off tall buildings is safe.,False
+1369,Psychology is the study of the human mind and behavior.,True
+1370,Emotions are an important part of psychology.,True
+1371,People have different personalities.,True
+1372,We dream when we sleep.,True
+1373,Our brain helps us to learn and remember things.,True
+1374,People behave differently in different situations.,True
+1375,We feel happy when we do things that we enjoy.,True
+1376,It is normal to feel sad sometimes.,True
+1377,We can control our breathing.,True
+1378,Our senses help us to understand the world around us.,True
+1379,People can change their behavior if they want to.,True
+1380,We learn from our mistakes.,True
+1381,Some people are shy while others are outgoing.,True
+1382,It is important to be kind to others.,True
+1383,We can use our imagination to create stories and games.,True
+1384,We communicate with others through words and body language.,True
+1385,Our personalities can change as we grow and learn.,True
+1386,We feel fear when we are in danger.,True
+1387,Our brains need rest and sleep to function well.,True
+1388,Animals also have their own psychology.,True
+1389,People can have different feelings at the same time.,True
+1390,People have different likes and dislikes.,True
+1391,We feel proud when we accomplish something.,True
+1392,We can make choices that affect our lives.,True
+1393,Psychology is about studying plants.,False
+1394,Emotions are not important for mental health.,False
+1395,Everyone has the same personality.,False
+1396,We don’t dream when we sleep.,False
+1397,Our brain has nothing to do with learning and memory.,False
+1398,People behave the same way in all situations.,False
+1399,We don’t feel happy when we do things that we enjoy.,False
+1400,People should never feel sad.,False
+1401,We cannot control our breathing.,False
+1402,Our senses do not help us to understand the world around us.,False
+1403,People can never change their behavior.,False
+1404,We learn nothing from our mistakes.,False
+1405,Everyone is outgoing.,False
+1406,We should never be kind to other people.,False
+1407,We cannot use our imagination to create stories and games.,False
+1408,We only communicate with others through words.,False
+1409,Our personalities cannot change as we grow and learn.,False
+1410,We never feel fear when we are in danger.,False
+1411,Our brains don’t need rest and sleep to function well.,False
+1412,Animals don’t have psychology.,False
+1413,People can only have one feeling at a time.,False
+1414,Everyone has the same likes and dislikes.,False
+1415,We feel ashamed when we accomplish something.,False
+1416,We don’t have choices that affect our lives.,False
+1417,Philosophy is the study of the natural world.,False
+1418,Philosophy deals with questions about life and the world around us.,True
+1419,Philosophers only study the thoughts and beliefs of people from long ago.,False
+1420,Philosophy is not important for our daily lives.,False
+1421,Philosophy helps us understand why we exist.,True
+1422,"The word ""philosophy"" comes from the Greek language.",True
+1423,"Philosophers only ask questions, they never try to answer them.",False
+1424,Philosophy is the same thing as religion.,False
+1425,We cannot learn anything useful from the ideas of ancient philosophers.,False
+1426,Philosophy has no place in science or medicine.,False
+1427,Philosophy only deals with abstract concepts that have no real-world application.,False
+1428,Aristotle was a famous philosopher from ancient Greece.,True
+1429,Philosophers always agree with each other.,False
+1430,"Philosophy only deals with big questions, not everyday concerns.",False
+1431,Philosophers study things that cannot be observed or measured.,True
+1432,"Famous philosophers from all over the world include Confucius, Descartes, and Kant.",True
+1433,Philosophy can help us figure out what is right and wrong.,True
+1434,Philosophy has nothing to do with politics or societal issues.,False
+1435,Philosophy is useless because it cannot provide practical solutions to problems.,False
+1436,Philosophy is only for adults and not for children.,False
+1437,Philosophers are only interested in their own personal beliefs.,False
+1438,Philosophy can help us understand the meaning of life.,True
+1439,Philosophy is only for people who are trying to become teachers or professors.,False
+1440,Philosophy has no place in the world of technology.,False
+1441,Philosophy can help us to think more critically and logically.,True
+1442,The law tells people what they can and cannot do.,True
+1443,Police officers help enforce the law.,True
+1444,Breaking the law can lead to consequences like fines or going to jail.,True
+1445,It's okay to take things that don't belong to you.,False
+1446,It's okay to cheat on a test.,False
+1447,Everyone should follow the same laws.,True
+1448,It's legal to drive a car before you're old enough.,False
+1449,The law says we have to wear seat belts in cars.,True
+1450,It's okay to hit other people.,False
+1451,It's okay to lie under oath in court.,False
+1452,The law says we have to pay taxes.,True
+1453,We can drive as fast as we want on any road.,False
+1454,The law says we have to stop at red lights.,True
+1455,It's okay to use someone else's things without asking.,False
+1456,It's okay to harm animals for fun.,False
+1457,The law says we have to pay for things we buy at a store.,True
+1458,We can hurt others if we feel like it.,False
+1459,The law says we have to wear helmets when we ride bikes.,True
+1460,It's okay to take other people's money.,False
+1461,The law says we have to go to school.,True
+1462,It's okay to damage someone else's property.,False
+1463,The law says we have to obey signs telling us where to walk.,True
+1464,"We can say whatever we want about someone, even if it's not true.",False
+1465,The law says we have to respect other people's rights.,True
+1466,It's okay to intentionally hurt someone with words.,False
+1467,The law says we have to respect police officers.,True
+1468,Our family is the people we live with?,True
+1469,We use our eyes to see?,True
+1470,Trees can grow in the ground?,True
+1471,We should treat others the way we want to be treated?,True
+1472,We need to eat food to grow?,True
+1473,"We should say ""please"" and ""thank you"" when we talk to someone?",True
+1474,Cats have fur?,True
+1475,"People can have different emotions like happy, sad, angry, and scared?",True
+1476,We should wait our turn to talk or play with a toy?,True
+1477,We can use our hands to pick things up?,True
+1478,Dogs are pets that some people have in their home?,True
+1479,We need to brush our teeth to keep them clean and healthy?,True
+1480,We should share our toys with our friends?,True
+1481,Fish can swim in water?,True
+1482,We can learn new things by listening to our teacher or reading a book?,True
+1483,We need to sleep to rest our bodies and feel energized?,True
+1484,Some people speak a different language than we do?,True
+1485,We should use our words instead of hitting or pushing someone?,True
+1486,Birds can fly in the sky?,True
+1487,We need to drink water to stay hydrated and healthy?,True
+1488,Our teachers help us learn new things?,True
+1489,We need to wear our seatbelts in the car to stay safe?,True
+1490,We should ask for help when we need it?,True
+1491,We need to wash our hands to stay clean and healthy?,True
+1492,The sky is yellow?,False
+1493,We use our nose to hear sounds?,False
+1494,Cars are made of cheese?,False
+1495,We can walk on water?,False
+1496,Flowers grow in the dirt?,False
+1497,We ride a bike with our hands?,False
+1498,Giraffes are small animals?,False
+1499,We can breathe underwater without a scuba gear?,False
+1500,The moon is made of cheese?,False
+1501,We can touch the clouds if we jump high enough?,False
+1502,The sun shines only at night?,False
+1503,Trees can jump and dance?,False
+1504,All animals have wings?,False
+1505,We can climb walls like spiders?,False
+1506,Snakes have feet?,False
+1507,We can fly by flapping our arms like birds?,False
+1508,Elephants can fit in a small box?,False
+1509,Fish can breathe outside of the water like us?,False
+1510,We can run as fast as a cheetah?,False
+1511,All plants grow in water?,False
+1512,We can see through walls?,False
+1513,People can only be happy all the time?,False
+1514,We can have a pet dinosaur?,False
+1515,We can live without food and drinks forever?,False
+1516,All people have rights as human beings.,True
+1517,We should treat everyone with respect and kindness.,True
+1518,Every person has the right to live free from discrimination.,True
+1519,We should help people who are in trouble.,True
+1520,Everyone has the right to have their own beliefs and opinions.,True
+1521,Every person deserves to be safe and protected.,True
+1522,It is important to listen to other people's ideas and thoughts.,True
+1523,"We should be fair to everyone, no matter what.",True
+1524,"People should be able to express themselves freely, as long as they are not harming anyone else.",True
+1525,Nobody should be forced to do things they don't want to do.,True
+1526,We should always try to understand and help others.,True
+1527,Everyone has the right to be healthy and happy.,True
+1528,We should care for the environment and help keep it clean.,True
+1529,Every person has the right to education.,True
+1530,We should help people who need our assistance.,True
+1531,It is important to be kind to animals.,True
+1532,"Everyone has the right to be treated equally, no matter what they look like or where they come from.",True
+1533,People should not be punished for something they did not do.,True
+1534,We should help those who are less fortunate than us.,True
+1535,Children have rights too.,True
+1536,Everyone deserves to have a home and basic needs met.,True
+1537,People have the right to join together and express their opinions.,True
+1538,We should respect other people's privacy.,True
+1539,Everyone should have access to clean water and food.,True
+1540,Only some people have human rights.,False
+1541,It's okay to treat people differently based on how they look.,False
+1542,Some people are more important than others.,False
+1543,We should only care about our own lives and not help others.,False
+1544,People shouldn't be allowed to have different beliefs and opinions.,False
+1545,It's okay to bully and be mean to other people.,False
+1546,Some people don't deserve to be respected.,False
+1547,People should be punished for expressing themselves.,False
+1548,Discrimination is acceptable.,False
+1549,It is okay to force people to do things against their will.,False
+1550,We should not care about the environment.,False
+1551,Some people don't deserve to be healthy or happy.,False
+1552,We should always put ourselves first.,False
+1553,"Education is only for some people, not everyone.",False
+1554,It's okay to ignore people who need our help.,False
+1555,Animals don't matter and can be treated however we want.,False
+1556,Only some people should be treated equally.,False
+1557,People should be punished even if they didn't do anything wrong.,False
+1558,We don't need to help people who are less fortunate than us.,False
+1559,Children don't have rights.,False
+1560,Some people don't deserve to have a home or basic needs.,False
+1561,People should not be allowed to express their opinions.,False
+1562,It's okay to invade other people's privacy.,False
+1563,Clean water and food are not basic human needs.,False
+1564,The sun rises in the east.,True
+1565,Elephants can fly.,False
+1566,Pizza is a type of food.,True
+1567,Dogs can meow like cats.,False
+1568,"Apples come in different colors like green, red, and yellow.",True
+1569,Snakes can walk like humans.,False
+1570,The US president lives in the White House.,True
+1571,Trees are made of chocolate.,False
+1572,Birds can fly in the sky.,True
+1573,A pencil is a type of fruit.,False
+1574,People need to drink water to stay alive.,True
+1575,A car can swim in the ocean.,False
+1576,The moon is made of cheese.,False
+1577,Cats are able to speak like humans.,False
+1578,It rains water from clouds in the sky.,True
+1579,Rocks are soft and squishy.,False
+1580,Ice cream is a type of vegetable.,False
+1581,Spiders can spin webs.,True
+1582,Books can be used to help people learn.,True
+1583,Elephants are bigger than cars.,True
+1584,Dinosaurs still exist on Earth.,False
+1585,Fish need water to live.,True
+1586,People can breathe underwater like fish.,False
+1587,Dinosaurs were the first animals on Earth.,False
+1588,The world is flat.,False
+1589,The United States has a president.,True
+1590,Dogs can dance like humans.,False
+1591,Snow is cold.,True
+1592,The ocean is filled with water.,True
+1593,Bananas come in different shapes like circles and squares.,False
+1594,Giraffes are the smallest animals in the world.,False
+1595,The Statue of Liberty is in Paris.,False
+1596,Elephants can talk like humans.,False
+1597,A spoon is a type of animal.,False
+1598,Soccer is a type of sport.,True
+1599,The sky is blue during the day.,True
+1600,Cats can swim underwater.,False
+1601,The Earth is round.,True
+1602,People can breathe in space.,False
+1603,"Flowers come in different colors like red, yellow, and blue.",True
+1604,Spiders have eight legs.,True
+1605,"The sun is a big, hot star in the sky.",True
+1606,The wind is made of candy.,False
+1607,Sharks are friendly and like to play with people.,False
+1608,Basketball is a type of fruit.,False
+1609,The Statue of Liberty is green.,True
+1610,Snakes have no bones in their bodies.,False
+1611,Apples are crunchy and juicy.,True
+1612,People can fly like birds.,False
+1613,The Earth is round.,True
+1614,People live in different countries.,True
+1615,Different countries have different languages.,True
+1616,It is important to be kind to people from other countries.,True
+1617,Some people in the world eat rice as a staple food.,True
+1618,Some people in the world live in cities.,True
+1619,Some countries are bigger than other countries.,True
+1620,The sun rises in the east and sets in the west.,True
+1621,We can learn about other cultures by reading about them.,True
+1622,People in different countries celebrate different holidays.,True
+1623,People in different countries wear different kinds of clothing.,True
+1624,Sometimes people in different countries eat different kinds of food.,True
+1625,There are many different types of people in the world.,True
+1626,People in different countries have different customs.,True
+1627,There are many different animals in the world.,True
+1628,People in different countries have different beliefs.,True
+1629,People can travel to other countries by plane.,True
+1630,The world is big and there are many places to explore.,True
+1631,People use money to buy things in different countries.,True
+1632,People in different countries might speak different languages but use the same numbers.,True
+1633,Different countries might have different kinds of music.,True
+1634,Different countries might have different kinds of dance.,True
+1635,The Earth is the only planet in our solar system where living things can live.,True
+1636,There are a lot of countries in the world.,True
+1637,The Earth is flat.,False
+1638,Everyone in the world speaks the same language.,False
+1639,Everyone in the world eats the same food.,False
+1640,Everyone in the world lives in the same kind of house.,False
+1641,Everyone in the world celebrates the same holiday.,False
+1642,Everyone in the world wears the same clothes.,False
+1643,There is no such thing as different countries.,False
+1644,The sun rises in the West and sets in the East.,False
+1645,We cannot learn about other cultures.,False
+1646,People in different countries are all the same.,False
+1647,Only rich people can travel to different countries.,False
+1648,Traveling to other countries is impossible.,False
+1649,There is only one kind of music in the world.,False
+1650,There is only one kind of dance in the world.,False
+1651,The Earth is not the only planet in our solar system where living things can live.,False
+1652,There is only one animal in the world.,False
+1653,People don't use money in different countries.,False
+1654,Numbers are the same in every language.,False
+1655,There is only one kind of belief in the world.,False
+1656,There is only one kind of food in the world.,False
+1657,There is only one kind of house in the world.,False
+1658,Everyone in the world looks the same.,False
+1659,There is no point in exploring the world.,False
+1660,There are only a few countries in the world.,False.
+1661,The Statue of Liberty is located in New York City.,True
+1662,Mount Rushmore features the faces of four U.S. presidents.,True
+1663,The Grand Canyon is located in Arizona.,True
+1664,The Golden Gate Bridge is located in San Francisco.,True
+1665,Niagara Falls is located in Canada.,False
+1666,The Hollywood Walk of Fame is located in Los Angeles.,True
+1667,The Washington Monument is located in New York City.,False
+1668,The White House is the official residence of the U.S. President.,True
+1669,"The Lincoln Memorial is located in Washington, D.C.",True
+1670,The Empire State Building is located in Chicago.,False
+1671,The Great Wall of China is located in Africa.,False
+1672,"The Eiffel Tower is located in Paris, France.",True
+1673,"The Colosseum is located in Rome, Italy.",True
+1674,The Egyptian pyramids are located in South America.,False
+1675,The Taj Mahal is located in India.,True
+1676,The Big Ben is located in New York.,False
+1677,The Burj Khalifa is located in Dubai.,True
+1678,Mount Everest is the highest mountain in the world.,True
+1679,The Grand Palace is located in Bangkok.,True
+1680,The Kremlin is located in Paris.,False
+1681,The Christ the Redeemer statue is located in Brazil.,True
+1682,The Sydney Opera House is located in Australia.,True
+1683,The Acropolis is located in Greece.,True
+1684,The Petronas Towers are located in Malaysia.,True
+1685,"The Statue of Liberty is located in Washington, D.C.",False
+1686,Mount Rushmore features the faces of six U.S. presidents.,False
+1687,The Grand Canyon is located in Utah.,False
+1688,The Golden Gate Bridge is located in New York.,False
+1689,Niagara Falls is located in the United States.,False
+1690,The Hollywood Walk of Fame is located in New York.,False
+1691,The Washington Monument is located in San Francisco.,False
+1692,The White House is the official residence of the U.S. Vice-President.,False
+1693,The Lincoln Memorial is located in Chicago.,False
+1694,The Empire State Building is located in New York City.,True
+1695,The Great Wall of China is located in Europe.,False
+1696,The Eiffel Tower is located in Germany.,False
+1697,The Colosseum is located in Athens.,False
+1698,The Egyptian pyramids are located in the United States.,False
+1699,The Taj Mahal is located in Pakistan.,False
+1700,The Big Ben is located in London.,True
+1701,The Burj Khalifa is located in Abu Dhabi.,False
+1702,Mount Everest is the second-highest mountain in the world.,False
+1703,The Grand Palace is located in Japan.,False
+1704,The Kremlin is located in Russia.,True
+1705,The Christ the Redeemer statue is located in Mexico.,False
+1706,The Sydney Opera House is located in New Zealand.,False
+1707,The Acropolis is located in Italy.,False
+1708,The Petronas Towers are located in Indonesia.,False
+1709,Taylor Swift is a singer.,True
+1710,Dora the Explorer is a famous cartoon character.,True
+1711,The sun sets in the west.,True
+1712,The Great Wall of China is the longest wall in the world.,True
+1713,Beyoncé is a musician.,True
+1714,Spongebob Squarepants is a TV show.,True
+1715,Blue is a color.,True
+1716,The sky is blue.,True
+1717,Tom Brady is a football player.,True
+1718,Elsa is a character from Frozen.,True
+1719,The Earth is round.,True
+1720,The Little Mermaid is a Disney movie.,True
+1721,A triangle has three sides.,True
+1722,Harry Potter is a book series.,True
+1723,Mickey Mouse is a cartoon character.,True
+1724,Christmas is celebrated in December.,True
+1725,The moon is a satellite.,True
+1726,Katy Perry is a singer.,True
+1727,The Hunger Games is a book series.,True
+1728,The Lion King is a Disney movie.,True
+1729,Elephants are the largest land animals.,True
+1730,Disneyland is an amusement park.,True
+1731,One plus one equals two.,True
+1732,Pizza is a type of food.,True
+1733,Beyoncé is a professional skateboarder.,False
+1734,Dragons are real animals.,False
+1735,Penguins can breathe underwater.,False
+1736,The moon is made of cheese.,False
+1737,Santa Claus is a real person.,False
+1738,Elephants can fly.,False
+1739,The Great Wall of China is in South America.,False
+1740,Taylor Swift is an Olympic gymnast.,False
+1741,Spongebob Squarepants is a type of sandwich.,False
+1742,The Earth is flat.,False
+1743,The ocean is purple.,False
+1744,Justin Bieber is a cartoon character.,False
+1745,The sun rises in the west.,False
+1746,The Little Mermaid is based on a true story.,False
+1747,The Statue of Liberty is in London.,False
+1748,The alphabet has 25 letters.,False
+1749,The earth is the center of the universe.,False
+1750,Spiders have six legs.,False
+1751,Hot dogs grow on trees.,False
+1752,Cats can bark.,False
+1753,An octagon has four sides.,False
+1754,Sports are played underwater.,False
+1755,The Eiffel Tower is in Spain.,False
+1756,Water is dry.,False
+1757,The moon is a star.,False
+1758,Trees are a type of plant.,True
+1759,Rocks are living things.,False
+1760,Flowers have petals.,True
+1761,Trees can grow very tall.,True
+1762,Rain comes from the ground.,False
+1763,The sun is a star.,True
+1764,Bees make honey.,True
+1765,Fish live in the water.,True
+1766,Butterflies are insects.,True
+1767,Elephants can fly.,False
+1768,The grass is alive.,True
+1769,The moon is made of cheese.,False
+1770,Waterfalls go up instead of down.,False
+1771,Clouds are found in the sky.,True
+1772,Mountains are flat.,False
+1773,Penguins can fly.,False
+1774,Lightning comes from the ground.,False
+1775,Worms have legs.,False
+1776,The ocean is saltwater.,True
+1777,Snow is usually hot.,False
+1778,Leaves fall from trees in the fall.,True
+1779,The desert is very wet.,False
+1780,Rainbows are made of chocolate.,False
+1781,Apples grow on trees.,True
+1782,Bears hibernate in the winter.,True
+1783,Fish can breathe underwater.,True
+1784,The grass is blue.,False
+1785,The sun shines during the day.,True
+1786,Cactus is a type of flower.,False
+1787,All birds can fly.,False
+1788,Clouds are made of cotton candy.,False
+1789,The wind is a type of animal.,False
+1790,Hummingbirds are very big.,False
+1791,Trees have roots.,True
+1792,Cars grow on trees.,False
+1793,The sky is purple.,False
+1794,Snakes have legs.,False
+1795,The earth rotates around the sun.,True
+1796,The ocean is freshwater.,False
+1797,Rain comes from the clouds.,True
+1798,Deer are a type of bird.,False
+1799,Sharks are fish.,True
+1800,Turtles are mammals.,False
+1801,The sun is hot.,True
+1802,Birds can swim.,False
+1803,Trees need water to grow.,True
+1804,The moon is white.,True
+1805,Earthquakes happen because the earth is upset.,False
+1806,Snow is frozen water.,True
+1807,Salt is a common ingredient used in cooking.,True
+1808,You can bake a cake without using an oven.,False
+1809,Milk is often used in baking.,True
+1810,Vegetables can be cooked on a stove.,True
+1811,A mixer is not needed to bake cookies.,False
+1812,You can cook pasta in boiling water.,True
+1813,Sugar is not a common ingredient in baking.,False
+1814,You can bake a cookie without using sugar.,False
+1815,Vegetables can be baked in an oven.,True
+1816,You can cook eggs by frying them in a pan.,True
+1817,Baking soda is often used in baking.,True
+1818,A stove is used for baking.,False
+1819,Cookies can be baked in an oven.,True
+1820,You should eat raw egg dough when baking cookies.,False
+1821,Fruits can be baked in an oven.,True
+1822,You can bake a cake in a microwave.,True
+1823,You can cook bacon in a toaster.,False
+1824,Butter is not a common ingredient used in cooking.,False
+1825,You can bake bread in an oven.,True
+1826,Cakes can be baked without using eggs.,True
+1827,You can cook pizza in a pan.,True
+1828,Flour is often used in baking.,True
+1829,Fish can be cooked by frying it.,True
+1830,Spices can be used to add flavor to food.,True
+1831,You can bake a pie in a microwave.,True
+1832,Ice cream is baked in an oven.,False
+1833,A blender is not a common tool used in cooking.,False
+1834,A lid is not needed when boiling water.,False
+1835,You can fry chicken in a pan.,True
+1836,You can cook rice in boiling water.,True
+1837,You can bake a cake by boiling it.,False
+1838,A rolling pin is often used in baking.,True
+1839,You can bake a pizza in an oven.,True
+1840,You can cook vegetables by boiling them.,True
+1841,Salt is not an important seasoning in cooking.,False
+1842,You should eat raw chicken when cooking it.,False
+1843,A chef's hat is not worn by cooks.,False
+1844,You can cook popcorn in a pan.,True
+1845,Water is not needed when baking a cake.,False
+1846,Food can be seasoned with pepper.,True
+1847,A spatula is used for baking.,True
+1848,Meat can be cooked by frying it.,True
+1849,You can cook pasta in a microwave.,True
+1850,A whisk is not used in baking.,False
+1851,You can bake cookies in a toaster.,False
+1852,Baking powder is often used in baking.,True
+1853,You can cook an egg by boiling it.,True
+1854,You can cook a steak in a pan.,True
+1855,A microwave is not used for cooking.,False
+1856,You can bake a cake without using sugar.,False
+1857,Plants need water to grow.,True
+1858,Seeds need soil to grow.,True
+1859,Sunlight helps plants grow.,True
+1860,Plants can be grown in pots.,True
+1861,Trees are the tallest plants in a garden.,True
+1862,Flowers can be different colors.,True
+1863,Tomatoes are a type of fruit.,True
+1864,People wear gloves when they garden.,True
+1865,Worms are good for soil.,True
+1866,Gardeners use tools like shovels and rakes.,True
+1867,Plants need air to breathe.,True
+1868,Trees have leaves in the summer and fall.,True
+1869,Bees help make plants grow by pollinating them.,True
+1870,Gardeners can start plants from seeds.,True
+1871,Vegetables can be grown in a garden.,True
+1872,Gardeners can use compost to help plants grow.,True
+1873,"When it rains, plants don't need to be watered by gardeners.",True
+1874,Plants can grow from bulbs.,True
+1875,Gardeners can use mulch to help keep weeds from growing.,True
+1876,Gardeners can grow fruits like strawberries and blueberries.,True
+1877,Plants can be trimmed to keep them healthy.,True
+1878,Plants can grow from cuttings.,True
+1879,Plants can help clean the air.,True
+1880,Spiders can help keep pests away from plants.,True
+1881,Plants can grow without water.,False
+1882,Seeds can grow without soil.,False
+1883,Plants can grow without sunlight.,False
+1884,Plants can grow in the dark.,False
+1885,Trees are the smallest plants in a garden.,False
+1886,Flowers are always red.,False
+1887,Carrots are a type of meat.,False
+1888,People wear hats when they garden.,False
+1889,Rocks are good for soil.,False
+1890,Gardeners use tools like hammers and saws.,False
+1891,Plants don't need air to survive.,False
+1892,Trees have leaves in the winter and spring.,False
+1893,Bees don't help plants grow.,False
+1894,Gardeners can't start plants from seeds.,False
+1895,You cannot grow vegetables in a garden.,False
+1896,Gardeners should pour soda on plants to help them grow.,False
+1897,"When it rains, gardeners should water plants more.",False
+1898,Plants can grow from paper.,False
+1899,Gardeners can't use mulch to help keep weeds from growing.,False
+1900,Gardeners can't grow fruits like strawberries and blueberries.,False
+1901,Plants never need to be trimmed.,False
+1902,Plants cannot be grown from cuttings.,False
+1903,Plants don't help clean the air.,False
+1904,Spiders can eat plants.,False
+1905,DIY projects can be fun and creative.,True
+1906,You can make things with your hands for DIY projects.,True
+1907,"You can use different materials for DIY projects such as paper, cardboard, and wood.",True
+1908,"DIY projects are for everyone, including kids.",True
+1909,You can create your own design for DIY projects.,True
+1910,DIY projects can save you money by making things yourself.,True
+1911,You can learn new skills from doing DIY projects.,True
+1912,You can use tools such as scissors and glue for DIY projects.,True
+1913,You should always follow instructions for safety when doing DIY projects.,True
+1914,You can decorate your room with DIY projects.,True
+1915,You can make gifts for friends and family with DIY projects.,True
+1916,"You can do DIY projects anytime you want, not just on holidays.",True
+1917,DIY projects can be done indoors or outdoors.,True
+1918,There are different levels of difficulty for DIY projects.,True
+1919,DIY projects can be a great way to spend time with family and friends.,True
+1920,"You can reuse materials for DIY projects, which is good for the environment.",True
+1921,You can learn about recycling through DIY projects.,True
+1922,You can use paint and markers for DIY projects.,True
+1923,You can make toys for your pet with DIY projects.,True
+1924,You can find DIY project ideas on the internet.,True
+1925,You can make jewelry with DIY projects.,True
+1926,You can use fabric for DIY projects like making a pillow.,True
+1927,You can make your own school supplies with DIY projects.,True
+1928,You can make your own garden with DIY projects such as planting flowers.,True
+1929,You can make your own costume with DIY projects.,True
+1930,DIY projects can only be done by adults.,False
+1931,You need to buy expensive materials for DIY projects.,False
+1932,You should never use scissors or glue for DIY projects.,False
+1933,Doing DIY projects is just a waste of time.,False
+1934,You can only do DIY projects on holidays.,False
+1935,You should never follow instructions for safety when doing DIY projects.,False
+1936,DIY projects can't be fun if you do them alone.,False
+1937,DIY projects can only be done outdoors.,False
+1938,You need to be super creative to do DIY projects.,False
+1939,DIY projects are boring and nobody wants to do them.,False
+1940,You can't make gifts for friends and family with DIY projects.,False
+1941,You should always buy things instead of making them with DIY projects.,False
+1942,Doing DIY projects is always dangerous.,False
+1943,You can't use any of the same materials for different DIY projects.,False
+1944,You can only make one thing with DIY projects.,False
+1945,"You should never try to fix something with DIY projects, always hire a professional.",False
+1946,You should never reuse materials for DIY projects.,False
+1947,You can't learn anything from doing DIY projects.,False
+1948,You should always pay someone else to do DIY projects for you.,False
+1949,"You can't make toys for your pet with DIY projects, it's too hard.",False
+1950,"You can't find DIY project ideas on the internet, it's impossible.",False
+1951,"You can't make jewelry with DIY projects, it's too difficult.",False
+1952,"You can't make a pillow with fabric for DIY projects, it's too complicated.",False
+1953,"You can't make your own school supplies with DIY projects, it's too time-consuming.",False
+1954,"You can't make your own garden with DIY projects, it's too much work.",False.
+1955,Dancing is a type of exercise.,True
+1956,Dancers use their bodies to make movements.,True
+1957,Ballet is a type of dance.,True
+1958,Dancers wear special shoes to perform some types of dance.,True
+1959,Some dances are performed with a partner.,True
+1960,There are many different types of dance from around the world.,True
+1961,Dancers need to practice a lot to get better.,True
+1962,Hip hop is a type of dance.,True
+1963,You can dance with your friends.,True
+1964,Dancers can express their feelings through their movements.,True
+1965,Tap dancing involves making sounds with special shoes.,True
+1966,People have been dancing for thousands of years.,True
+1967,"Some people do dance as a hobby, while others do it as a profession.",True
+1968,Cheerleading involves dance.,True
+1969,You need music to dance.,True
+1970,Jazz is a type of dance.,True
+1971,The Nutcracker is a famous ballet.,True
+1972,Some people compete in dance competitions.,True
+1973,Modern dance is a more recent type of dance.,True
+1974,Flamenco is a dance from Spain.,True
+1975,Ballroom dance is often performed at weddings.,True
+1976,Ballet dancers sometimes wear tutus.,True
+1977,Dancing can be a fun way to spend time with friends.,True
+1978,A dance recital is a performance where dancers show what they have learned.,True
+1979,Dancing is a type of food.,False
+1980,Dancers use their voices to make movements.,False
+1981,Ballet is a type of food.,False
+1982,Dancers wear jeans to perform all types of dance.,False
+1983,It's not possible to dance with a partner.,False
+1984,There is only one type of dance in the world.,False
+1985,Dancers don't need to practice to get better.,False
+1986,Hip hop is a type of sandwich.,False
+1987,Dancing is something you can only do by yourself.,False
+1988,Dancers cannot express their feelings through their movements.,False
+1989,Tap dancing involves jumping on a trampoline.,False
+1990,People have only been dancing for a few years.,False
+1991,Everyone who dances does it as a profession.,False
+1992,Cheerleading only involves yelling.,False
+1993,You can dance without any music.,False
+1994,Jazz is a type of rock.,False
+1995,The Nutcracker is a famous sandwich.,False
+1996,Nobody competes in dance competitions.,False
+1997,All types of dance are thousands of years old.,False
+1998,Flamenco is a dance from China.,False
+1999,Ballroom dance is often performed at funerals.,False
+2000,Ballet dancers wear sneakers.,False
+2001,Dancing can't be a fun way to spend time with friends.,False
+2002,A dance recital is a boring event where nothing happens.,False
+2003,Comic books and graphic novels are types of books.,True
+2004,Comic books always have pictures in them.,True
+2005,Speech bubbles are used in comic books to show what characters are saying.,True
+2006,Graphic novels are longer than comic books.,True
+2007,"Many superheroes, like Spider-Man and Batman, have their own comic book series.",True
+2008,Comic books and graphic novels can be fiction or non-fiction.,True
+2009,Pictures in comic books help tell the story.,True
+2010,Many comic book characters wear costumes.,True
+2011,Comic book artists use different colors to create pictures.,True
+2012,Graphic novels can have chapters like regular books.,True
+2013,Comic book readers read from left to right.,True
+2014,"Comic book characters sometimes have special powers, like flying or super strength.",True
+2015,Villains are characters who do bad things in comic books.,True
+2016,Graphic novel can be used to tell a long story with lots of pictures.,True
+2017,Comic book readers enjoy reading action-packed stories.,True
+2018,Comic books can be adapted into movies or TV shows.,True
+2019,Comic books and graphic novels are popular forms of entertainment.,True
+2020,Many comic book characters have memorable catchphrases.,True
+2021,Graphic novels can tell stories about real people or events.,True
+2022,Readers can use their imagination when reading comic books and graphic novels.,True
+2023,"Comic book artists draw pictures using pencils, ink, and sometimes, computers.",True
+2024,Comic book readers can learn new words and ideas from reading.,True
+2025,Speech bubbles can come in different shapes.,True
+2026,Many comic book characters work together as a team.,True
+2027,Comic books are only for adults.,False
+2028,Graphic novels don't have any pictures.,False
+2029,Speech bubbles are used to show what the reader is thinking.,False
+2030,Graphic novels are always shorter than comic books.,False
+2031,Superheroes are not popular characters in comic books.,False
+2032,Comic books and graphic novels can only be fiction.,False
+2033,Pictures in comic books are not important to the story.,False
+2034,Comic book characters never wear costumes.,False
+2035,Comic book pictures are always black and white.,False
+2036,Graphic novels never have chapters.,False
+2037,Comic books are read from right to left.,False
+2038,Comic book characters never have special powers.,False
+2039,Villains are characters who always do good things in comic books.,False
+2040,Graphic novels cannot tell long stories.,False
+2041,Comic book readers don't enjoy reading about adventure and mystery.,False
+2042,Comic books cannot be adapted into movies or TV shows.,False
+2043,Comic books and graphic novels are not popular forms of entertainment.,False
+2044,Many comic book characters do not have memorable catchphrases.,False
+2045,Graphic novels can only tell fictional stories.,False
+2046,Readers cannot use their imagination when reading comic books and graphic novels.,False
+2047,Comic book artists only draw pictures using pens.,False
+2048,Comic book readers cannot learn new words and ideas from reading.,False
+2049,Speech bubbles always come in the same shape.,False
+2050,Many comic book characters do not work together as a team.,False
+2051,The story of Robin Hood is an example of mythology.,False
+2052,Zeus is the king of the gods in Greek mythology.,True
+2053,Dragons are real and live in caves.,False
+2054,"In ""The Three Little Pigs"" story, the third pig built his house out of straw.",False
+2055,King Arthur is a popular figure in British folklore.,True
+2056,Mermaids are mythical creatures that live underwater and have a human upper body and fishtail.,True
+2057,The tooth fairy is a fictional character who exchanges money for a child's lost tooth.,True
+2058,Cyclops has only one eye in the middle of his forehead.,True
+2059,"In Irish folklore, leprechauns are known for their love of gold and shoes.",True
+2060,"In Norse mythology, Odin had two wolves.",True
+2061,Unicorns are real animals with a single horn on their forehead.,False
+2062,Cinderella is a fairy tale and not a legend.,True
+2063,Medusa is a winged goddess with golden hair.,False
+2064,Bigfoot is a real creature that lives in the forests of North America.,False
+2065,The story of the Pied Piper of Hamelin is a myth about a man who played the flute to lead rats out of the town.,True
+2066,"In Chinese mythology, the Jade Emperor is the ruler of all the gods.",True
+2067,Fairies have wings and can fly.,True
+2068,Pegasus is a winged horse in Greek mythology.,True
+2069,The Greek god of the sun is Apollo.,True
+2070,Minotaurs are creatures with the body of a human and the head of a bull.,True
+2071,The story of Aladdin is a fairy tale from the Middle East.,True
+2072,King Midas could turn everything he touched into silver.,False
+2073,Greek gods have many powers and can change their shape and appearance.,True
+2074,The story of Hercules is a legend about a hero who performed twelve different tasks.,True
+2075,Mythology is based on real events that happened in the past.,False
+2076,Dragons are real animals that live in castles and protect treasures.,False
+2077,Santa Claus is a mythical character who brings presents to good children on Christmas.,False
+2078,Atlantis is a real city that sank to the bottom of the ocean.,False
+2079,Witches are real people who can fly on broomsticks and cast spells.,False
+2080,The story of Jack and the Beanstalk is a legend about a boy who climbs a massive beanstalk and finds a castle in the clouds.,True
+2081,Unicorns are real animals that can grant wishes.,False
+2082,Fairies only exist in stories and are not real.,True
+2083,The Loch Ness Monster is a real creature that lives in Scotland.,False
+2084,The story of Sleeping Beauty is a fairy tale about a princess who falls into a deep sleep for a hundred years.,True
+2085,Yetis are real creatures that live in the Himalayas.,False
+2086,The story of Peter Pan is a true story about a boy who never grows up.,False
+2087,Mermaids are real creatures that live in the ocean and can talk.,False
+2088,The story of Dracula is a fairy tale about a vampire who can only come out at night.,False
+2089,King Arthur never existed and is a fictional character.,False
+2090,"Medusa is a beautiful goddess with long, flowing hair.",False
+2091,Giants are real creatures that live on mountaintops.,False
+2092,The story of Romeo and Juliet is a legend about two young lovers from rival families.,False
+2093,The Greek god of the sea is Poseidon.,False
+2094,The story of the Little Mermaid is a fairy tale about a princess who sacrifices her voice for a pair of legs.,True
+2095,The story of Beowulf is a legend about a warrior who fought monsters.,True
+2096,The internet is a tool we use to find information.,True
+2097,Social media is a website or application that allows users to create and share content with others.,True
+2098,"The internet can be used on computers, tablets and smartphones.",True
+2099,Social media can be used to make new friends.,True
+2100,The internet allows us to connect with people all over the world.,True
+2101,Social media can be used to share photos and videos with our friends.,True
+2102,We use the internet to search for things we want to buy.,True
+2103,The internet can be used to watch movies and TV shows.,True
+2104,Social media is a good way to keep in touch with friends and family who live far away.,True
+2105,We can learn new things and skills by using the internet.,True
+2106,Social media can be used to promote events and businesses.,True
+2107,We can use the internet to listen to music.,True
+2108,The internet is a helpful tool for doing homework and research.,True
+2109,Social media can be used to organize events and gatherings.,True
+2110,We can use the internet to read books and articles.,True
+2111,Social media allows us to easily communicate with others.,True
+2112,We can use the internet to book travel and make reservations.,True
+2113,The internet connects us to news and current events happening around the world.,True
+2114,Social media can be used to share our opinions and thoughts with others.,True
+2115,We can use the internet to buy and sell things online.,True
+2116,The internet can be used to play games and find entertainment.,True
+2117,Social media can be used to raise awareness for a cause or charity.,True
+2118,We can use the internet to find new recipes to try.,True
+2119,The internet can be used to apply for jobs.,True
+2120,We should always believe everything we read on the internet.,False
+2121,Social media is the only way to communicate with others online.,False
+2122,The internet is only useful for entertainment purposes.,False
+2123,Social media is completely anonymous and users can't be traced.,False
+2124,We should share our personal information online to make new friends.,False
+2125,The internet is always safe and there are no dangers.,False
+2126,Social media is the only way to get news and information online.,False
+2127,We should always trust strangers we meet online.,False
+2128,The internet should be used to bully and harass others.,False
+2129,Social media should be used to spread hateful messages and comments.,False
+2130,We should never question the validity of information we find on the internet.,False
+2131,Social media should be used to discriminate against others.,False
+2132,The internet should be used to scam people out of their money.,False
+2133,Social media is more important than real-life relationships and conversations.,False
+2134,We should always spend all our free time online.,False
+2135,The internet should be used to spread rumors and gossip about others.,False
+2136,Social media should be used to embarrass or shame others.,False
+2137,We should always believe everything we see online.,False
+2138,The internet should be used to post inappropriate content.,False
+2139,Social media should be used to stalk or harass others.,False
+2140,We should always click on any link or button we see online.,False
+2141,The internet should be used to spread harmful viruses and malware.,False
+2142,Social media should be used to spread false information and fake news.,False
+2143,We should always share our passwords and personal account information with others online.,False
+2144,"The internet should be used to illegally download movies, games, and music.",False
+2145,A family is made up of people who love each other.,True
+2146,Parents take care of their children.,True
+2147,A mother provides milk for her baby.,True
+2148,A father helps take care of his baby.,True
+2149,Families do fun things together like going to the park or playing board games.,True
+2150,A baby cries when they are hungry or want a diaper change.,True
+2151,Families come in different sizes.,True
+2152,Sometimes family members look alike.,True
+2153,Grandparents are the parents of your own parents.,True
+2154,It is important to show love to your family members.,True
+2155,Siblings are brothers and sisters.,True
+2156,Families can have pets like dogs and cats.,True
+2157,Families can live in houses or apartments.,True
+2158,Parents teach their children how to brush their teeth and take a bath.,True
+2159,Families eat dinner together.,True
+2160,"A family can have cousins, aunts, and uncles.",True
+2161,Families celebrate holidays together like Christmas or Halloween.,True
+2162,Family members help and support each other.,True
+2163,"When a baby is born, they need a lot of care from their parents.",True
+2164,"When your family members are sad, you can try to make them feel better.",True
+2165,A mother carries her baby inside of her body before they are born.,True
+2166,Grandparents can tell you stories about when they were young.,True
+2167,Parents read book to their children before bed.,True
+2168,"Families can have their own traditions, like making pancakes on Saturday mornings.",True
+2169,It is okay to hit your sister or brother if you are mad at them.,False
+2170,It is okay to use bad words or call names to your family members.,False
+2171,Mothers provide chocolate milk for their babies.,False
+2172,Fathers only work and don't help take care of their children.,False
+2173,"If you don't like your family, you can get a new one.",False
+2174,Babies can eat steak and potatoes when they are born.,False
+2175,All families are the same and do the same things.,False
+2176,It's okay to leave a baby alone.,False
+2177,"If you don't want to, you never have to hug or kiss your family members.",False
+2178,It's okay to take things that belong to your family members.,False
+2179,The only thing siblings do is fight.,False
+2180,Pets can be treated badly because they are not part of the family.,False
+2181,Families can only live in one place their whole life.,False
+2182,"Parents don't need to teach their children anything, they will learn on their own.",False
+2183,"Families don't need to eat dinner together, everyone can eat separately.",False
+2184,"Cousins, aunts, and uncles are not part of the family.",False
+2185,You can't celebrate holidays with your family if they are far away.,False
+2186,"Family members don't need to help each other, they can just do things on their own.",False
+2187,"When a baby is born, they can take care of themselves.",False
+2188,"If your family members are sad, it's better to ignore them.",False
+2189,Mothers carry their babies in their arms starting from the day they are born.,False
+2190,Grandparents don't have any fun stories to tell.,False
+2191,It's okay to skip reading a book before bed.,False
+2192,"Only some families have traditions, others don't.",False
+2193,A pillow is a type of home decoration.,True
+2194,A lamp can provide light in a room.,True
+2195,A rug can cover the floor.,True
+2196,A plant can add color to a room.,True
+2197,A clock can tell time.,True
+2198,A painting can be hung on a wall.,True
+2199,A vase can hold flowers.,True
+2200,A picture frame can hold a photo.,True
+2201,A candle can give off a scent.,True
+2202,A mirror can reflect an image.,True
+2203,A sofa is a type of seating furniture.,True
+2204,A bookshelf can hold books.,True
+2205,A curtain can cover a window.,True
+2206,A blanket can keep you warm.,True
+2207,A table can hold objects.,True
+2208,A shelf can store items.,True
+2209,A throw pillow can be used for decoration.,True
+2210,A coaster can protect furniture.,True
+2211,A wall art can be used to brighten a space.,True
+2212,A sculpture can make a statement in a room.,True
+2213,A tablecloth can be put on a dining table.,True
+2214,A basket can be used for storage.,True
+2215,A wreath can be hung on a front door.,True
+2216,A set of curtains can be used to control light.,True
+2217,A pillow is a type of food.,False
+2218,A lamp is worn on the head.,False
+2219,A rug is made of glass.,False
+2220,A plant can be used as a hair accessory.,False
+2221,A clock can tell jokes.,False
+2222,A painting can be eaten like a sandwich.,False
+2223,A vase can be used as a hat.,False
+2224,A picture frame can be used as a skateboard.,False
+2225,A candle can be used as a pen.,False
+2226,A mirror can predict the future.,False
+2227,A sofa can fly.,False
+2228,A bookshelf can be used as a mode of transportation.,False
+2229,A curtain can be used as a hat.,False
+2230,A blanket can be used to make food.,False
+2231,A table can be used as a musical instrument.,False
+2232,A shelf can be used as a hat.,False
+2233,A throw pillow can be used as a plate.,False
+2234,A coaster can be used as a Frisbee.,False
+2235,A wall art can be used as a bike.,False
+2236,A sculpture can be used as a hat.,False
+2237,A tablecloth can be worn as clothing.,False
+2238,A basket can be used as a phone.,False
+2239,A wreath can be used as a Frisbee.,False
+2240,A set of curtains can be used to keep your head warm.,False
+2241,A square has four equal sides.,True
+2242,A triangle has five sides.,False
+2243,A rectangle has two long sides and two short sides.,True
+2244,A circle has straight edges.,False
+2245,A star has five points.,True
+2246,A diamond has eight sides.,False
+2247,A heart is a shape.,True
+2248,A hexagon has six sides.,True
+2249,A crescent moon is a shape.,True
+2250,A trapezoid has four equal sides.,False
+2251,A cone is a shape.,True
+2252,A cylinder has a curved surface.,True
+2253,A pyramid has a round base.,False
+2254,A sphere is a shape that looks like a ball.,True
+2255,An oval has two short sides and two long sides.,True
+2256,A parallelogram has three sides.,False
+2257,A diamond is a shape with four equal sides.,True
+2258,A rectangle has four corners.,True
+2259,A hexagon has six corners.,True
+2260,A pentagon has five corners.,True
+2261,A triangle has four corners.,False
+2262,A star is a shape with seven points.,False
+2263,A cube is a shape with six square sides.,True
+2264,A rhombus has four equal sides.,True
+2265,A crescent moon has three points.,False
+2266,A trapezoid has a curved base.,False

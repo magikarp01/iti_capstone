@@ -31,16 +31,16 @@ for dataset_tuple in dataset_names:
 #%%
 
 label_dict = {
-"imdb": ["negative", "positive"], # This is for normal IMDB
-"amazon-polarity": ["negative", "positive"],
-"ag-news": ["politics", "sports", "business", "technology"],
-"dbpedia-14": ["company", "educational institution", "artist", "athlete", "office holder", "mean of transportation", "building", "natural place", "village", "animal",  "plant",  "album",  "film",  "written work"],
-"copa": ["choice 1", "choice 2"],
-"rte": ["yes", "no"],   # whether entail
-"boolq": ["false", "true"],
-"qnli": ["yes", "no"],  # represent whether entail
-"piqa": ["solution 1", "solution 2"],
-"story-cloze": ["choice 1", "choice 2"],
+    "imdb": ["negative", "positive"], # This is for normal IMDB
+    "amazon-polarity": ["negative", "positive"],
+    "ag-news": ["politics", "sports", "business", "technology"],
+    "dbpedia-14": ["company", "educational institution", "artist", "athlete", "office holder", "mean of transportation", "building", "natural place", "village", "animal",  "plant",  "album",  "film",  "written work"],
+    "copa": ["choice 1", "choice 2"],
+    "rte": ["yes", "no"],   # whether entail
+    "boolq": ["false", "true"],
+    "qnli": ["yes", "no"],  # represent whether entail
+    "piqa": ["solution 1", "solution 2"],
+    "story-cloze": ["choice 1", "choice 2"],
 }
 
 def format_imdb(text, text1, text2, dataset = "imdb", label):
@@ -52,9 +52,9 @@ def format_imdb(text, text1, text2, dataset = "imdb", label):
     """
 
     if dataset == "imdb":
-        "The following movie review expresses a " + label_dict[dataset][label] + " sentiment:\n" + text
+        return "The following movie review expresses a " + label_dict[dataset][label] + " sentiment:\n" + text
     if dataset == "amazon-polarity":
-        "The following Amazon review expresses a " + label_dict[dataset][label] + " sentiment:\n" + text
+        return "The following Amazon review expresses a " + label_dict[dataset][label] + " sentiment:\n" + text
         # text = title and content
     if dataset == "ag-news":
         "The topic of the following news article is about " + label_dict[dataset][label] + ":\n" + text
@@ -66,17 +66,32 @@ def format_imdb(text, text1, text2, dataset = "imdb", label):
         f'{text}. In this story, out of "{text1}" and "{text2}", the sentence is most likely to follow is {["the former", "the latter"][label]}'
         # text = premise. text1 and text2 are choice1 choice2
 
-    if dataset == "rte" or dataset == "boolq":
-        f"{text}\nQuestion: Does this imply that {text2}? {['Yes', 'no'][label]}"
+    if dataset == "rte":
+        f"{text}\nQuestion: Does this imply that {text1}? {['Yes', 'no'][label]}"
         # text = premise
-        # text2 = hypothesis / question
+        # text1 = hypothesis
+
+    if dataset == "boolq":
+        f"{text}\nQuestion: {text1}? {['Yes', 'no'][label]}"
+        # text = passage
+        # text1 = question
 
     if dataset == "qnli":
-        "The following movie review expresses a " + label_dict[dataset][label] + " sentiment:\n" + text
+        f"Question: {text}\nAnswer: {text1}\n Does the information in the provided answer help completely the question? {['yes', 'no'][label]}"
+        # text = question
+        # text1 = answer
+
     if dataset == "piqa":
-        "The following movie review expresses a " + label_dict[dataset][label] + " sentiment:\n" + text
+        f"Which choice makes the most sense? \nQuestion: {text}\nChoice 1: {text1}\nChoice2:{text2}? {['Choice 1', 'Choice 2'][label]}"
+        # text = question
+        # text1 = sol1
+        # text2 = sol2
+
     if dataset == "story-cloze":
-        "The following movie review expresses a " + label_dict[dataset][label] + " sentiment:\n" + text
+        f"Which choice makes the most sense? \Story: {text}\nContinuation 1: {text1}\nContinuation 2:{text2}? {['Continuation 1', 'Continuation 2'][label]}"
+        # text = context
+        # text1 = sentence_quiz1
+        # text2 = sentence_quiz2
 
 #%%
 # Here are a few different model options you can play around with:

@@ -1,0 +1,2488 @@
+,Question,Correct
+0,Dogs are mammals.,True
+1,Elephants are the largest land animals.,True
+2,Reptiles are warm-blooded animals.,False
+3,A group of lions is called a pack.,False
+4,Kangaroos cannot walk backward.,True
+5,Snakes have slimy skin.,False
+6,Penguins only live in the North Pole.,False
+7,Bats are the only mammal that can fly.,True
+8,Sharks do not have bones.,True
+9,Bees can only see the color yellow.,False
+10,Cheetahs are the fastest land animals.,True
+11,Spiders are insects.,False
+12,Penguins have feathers.,True
+13,Snails are able to sleep for up to three years.,False
+14,Whales are not fish.,True
+15,A group of fish is called a school.,True
+16,Tortoises can live up to 200 years.,True
+17,Ants are able to carry objects 50 times their weight.,True
+18,Octopuses have three hearts.,True
+19,Rabbits are rodents.,False
+20,Dolphins are fish.,False
+21,Crocodiles have the strongest bite force of any animal.,True
+22,Cats can see better than dogs in the dark.,True
+23,Gorillas are the largest primates.,True
+24,Fish are the only animals that breathe underwater.,False
+25,Polar bears are only found in Antarctica.,False
+26,Snakes have legs.,False
+27,Camels store water in their humps.,False
+28,Gorillas are monkeys.,False
+29,Scorpions are mammals.,False
+30,Elephants can jump.,False
+31,Penguins have knees.,True
+32,Bees are not important for the pollination of flowers.,False
+33,Turtles are slow and cannot move quickly.,False
+34,Hippos are herbivores.,True
+35,Cockroaches can survive a nuclear explosion.,False
+36,Komodo dragons are found in Africa.,False
+37,A kangaroo can move both its legs at the same time.,False
+38,Rhinoceroses are extinct.,False
+39,Birds are the only animals that can fly.,False
+40,Koalas are bears.,False
+41,Jaguars only live in Africa.,False
+42,Spiders have six legs.,False
+43,Lobsters have blue blood.,True
+44,Sharks can swim backward.,False
+45,Platypuses lay eggs.,True
+46,Owls are able to turn their heads 360 degrees.,False
+47,Snails move quickly.,False
+48,Sloths are fast-moving animals.,False
+49,Plants require sunlight to grow.,True
+50,Plants release oxygen into the atmosphere.,True
+51,Photosynthesis is the process by which plants produce food.,True
+52,Chlorophyll is the green pigment in plants that captures light energy.,True
+53,Plants can perform cellular respiration.,True
+54,The cells of plants have cell walls.,True
+55,Plant cells contain chloroplasts.,True
+56,Plants use water and carbon dioxide in photosynthesis.,True
+57,Xylem and phloem are the two types of tissues used for transport in plants.,True
+58,Pollination is the transfer of pollen from the male to the female part of a plant.,True
+59,Fruits and seeds are the products of successful plant reproduction.,True
+60,The process of germination is when a seed starts to grow.,True
+61,Leaves of plants are responsible for photosynthesis.,True
+62,Some plants are used to produce medicines.,True
+63,The roots of the plants provide anchorage to the plant and also absorb water and nutrients from the soil.,True
+64,Stamens produce the female reproductive parts of a flower.,False
+65,All parts of a plant are edible and safe for humans to consume.,False
+66,"All plants require the same type and amount of water, soil, and sunlight.",False
+67,"Almost all medicines come from synthetic sources, not plants.",False
+68,All plants produce colorful flowers that attract pollinators.,False
+69,All plants reproduce by seeds.,False
+70,Succulent plants require the same amount of water as other plants.,False
+71,All plants are native to a particular region.,False
+72,All plants are able to grow and survive in any type of environment.,False
+73,The leaves of deciduous plants fall off during winter.,True
+74,Plants do not require sunlight to grow.,False
+75,Plants release carbon dioxide into the atmosphere.,False
+76,Photosynthesis is the process by which plants consume food.,False
+77,Chlorophyll is the yellow pigment in plants that captures light energy.,False
+78,Plants cannot perform cellular respiration.,False
+79,The cells of plants do not have cell walls.,False
+80,Plant cells don't contain chloroplasts.,False
+81,Plants use iron and nitrogen in photosynthesis.,False
+82,Only xylem is the type of tissue used for transport in plants.,False
+83,Pollination is the transfer of pollen from the male to the male part of a plant.,False
+84,Fruits and seeds are not produced as a result of successful plant reproduction.,False
+85,The process of germination is when a seed stops to grow.,False
+86,Leaves of plants are not responsible for photosynthesis.,False
+87,No plants are used to produce any medicines.,False
+88,"The roots of the plants provide only anchorage to the plant, and do not absorb water and nutrients from the soil.",False
+89,The stamens produce the male reproductive parts of a flower.,True
+90,All parts of a plant are edible and safe for humans to consume.,False
+91,"All plants require the same type and amount of water, soil, and sunlight.",False
+92,"Almost all medicines come from natural sources, like plants.",True
+93,All plants produce colorful flowers that attract pollinators.,False
+94,All plants reproduce asexually.,False
+95,Succulent plants require less water than other plants.,True
+96,All plants are invasive species.,False
+97,All plants are able to grow and survive in any type of environment.,False
+98,The leaves of deciduous plants never fall off.,False
+99,Pizza is an Italian dish.,True
+100,Apples are a type of fruit.,True
+101,Water is a necessary component for making coffee.,True
+102,Hot dogs are a type of sandwich.,True
+103,"There are four basic tastes: sweet, sour, bitter, and umami.",True
+104,Milk comes from cows.,True
+105,Sushi originated in Japan.,True
+106,Omelets are made with eggs.,True
+107,Chocolate is made from cocoa beans.,True
+108,Honey comes from bees.,True
+109,A smoothie is made by blending fruits and vegetables.,True
+110,Lemons are more acidic than oranges.,True
+111,A latte is a coffee drink that contains milk.,True
+112,Potatoes are a type of vegetable.,True
+113,Carbonation is the process of adding carbon dioxide gas to a liquid.,True
+114,Cabbage is a cruciferous vegetable.,True
+115,"Bread is made from flour, water, and yeast.",True
+116,Carrots contain vitamin A.,True
+117,Red wine is made from red grapes.,True
+118,An avocado is a type of fruit.,True
+119,Coffee is brewed by steeping ground coffee beans in hot water.,True
+120,Tea is the most popular beverage in the world after water.,True
+121,Grapes are used to make wine.,True
+122,Yogurt is produced by bacterial fermentation of milk.,True
+123,Chocolate milk comes from brown cows.,False
+124,Seltzer water and club soda are the same thing.,False
+125,Margarine is healthier than butter.,False
+126,Tuna is a type of bird.,False
+127,White chocolate contains cocoa solids.,False
+128,Fruit snacks are a good source of whole fruit.,False
+129,French fries were invented in France.,False
+130,Strawberry is the most popular ice cream flavor.,False
+131,Quinoa is a type of animal protein.,False
+132,Energy drinks hydrate better than water.,False
+133,Pigs in a blanket are made with actual pigs.,False
+134,Cucumbers belong to the fruit family.,False
+135,Blueberries are yellow on the outside.,False
+136,Popcorn is a type of cereal.,False
+137,Tofu is made from soybeans.,False
+138,Pineapples grow on trees.,False
+139,Ketchup was originally a type of medicine.,False
+140,Soy milk is made from cow's milk.,False
+141,Almonds are a type of nut.,False
+142,"The phrase ""grab the bull by the horns"" refers to a cooking technique.",False
+143,Gummy bears are a type of fruit.,False
+144,Gazpacho is a dish served hot.,False
+145,Hummus is made with chickpeas.,False
+146,Red velvet cake is a different flavor than regular chocolate cake.,False
+147,Music is a form of art.,True
+148,Melody is a sequence of pitches.,True
+149,A chord is a combination of multiple notes played together.,True
+150,Music can evoke emotions in listeners.,True
+151,Harmony is created by playing multiple notes at the same time.,True
+152,Rhythm is the underlying beat and tempo of a piece of music.,True
+153,The bass clef is typically used for lower-pitched instruments.,True
+154,The treble clef is typically used for higher-pitched instruments.,True
+155,Instrumental music doesn't have any lyrics.,True
+156,Decrescendo means to gradually decrease in volume.,True
+157,A scale is a set of musical notes ordered by frequency or pitch.,True
+158,A key signature is a set of sharps or flats shown at the beginning of a piece of music to indicate which notes are to be consistently played as sharp or flat.,True
+159,A staff is a set of five horizontal lines upon which musical notes are placed.,True
+160,A time signature indicates the number of beats per measure in a piece of music.,True
+161,Crescendo means to gradually increase in volume.,True
+162,An octave consists of eight notes.,True
+163,A major key sounds happy or bright.,True
+164,A minor key sounds sad or dark.,True
+165,More than one person can sing in unison.,True
+166,A flat note is lower in pitch than a natural note.,True
+167,Music can be used to help people relax or sleep better.,True
+168,Different genres of music can vary in their use of instruments or vocal styles.,True
+169,A measure is a segment of time in which a set number of beats are played.,True
+170,Music can be used to express cultural identities or values.,True
+171,A chord is a combination of only one note played at a time.,False
+172,Rhythm is the melody and harmony of a piece of music.,False
+173,The bass clef is typically used for higher-pitched instruments.,False
+174,The treble clef is typically used for lower-pitched instruments.,False
+175,Instrumental music always has lyrics.,False
+176,Decrescendo means to suddenly decrease in volume.,False
+177,A scale is a set of musical notes played randomly.,False
+178,A key signature is a set of symbols used to indicate the key of the music.,False
+179,A staff is a set of three horizontal lines upon which musical notes are placed.,False
+180,A time signature indicates the number of notes per measure in a piece of music.,False
+181,Crescendo means to suddenly increase in volume.,False
+182,An octave consists of ten notes.,False
+183,A major key sounds sad or dark.,False
+184,A minor key sounds happy or bright.,False
+185,More than one person cannot sing in unison.,False
+186,A flat note is higher in pitch than a natural note.,False
+187,Music can only be used to energize people.,False
+188,Different genres of music use the same instruments and vocal styles.,False
+189,A measure is a random segment of time.,False
+190,Music only expresses romantic feelings.,False
+191,"The word ""melody"" refers to the rhythm of a piece of music.",False
+192,Every song has a time signature.,False
+193,Harmony consists of only one note played at a time.,False
+194,A note is the same as a rest in music theory.,False
+195,Movies are a form of visual art.,True
+196,The first movie was made in the 19th century.,True
+197,Movies can be informative or entertaining.,True
+198,A director is responsible for overseeing the entire movie production.,True
+199,Sound effects are added to a movie during post-production.,True
+200,An actor's performance can make or break a movie.,True
+201,Comedies are movies intended to be funny.,True
+202,Horror movies may include jump scares and gore.,True
+203,Computer-generated imagery (CGI) can be used to create special effects in a movie.,True
+204,Animated movies are films with animated characters and backgrounds.,True
+205,Most movies have a musical score in the background.,True
+206,Film festivals are events where movies are premiered and celebrated.,True
+207,A film's rating can determine what audience it attracts.,True
+208,Foreground refers to the closer objects in a shot while background refers to the further objects in a shot.,True
+209,Some movies are based on true events or real people.,True
+210,A sequel is a movie that continues the story from a previous film.,True
+211,A screenplay is the written script for a movie.,True
+212,"Movies can be enjoyed in theaters, on streaming services, or on physical media.",True
+213,Actors and crew members work long hours to make a movie.,True
+214,A film can be shot in multiple locations or sets.,True
+215,"The Academy Awards, also known as the Oscars, are awards given for excellence in film.",True
+216,A successful movie can earn a lot of money for its producers.,True
+217,Movie trailers are short previews of an upcoming movie.,True
+218,Foreign language films can provide insight into other cultures.,True
+219,Movies were not popular before the 20th century.,False
+220,Only one person is responsible for making a movie.,False
+221,Silent movies had background music and sound effects.,False
+222,A movie's genre cannot be determined by its tone or subject.,False
+223,A sequel has no connection to the story of a previous movie.,False
+224,A film cannot be shot in a single location.,False
+225,Special effects can only be created with physical props and makeup.,False
+226,A director's sole responsibility is to work with the actors.,False
+227,Animated movies are always intended for children.,False
+228,Actors do not need to memorize their lines before filming.,False
+229,Horror movies are never based on true events.,False
+230,Movies are only enjoyable if watched in a theater.,False
+231,There is no such thing as a bad movie.,False
+232,A movie's budget has no impact on its quality.,False
+233,Film festivals are not important for the movie industry.,False
+234,The plot of a movie never involves twists or surprises.,False
+235,A movie's title reflects its genre.,False
+236,A movie's success is determined solely by its critical reception.,False
+237,A movie's soundtrack is always released before the film.,False
+238,CGI cannot be used in live-action films.,False
+239,An actor's performance has no influence on a movie's quality.,False
+240,Movies are primarily consumed on physical media.,False
+241,A movie's rating has no impact on the type of content it contains.,False
+242,Trailers are not created until after a movie is finished.,False
+243,Foreign language films are only enjoyable for people who speak that language.,False
+244,Television shows are typically broadcasted on radio.,False
+245,Television shows are not available on the internet.,False
+246,"Television shows do not come in various genres such as comedy, drama, and thriller.",False
+247,Television shows generally have opening theme songs.,True
+248,"The content of television shows can vary in their rating, ranging from G to R.",True
+249,Television shows can have one or multiple seasons.,True
+250,Shows that air during primetime are typically geared towards adults.,True
+251,Most television shows will have last episode aired during Sweeps Week.,False
+252,Television shows are watched exclusively in the home by viewers.,False
+253,Some television shows are adapted from popular books.,True
+254,Television shows can feature famous actors.,True
+255,"Reality shows feature real-life individuals, competitions, or events.",True
+256,Television shows can be viewed on streaming services.,True
+257,Television shows do not air on weekends.,False
+258,Each network has to pay a specific licensing fee for each television show they plan to air.,True
+259,Reruns of television shows do not air as frequently in the summertime.,False
+260,"The current trend in television shows is to make them as long as possible, even if it means stretching the plot.",False
+261,Television shows can have spin-offs.,True
+262,Television shows mostly broadcast through cable.,False
+263,Some television shows were produced in black and white.,True
+264,Television shows can be recorded and watched at a later time.,True
+265,The most popular shows on TV are ones that feature musical numbers and routines.,False
+266,Commercials are typically aired during commercial breaks between segments of television shows.,True
+267,"Majority of TV Tropes are based on archetypes of setting, plot, character types and themes present commonly within television shows.",True
+268,TV censorship can be influenced by social and political standards of the current time.,True
+269,Television shows never film multiple episodes before their release.,True
+270,Television shows are not released weekly.,False
+271,The actors portraying characters on television shows do not play a critical role in the show's success.,False
+272,Television shows usually have the same episode runtime.,False
+273,Television shows have a singular plotline that ends at the finale.,False
+274,Television shows cannot be binged.,False
+275,Being a guest star on a popular television show cannot help boost a person's career.,False
+276,All television shows reach their intended series finales.,False
+277,Networks produce and air endless amounts of television shows without any limits on how many one can produce a year.,False
+278,The term 'jumping the shark' refers to shows getting better with age.,False
+279,"In television shows, actors spend 90% of their screen time improvising their lines.",False
+280,Television shows aren't sometimes cancelled after only one episode has aired.,False
+281,Television shows that run during the fall season premiere all at the same time.,False
+282,Crossovers between television shows are impossible.,False
+283,Television shows can't be broadcasted in other countries.,False
+284,It's impossible for a television show to be adapted into a movie or movie series.,False
+285,"If a television show is critically acclaimed, it doesn't necessarily mean it will be renewed for more seasons.",False
+286,Scripted television shows have no basis in reality.,False
+287,"The 'clip show' technique, featuring a compilation of flashbacks from previous episodes, is no longer used in current television shows.",False
+288,Television shows geared towards children are usually produced by a different set of studios than adult-oriented shows.,False
+289,Television shows never use product placement to advertise to their viewers.,False
+290,Television shows do not have writing teams.,False
+291,The general rule for television episodes is that they must wrap up in under 15 minutes.,False
+292,Fandoms and cosplay have no direct connection to television shows.,False
+293,"When a television show is cancelled due to low ratings, the network typically has no say in the decision.",False
+294,"Shakespeare wrote ""Romeo and Juliet.""",True
+295,"""Hamlet"" is a tragedy.",True
+296,"""To Kill a Mockingbird"" was written by Harper Lee.",True
+297,"The protagonist of ""The Great Gatsby"" is Jay Gatsby.",True
+298,"""The Catcher in the Rye"" was written by J.D. Salinger.",True
+299,"Charles Dickens wrote ""Oliver Twist.""",True
+300,"""1984"" was written by George Orwell.",True
+301,"Mark Twain wrote ""The Adventures of Huckleberry Finn.""",True
+302,"""Pride and Prejudice"" was written by Jane Austen.",True
+303,"""The Grapes of Wrath"" was written by John Steinbeck.",True
+304,"Mary Shelley wrote ""Frankenstein.""",True
+305,"""The Lord of the Flies"" was written by William Golding.",True
+306,"Edgar Allan Poe wrote ""The Raven.""",True
+307,"Toni Morrison wrote ""Beloved.""",True
+308,"""Animal Farm"" was written by George Orwell.",True
+309,"William Faulkner wrote ""The Sound and the Fury.""",True
+310,"""The Scarlet Letter"" was written by Nathaniel Hawthorne.",True
+311,"Ernest Hemingway wrote ""The Old Man and the Sea.""",True
+312,"""Brave New World"" was written by Aldous Huxley.",True
+313,"""The Outsiders"" was written by S.E. Hinton.",True
+314,"F. Scott Fitzgerald wrote ""This Side of Paradise.""",True
+315,"""A Tale of Two Cities"" was written by Charles Dickens.",True
+316,"""The Picture of Dorian Gray"" was written by Oscar Wilde.",True
+317,"""Little Women"" was written by Louisa May Alcott.",True
+318,"""War and Peace"" was written by Charles Dickens.",False
+319,"""The Catcher in the Rye"" was written by John Steinbeck.",False
+320,"""Pride and Prejudice"" was written by Charlotte Bronte.",False
+321,"""1984"" was written by Aldous Huxley.",False
+322,"Jane Austen wrote ""Wuthering Heights.""",False
+323,"William Shakespeare wrote ""The Adventures of Tom Sawyer.""",False
+324,"""The Great Gatsby"" was written by Ernest Hemingway.",False
+325,"""The Grapes of Wrath"" was written by Ernest Hemingway.",False
+326,"""Animal Farm"" was written by J.R.R. Tolkien.",False
+327,"""Frankenstein"" was written by Bram Stoker.",False
+328,"Emily Dickinson wrote ""The Yellow Wallpaper.""",False
+329,"""The Scarlet Letter"" was written by Herman Melville.",False
+330,"""The Lord of the Flies"" was written by J.D. Salinger.",False
+331,"Edgar Allan Poe wrote ""Moby Dick.""",False
+332,"""To Kill a Mockingbird"" was written by Truman Capote.",False
+333,"""The Picture of Dorian Gray"" was written by Robert Louis Stevenson.",False
+334,"F. Scott Fitzgerald wrote ""The Sun Also Rises.""",False
+335,"""A Christmas Carol"" was written by Mark Twain.",False
+336,"Charles Dickens wrote ""The Old Man and the Sea.""",False
+337,"""The Outsiders"" was written by Stephen King.",False
+338,"John Steinbeck wrote ""One Hundred Years of Solitude.""",False
+339,"""The Importance of Being Earnest"" was written by Samuel Beckett.",False
+340,"William Faulkner wrote ""As I Lay Dying.""",False
+341,"""Heart of Darkness"" was written by Joseph Conrad.",True
+342,A touchdown in American football is worth six points.,True
+343,A soccer match lasts for 90 minutes.,True
+344,"In baseball, there are nine players on each team.",True
+345,Basketball games are played with a round ball.,True
+346,"In volleyball, players are allowed to touch the ball three times before passing it to their teammates.",True
+347,"In tennis, a player wins a game when they win four points.",True
+348,"In swimming, freestyle is also known as front crawl.",True
+349,"In gymnastics, the balance beam is four inches wide.",True
+350,The Summer Olympics are held every four years.,True
+351,"In athletics, a marathon is a race of 42.195 kilometers.",True
+352,"In boxing, a TKO stands for ""Technical Knockout"".",True
+353,"In ice hockey, each team is allowed to have six players on the ice at the same time, including the goalkeeper.",True
+354,"In golf, the Masters tournament is held annually in Augusta, Georgia.",True
+355,"In basketball, a shot made from behind the three-point line is worth three points.",True
+356,"In football/soccer, a player is sent off after receiving two yellow cards.",True
+357,"In figure skating, a triple axel is a jump with three and a half turns.",True
+358,The Super Bowl is the championship game of the National Football League (NFL).,True
+359,"In baseball, a batter can be walked by the pitcher if four balls are thrown outside of the strike zone.",True
+360,"In athletics, the high jump is a track and field event where athletes try to jump over a bar without knocking it off.",True
+361,"In badminton, a game is played to 21 points.",True
+362,"In rugby, a try is worth five points.",True
+363,"In motor racing, the Formula One World Championship is decided by a series of races.",True
+364,"In fencing, a touch can be scored by hitting an opponent with the point of the weapon.",True
+365,"In weightlifting, the snatch is a lift where an athlete tries to lift the weight from the ground to overhead in one movement.",True
+366,"In swimming, the 100-meter freestyle is a shorter distance than the 200-meter freestyle.",True
+367,"In baseball, the pitcher throws the ball overhand.",False
+368,"In tennis, a player must win the match by a margin of at least three games.",False
+369,"In soccer, a goal can be scored by touching the ball with your hands.",False
+370,"In basketball, a player is fouled out of the game after committing five fouls.",False
+371,"In boxing, a bout is scheduled for 10 rounds.",False
+372,"In figure skating, jumps are not scored based on the number of revolutions.",False
+373,"In volleyball, a player is not allowed to touch the ball with their feet.",False
+374,"In athletics, the 400-meter race is longer than the 100-meter race.",False
+375,"In gymnastics, the pommel horse is an apparatus used for floor exercises.",False
+376,"In badminton, the doubles court is wider than the singles court.",False
+377,"In motor racing, drivers are not allowed to change tires during a pit stop.",False
+378,"In rugby, a player is not allowed to pass the ball forward.",False
+379,"In weightlifting, the clean and jerk involves lifting the weight overhead in one movement.",False
+380,"In swimming, the breaststroke is the fastest swimming style.",False
+381,"In golf, players are only allowed to carry a maximum of eight clubs in their bag.",False
+382,"In basketball, a team can have up to seven players on the court at the same time.",False
+383,"In football/soccer, a goal scored with a player's head is worth two points.",False
+384,"In ice hockey, a penalty shot is awarded after a player commits a minor penalty.",False
+385,"In athletics, the pole vault is a throwing event.",False
+386,"In fencing, a touch can be scored by hitting an opponent's leg.",False
+387,"In baseball, the ball is thrown from the hand of the catcher to the pitcher to start each play.",False
+388,"In tennis, a player must win six games to win a set.",False
+389,"In soccer, the offside rule means that a player cannot be behind the last defender when the ball is passed to them.",False
+390,"In gymnastics, the vault is an event that involves balancing on a beam.",False
+391,The equator runs through Africa.,False
+392,Antarctica is the coldest continent on Earth.,True
+393,Brazil is the only country in South America that speaks Portuguese.,True
+394,The Great Barrier Reef is located in Australia.,True
+395,The capital of Japan is Tokyo.,True
+396,The Nile is the longest river in the world.,False
+397,The Sahara is the world's largest hot desert.,True
+398,Mount Everest is the tallest mountain in the world.,True
+399,The Amazon River is the longest river in South America.,True
+400,The Great Lakes are located in Africa.,False
+401,The United States has 50 states.,True
+402,Greenland is the largest island in the world.,True
+403,The Dead Sea is located in Africa.,False
+404,The Panama Canal connects the Atlantic and Pacific oceans.,True
+405,The Caspian Sea is the world's largest lake.,True
+406,The Gobi Desert is located in South America.,False
+407,The United Kingdom is comprised of four countries.,True
+408,Hawaii is located in the Pacific Ocean.,True
+409,The Yangtze River is the longest river in China.,True
+410,The Czech Republic is a landlocked country.,True
+411,The Andes Mountains are the longest mountain range in the world.,True
+412,The Red Sea is located between Africa and Asia.,True
+413,The capital of Italy is Madrid.,False
+414,The Matterhorn is located in the Alps.,True
+415,The capital of Canada is Montreal.,False
+416,Africa is the world's largest continent.,False
+417,There is only one time zone in the United States.,False
+418,The largest country in the world by land area is Australia.,False
+419,The Great Wall of China is visible from space.,False
+420,The country with the most people is India.,False
+421,The Grand Canyon is located in New Mexico.,False
+422,Niagara Falls is located in South America.,False
+423,The country of Norway is located in Asia.,False
+424,The continent with the fewest countries is Antarctica.,True
+425,The city of Istanbul is located in Greece.,False
+426,The city of Mumbai is located in China.,False
+427,The country of Peru is located in Central America.,False
+428,The country with the most coastline is Canada.,True
+429,The continent of Europe only has one time zone.,False
+430,The country of Thailand is located in South America.,False
+431,The country of Chile is located in Africa.,False
+432,The country of Iran is located in Europe.,False
+433,The country of South Africa is located entirely below the equator.,False
+434,The country of Mexico has the highest population in North America.,True
+435,The Great Pyramids of Giza are located in Iraq.,False
+436,The largest island nation in the world is Indonesia.,True
+437,Lake Victoria is the largest lake in South America.,False
+438,The city of Vancouver is located in the United States.,False
+439,The United States gained independence from Great Britain in 1776.,True
+440,World War II ended in 1945.,True
+441,The French Revolution began in 1789.,True
+442,The ancient Egyptians built the pyramids.,True
+443,Julius Caesar was assassinated in 44 BC.,True
+444,"Martin Luther King Jr. gave his famous ""I Have A Dream"" speech in 1963",True
+445,The Magna Carta was signed in 1215.,True
+446,The American Civil War happened in the 19th century.,True
+447,The Renaissance began in Italy in the 14th century.,True
+448,The first successful airplane flight was by the Wright Brothers in 1903.,True
+449,The Great Wall of China was built in the 7th century BC.,True
+450,The Age of Exploration took place in the 15th and 16th centuries.,True
+451,World War I lasted from 1914 to 1918.,True
+452,The Russian Revolution happened in 1917.,True
+453,Christopher Columbus discovered America in 1492.,True
+454,The Holocaust happened during World War II.,True
+455,Mahatma Gandhi led India's nonviolent independence movement.,True
+456,The Boston Tea Party took place in 1773.,True
+457,The Industrial Revolution began in Britain in the 18th century.,True
+458,The Bill of Rights is the first ten amendments to the US Constitution.,True
+459,The Apollo 11 mission put the first humans on the moon.,True
+460,The Berlin Wall was erected in 1961 and fell in 1989.,True
+461,The Battle of Waterloo ended the Napoleonic Wars.,True
+462,The Emancipation Proclamation was issued by Abraham Lincoln in 1863.,True
+463,The American Revolution began in the 20th century.,False
+464,The Roman Empire lasted until the 12th century.,False
+465,George Washington was the first president of the United States.,False
+466,The Cold War was fought between the US and France.,False
+467,The Vietnam War ended in 1969.,False
+468,The War of 1812 was fought between the US and Great Britain.,False
+469,The Battle of Gettysburg was fought during World War II.,False
+470,The Louisiana Purchase from France happened in the 19th century.,False
+471,Marco Polo was a famous Renaissance painter.,False
+472,Egypt is located in South America.,False
+473,The United States was founded in the 18th century.,False
+474,The Magna Carta was signed by King Henry VIII.,False
+475,World War II began in 1939.,False
+476,Cleopatra was a Greek queen.,False
+477,The French Revolution began in the 16th century.,False
+478,The Ku Klux Klan was founded in the 20th century.,False
+479,The Russian Revolution abolished the monarchy.,False
+480,The ancient Greek city-state of Sparta was a democracy.,False
+481,The Renaissance took place in Germany.,False
+482,The atomic bomb was dropped on Hiroshima in 1945.,False
+483,The Magna Carta established democracy in England.,False
+484,The American Civil War was fought over slavery.,False
+485,The Great Wall of China was built to keep out the Mongols.,False
+486,Tsar Nicholas II led the Bolshevik Revolution in Russia.,False
+487,The American Revolution began with the Battle of Lexington and Concord.,False
+488,Water freezes at 100 degrees Celsius.,False
+489,The Earth revolves around the Sun.,True
+490,Saltwater boils at a higher temperature than freshwater.,True
+491,Force equals mass times acceleration.,True
+492,Oxygen is the most abundant gas in the Earth's atmosphere.,False
+493,The atomic number of carbon is 6.,True
+494,Sound travels faster through water than air.,True
+495,A plant cell contains a nucleus.,True
+496,The human body has four chambers in the heart.,False
+497,An acid has a pH level greater than 7.,False
+498,Bronze is made by combining copper and zinc.,True
+499,The human appendix has no purpose.,False
+500,The human body has 206 bones.,True
+501,Electrons have a negative charge.,True
+502,Protons have a greater mass than neutrons.,False
+503,The density of water increases as it gets colder.,True
+504,The formula for photosynthesis is CO2 + H2O -> C6H12O6 + O2.,True
+505,Every element in the periodic table is a metal.,False
+506,Sound cannot travel through a vacuum.,True
+507,The chemical symbol for gold is Go.,False
+508,The moon has its own atmosphere.,False
+509,The smallest unit of matter is an atom.,True
+510,All living organisms need oxygen to survive.,False
+511,Fungi are photosynthetic.,False
+512,The Earth is flat.,False
+513,Water is not necessary for human survival.,False
+514,The Great Wall of China is visible from space.,False
+515,The Atlantic Ocean is larger than the Pacific Ocean.,False
+516,Plants are not considered living organisms.,False
+517,A rock is a type of mineral.,False
+518,Earthquakes can occur anywhere in the world.,True
+519,"The circumference of the Earth is less than 10,000 km.",False
+520,Jupiter is closer to the Sun than Mars.,False
+521,Koalas are native to Africa.,False
+522,A mammal is an animal that lays eggs.,False
+523,A right angle measures 120 degrees.,False
+524,Fire is not considered matter.,False
+525,Hurricanes only occur on land.,False
+526,A shark is a mammal.,False
+527,The capital of Canada is Toronto.,False
+528,Air is not a mixture of gases.,False
+529,There are fewer than 50 elements on the periodic table.,False
+530,Carbon dioxide is lighter than air.,False
+531,The earthworm is not hermaphroditic.,False
+532,Radar can only detect objects on land.,False
+533,The longest river in the world is the Amazon.,False
+534,An acre is larger than a hectare.,False
+535,The largest bone in the human body is the femur.,True
+536,Salt is a type of sugar.,False
+537,1+1=2.,True
+538,A triangle has three sides.,True
+539,A number can either be odd or even.,True
+540,Square root of 16 is 5.,False
+541,There are 12 inches in a foot.,True
+542,The equation y = mx+b is the slope-intercept form.,True
+543,Division by zero is undefined.,True
+544,The formula for the area of a circle is pi*r^2.,True
+545,A rhombus has four right angles.,False
+546,Adding two negative numbers gives you a negative result.,True
+547,The sum of angles in a triangle is 180 degrees.,True
+548,The Pythagorean theorem states that a^2 + b^2 = c^2.,True
+549,"In probability, the sum of all possible outcomes is always equal to 1.",True
+550,A polygon with 8 sides is called an octagon.,True
+551,A right triangle has one angle that measures 90 degrees.,True
+552,A diameter is a line that passes through the center of a circle.,True
+553,"Subtraction is commutative, meaning 8-3 is the same as 3-8.",False
+554,An obtuse angle is greater than 90 degrees.,True
+555,An integer is a whole number.,True
+556,A rectangle is a type of parallelogram.,True
+557,The reciprocal of 1/2 is 2/1.,True
+558,A line segment has only one endpoint.,False
+559,A fraction is a way to represent a part of a whole.,True
+560,"Multiplication is distributive over addition, meaning a * (b+c) = a*b + a*c.",True
+561,1+2=3.,False
+562,A hexagon has 8 sides.,False
+563,A negative number multiplied by a negative number gives a positive result.,True
+564,The formula for the circumference of a circle is 2*pi*r.,False
+565,4/8 is equivalent to 2/4.,False
+566,"In statistics, the median is the same as the mean.",False
+567,A trapezoid has 4 equal sides.,False
+568,10 is a prime number.,False
+569,A multiple of a number is always bigger than the original number.,False
+570,Division and multiplication are inverse operations.,True
+571,A ray has two endpoints.,False
+572,The formula for the surface area of a sphere is 4*pi*r^2.,True
+573,0 is considered a natural number.,False
+574,A line of symmetry can be found in an asymmetrical shape.,False
+575,"In a parallelogram, opposite sides are parallel and equal in length.",True
+576,The opposite of 7 is -7.,True
+577,A scalene triangle has two equal sides and two equal angles.,False
+578,The commutative property of addition states that a+b = b+a for all numbers a and b.,True
+579,A decimal with three digits after the decimal point is called a thousandth.,False
+580,A function is a type of mathematical operation.,False
+581,A quadratic equation cannot have more than two solutions.,True
+582,A ratio is the same as a percentage.,False
+583,The domain of a function is the set of all possible output values.,False
+584,A line graph can be used to show the relationship between two variables.,True
+585,A line of best fit is used to connect all the data points in a scatter plot.,False
+586,The Mona Lisa was painted by Michelangelo.,False.
+587,Watercolor is a type of painting that uses water-soluble pigments.,True.
+588,Picasso is famous for his cubist style of painting.,True.
+589,The Statue of David was sculpted by Michelangelo.,True.
+590,"Vincent van Gogh is known for his use of bright, bold colors in his artwork.",True.
+591,The color wheel is used to identify complementary colors.,True.
+592,The Sistine Chapel ceiling was painted by Leonardo da Vinci.,False.
+593,Photography is not considered a form of art.,False.
+594,Monet is known for his series of paintings of water lilies.,True.
+595,The Pieta is a sculpture created by Michelangelo.,True.
+596,"The term ""impressionism"" originated in France in the late 19th century.",True.
+597,"The term ""renaissance"" means ""rebirth"" in French.",False.
+598,Banksy is a popular street artist known for his satirical and politically charged works.,True.
+599,The Great Wave off Kanagawa is a famous woodblock print created by Hokusai.,True.
+600,"Pointillism is a painting technique that uses small, distinct dots of color.",True.
+601,The Mona Lisa is a sculpture created by Donatello.,False.
+602,Art Nouveau is a style that originated in the 18th century.,False.
+603,"The term ""modern art"" refers to artwork created in the Middle Ages.",False.
+604,The Venus de Milo is a sculpture created by Michelangelo.,False.
+605,"Leonardo da Vinci was primarily a sculptor, not a painter.",False.
+606,Surrealism is a style of art that seeks to represent reality through recognizable images.,False.
+607,"In Chinese art, calligraphy is valued more highly than painting.",False.
+608,Impressionist paintings typically depict realistic scenes with intricate details.,False.
+609,"Edvard Munch's painting ""The Scream"" features a smiling figure in a bright, colorful background.",False.
+610,"""Still life"" is a painting style that features mainly human subjects.",False.
+611,"Pablo Picasso was primarily a sculptor, not a painter.",False.
+612,Georgia O'Keeffe was known for her abstract expressionist paintings.,False.
+613,"""Baroque"" is a term used to describe a simplistic, minimalist style of art.",False.
+614,"The ""Charging Bull"" statue in Wall Street was created by Banksy.",False.
+615,"The ""Laocoön and His Sons"" sculpture was created during the Renaissance period.",False.
+616,Technology is the application of scientific knowledge for practical purposes.,True
+617,The internet was created in the late 1960s.,True
+618,Google is the most popular search engine in the world.,True
+619,A USB port is a type of input device.,False
+620,Wi-Fi is a type of wireless networking technology.,True
+621,HTML is a programming language used to create web pages.,True
+622,Every computer has a Central Processing Unit (CPU).,True
+623,Instagram is a social media platform dedicated to sharing short-form videos.,False
+624,Bluetooth technology is primarily used for file sharing between devices.,True
+625,Virtual Reality technology can simulate a real-life environment.,True
+626,A firewall is a type of computer security system.,True
+627,The first iPhone was released in 2007.,True
+628,E-commerce refers to buying and selling goods or services online.,True
+629,Podcasts are audio broadcasts that can be subscribed to online.,True
+630,A megabyte (MB) is larger than a kilobyte (KB).,True
+631,A floppy disk is a type of solid-state storage device.,False
+632,Wikipedia is a website that allows users to contribute and edit articles.,True
+633,JPEG is a file format used for compressing digital images.,True
+634,Cloud computing allows users to access data stored remotely.,True
+635,A router is a device used to connect multiple devices to a network.,True
+636,.exe is a file extension used for Windows executable files.,True
+637,Computer programming is the process of writing instructions for a computer to execute.,True
+638,A gigabyte (GB) is larger than a terabyte (TB).,False
+639,Twitter is a social media platform that only allows users to share text-based updates.,False
+640,The first commercially available computer mouse was made of wood.,True
+641,Technology refers to purely theoretical knowledge and ideas.,False
+642,The internet was developed by a single person.,False
+643,Bing is the most popular search engine in the world.,False
+644,A printer is a type of output device.,False
+645,Bluetooth technology is primarily used for wireless charging of devices.,False
+646,Virtual Reality technology can only simulate cartoonish environments.,False
+647,Antivirus software is a type of computer virus.,False
+648,TikTok is a social media platform dedicated to sharing long-form videos.,False
+649,The first commercially available smartphone was released in the 1990s.,False
+650,Email is a form of social media.,False
+651,VRAM is a type of RAM used in video cards.,False
+652,A byte is larger than a kilobyte.,False
+653,Instagram is a social media platform that only allows users to share photos.,False
+654,Windows is the only operating system used by computers worldwide.,False
+655,Cloud computing allows users to access data stored only on their local devices.,False
+656,A modem is a device used to connect a computer to a power source.,False
+657,The first computer was invented in the 21st century.,False
+658,Linux is a type of computer virus.,False
+659,A graphic card is a type of input device.,False
+660,A pixel is a unit of length measurement.,False
+661,Microsoft Office is a music streaming platform.,False
+662,The first commercially available computer mouse was made of plastic.,False
+663,Cell phones pre-date computers.,False
+664,Virtual reality technology is no longer being developed.,False
+665,BitTorrent is a type of computer virus.,False
+666,The President of the United States is elected every 4 years.,True
+667,The United States has a two-party system.,True
+668,The Senate is made up of 100 members.,True
+669,The First Amendment guarantees freedom of speech.,True
+670,The Vice President is second in line for the presidency after the Speaker of the House.,True
+671,The United Kingdom has a unicameral parliament.,False
+672,Gerrymandering is the practice of manipulating electoral district boundaries.,True
+673,The Speaker of the House is third in line for the presidency.,True
+674,The United States is a democracy.,True
+675,The President has the power to veto bills.,True
+676,The United States has a written constitution.,True
+677,Citizens of the United States over 18 have the right to vote.,True
+678,The United Nations was established after World War II.,True
+679,The President is elected by an electoral college.,True
+680,Impeachment is the process of removing an official from office.,True
+681,The Declaration of Independence was signed in 1776.,True
+682,The United States has a federal system of government.,True
+683,The United States has a president and a prime minister.,False
+684,The Supreme Court is the highest court in the United States.,True
+685,The President can serve a maximum of 2 terms.,True
+686,The United States Constitution has been amended 27 times.,True
+687,The United States has 50 states.,True
+688,The Second Amendment guarantees the right to bear arms.,True
+689,The House of Representatives is made up of 435 members.,True
+690,The United States has a one-party system.,False
+691,The President has the power to declare war.,False
+692,The United States has a king and queen.,False
+693,The Bill of Rights is the first 10 amendments to the United States Constitution.,False (This is true)
+694,The Vice President is first in line for the presidency.,False
+695,Socialism is a widely accepted political ideology in the United States.,False
+696,The United States has a president and a chancellor.,False
+697,The United Nations was established after World War I.,False
+698,Citizens of the United States over 21 have the right to vote.,False
+699,The United States has a unitary system of government.,False
+700,The Supreme Court is the lowest court in the United States.,False
+701,The President can serve a maximum of 3 terms.,False
+702,Impeachment is the process of pardoning an official.,False
+703,The Declaration of Independence was signed in 1876.,False
+704,The Senate is made up of 50 members.,False
+705,The United Kingdom has a bicameral parliament.,False
+706,Gerrymandering is the process of redrawing international borders.,False
+707,The First Amendment guarantees freedom of religion.,False (This is true)
+708,The Speaker of the House is fourth in line for the presidency.,False
+709,The United States has a written monarchy.,False
+710,The United States has 52 states.,False
+711,The Second Amendment guarantees the right to own a tank.,False
+712,The President is elected by popular vote.,False
+713,The President has the power to create laws.,False
+714,The House of Representatives is made up of 500 members.,False
+715,Supply refers to the amount of goods and services that producers are willing and able to offer for sale at each possible price.,True
+716,"Inflation is the rate at which general prices for goods and services are increasing, and subsequently, purchasing power is decreasing.",True
+717,A monopoly occurs when a single seller or producer supplies a particular commodity or service.,True
+718,An oligopoly is a market structure characterized by only a few firms holding a large market share.,True
+719,The GDP (gross domestic product) measures the total value of all goods and services produced within a country in a given period.,True
+720,The poverty line is the minimum level of income deemed adequate in a particular country.,True
+721,A progressive tax is a taxation method in which the rate increases as the taxable amount increases.,True
+722,A budget surplus occurs when government revenues exceed government expenditures over a given period.,True
+723,Price floors are minimum prices that can be charged for a good or service in a given market.,True
+724,Price ceilings are maximum prices that can be charged for a good or service in a given market.,True
+725,Assets are things that a company or person owns having financial value.,True
+726,A liability is a financial obligation of a company or person.,True
+727,An equity in accounting is the difference between the value of assets and the value of liabilities of something owned.,True
+728,Tariffs are taxes placed on imported goods.,True
+729,Import subsidies are financial assistance given to support an importing firm.,True
+730,"Entrepreneurship is the process of designing, launching, and running new businesses.",True
+731,"The term ""capital"" refers to money invested in a business or any other venture for the purpose of making a profit.",True
+732,"The term ""recession"" refers to a decline in a country's economic activity, characterized by a decline in GDP, industrial production, and employment.",True
+733,A stock is a type of security that represents ownership in a company.,True
+734,A bond is a type of financial instrument which is an agreement between the borrower and lender that includes terms and conditions of the lending.,True
+735,"The word ""macroeconomics"" refers to the study of the economy as a whole.",True
+736,"An economic boom is a period of economic growth in which the economy expands, with increasing jobs and investment opportunities.",True
+737,A fiscal policy involves using government spending and taxation to influence the economy.,True
+738,Monetary policy involves adjusting the money supply and interest rates to achieve economic goals.,True
+739,The Dow Jones Industrial Average is a stock market index that measures the performance of 30 large companies in the United States.,True
+740,A monopoly protects consumers from high prices because there are no competitors.,False
+741,"The law of demand states that as the price of a good or service rises, the demand also rises.",False
+742,A mixed economy is characterized by a complete absence of government intervention.,False
+743,A weak currency is advantageous to its economy because foreign investors can buy more with their currency.,False
+744,"A depression is a period of economic growth, characterized by a rise in GDP and employment.",False
+745,The Adam Smith’s theory of the invisible hand says that governments should intervene in the markets in order to create an efficient economy.,False
+746,"In a free market, the market is guided by individual self-interest.",False
+747,"The term ""opportunity cost"" refers to the benefit you receive from a decision you make.",False
+748,The aggregate demand curve shows the amount of output produced at each price level.,False
+749,"In a closed economy, imports and exports have no impact on the economy.",False
+750,A structural unemployment is due to a cyclical downturn in the economy and a low demand for labor.,False
+751,A trade deficit occurs when a country exports more goods and services than it imports.,False
+752,A debit is an item on the credit side of the balance sheet.,False
+753,A credit is an item on the debit side of the balance sheet.,False
+754,A mixed economy is a combination of free market and command economy.,False
+755,An exchange rate is the price of one currency in terms of another currency.,False
+756,A planned economy is considered more efficient than a market economy.,False
+757,A subsidy is a penalty or negative incentive.,False
+758,Different countries can have different currencies and exchange rates.,False
+759,Fiscal policies are implemented by central banks.,False
+760,A bear market is characterized by a decline in the stock market.,False
+761,A budget deficit occurs when government spending is less than the revenue it collects.,False
+762,Short-term bonds are less risky than long-term bonds.,False
+763,Economic growth is always a positive thing for a country.,False.
+764,All students must attend school by law.,True
+765,The United States Constitution mentions education as a right.,False
+766,Teachers must have a bachelor's degree to teach in public schools.,True
+767,Only states have the power to regulate education.,False
+768,12th grade is the last year of high school.,True
+769,All public schools in the United States receive federal funding.,False
+770,"In most schools, students have to take standardized tests.",True
+771,Only students with good grades can get scholarships for college.,False
+772,Private schools are free for students to attend.,False
+773,Students are required to take a certain number of courses to graduate high school.,True
+774,The school district determines which textbooks are used in its schools.,True
+775,The SAT and ACT are types of college entrance exams.,True
+776,Students can choose to opt-out of physical education classes.,False
+777,"The term ""homework"" refers to assignments that students complete outside of class.",True
+778,All students in the same grade level take the same classes.,False
+779,"Education is a state responsibility, meaning each state decides what to teach in their schools.",True
+780,Students are allowed to use their phones during class.,False
+781,A student's grade point average (GPA) measures their overall academic achievement.,True
+782,"In most schools, a grade of D is considered a passing grade.",False
+783,Colleges only consider a student's grades when deciding who to admit.,False
+784,Students cannot continue their education after high school unless they attend college.,False
+785,The No Child Left Behind Act (NCLB) mandated standardized testing for all public school students.,True
+786,Students must be at least 16 years old to legally drop out of high school.,True
+787,Kindergarten is optional in most states.,False
+788,College tuition is usually free in the United States.,False
+789,The United States has some of the highest tuition fees in the world.,True
+790,Education is necessary to get a good job.,True
+791,Teachers are required to have a teaching certificate or license to teach in public schools.,True
+792,Students can only receive financial aid for college if they demonstrate financial need.,False
+793,"It is illegal for schools to discriminate against students based on their race, ethnicity, or gender.",True
+794,"All students learn the same subjects in school, regardless of where they live.",False
+795,Students with disabilities have the right to receive accommodations in school.,True
+796,Students can be expelled from school for breaking school rules.,True
+797,The United States Department of Education is responsible for setting education policy.,True
+798,Teachers are not allowed to discuss controversial topics in the classroom.,False
+799,School bullying is not illegal.,False
+800,The No Child Left Behind Act has been replaced by the Every Student Succeeds Act.,True
+801,All schools must have a nurse on staff.,False
+802,Teachers are not allowed to assign homework on weekends.,False
+803,Charter schools are privately run schools that receive public funding.,True
+804,Students are not allowed to bring their own computers to school.,False
+805,All schools must offer special education programs for students with disabilities.,True
+806,It is illegal for schools to require students to participate in religious activities.,True
+807,All students must stay in school until they turn 18 years old.,False
+808,"In most schools, students are required to wear uniforms.",False
+809,Homeschooled students are not allowed to participate in extracurricular activities at public schools.,False
+810,Teachers are allowed to physically discipline students.,False
+811,Students are not allowed to bring their own food to school.,False
+812,Private schools can legally discriminate against students based on their religion.,True
+813,The United States spends more on education per student than any other country.,False
+814,Dual enrollment allows high school students to take college courses for credit.,True
+815,All schools must have a school resource officer to provide security.,False
+816,It is illegal for schools to search a student's belongings without permission or reasonable suspicion.,False
+817,Homeschooled students are required to take standardized tests.,False
+818,All public schools must offer free breakfast and lunch to students from low-income families.,False
+819,School districts determine the length of the school day.,True
+820,Exercise is important for maintaining good health.,True
+821,Eating a balanced diet can help prevent chronic diseases.,True
+822,Drinking enough water every day is essential for good health.,True
+823,Regular physical activity can help to improve mental health.,True
+824,Consuming a diet high in processed foods may increase the risk of diabetes.,True
+825,Being sedentary for long periods of time can increase the risk of heart disease.,True
+826,Eating a lot of sugar can increase the risk of tooth decay.,True
+827,Stretching before and after exercise can help prevent injury.,True
+828,Getting enough sleep is important for good health.,True
+829,Engaging in regular physical activity can help reduce stress levels.,True
+830,Processed foods are generally healthier than whole foods.,False
+831,Fad diets are a safe and effective way to lose weight.,False
+832,All fats are bad for you.,False
+833,Spot reduction exercises can reduce fat in a specific area of the body.,False
+834,Drinking sports drinks is just as good as water for rehydration.,False
+835,It's normal to feel sore for several days after working out if you're doing it right.,False
+836,Running is bad for your knees.,False
+837,Lifting weights will make women bulk up like men.,False
+838,Chewing gum stays in your stomach for seven years if you swallow it.,False
+839,It's best to exercise on an empty stomach.,False
+840,Weight loss supplements are effective and safe.,False
+841,You should always stretch before exercise.,True
+842,Eating late at night can cause weight gain.,False
+843,Drinking alcohol in moderation can have health benefits.,True
+844,Yoga can help improve flexibility and balance.,True
+845,Skipping meals is an effective way to lose weight.,False
+846,Cardiovascular exercise is effective for burning calories and improving heart health.,True
+847,Consuming a diet high in sugar can help lower cholesterol levels.,False
+848,Eating a diet high in saturated fats is good for your heart.,False
+849,Drinking coffee can dehydrate you.,False
+850,It's important to push through pain during a workout.,False
+851,Weightlifting is only for bodybuilders.,False
+852,"The more you sweat, the more calories you burn.",False
+853,Detox diets are an effective way to rid your body of toxins.,False
+854,A high-protein diet is bad for your kidneys.,False
+855,You should only exercise when you have a lot of time.,False
+856,It's impossible to be overweight and still be healthy.,False
+857,Drinking water during a workout is bad for digestion.,False
+858,Energy drinks are a healthy alternative to coffee.,False
+859,Stretching after a workout is unnecessary.,False
+860,Sit-ups are the most effective exercise for toning your abs.,False
+861,Coconut oil is healthier than other cooking oils.,False
+862,The number on the scale is the best way to measure health.,False
+863,Sweating a lot will help you lose weight.,False
+864,The only way to get a good workout is to go to the gym.,False
+865,Juicing is a good way to get all of your necessary nutrients.,False
+866,Creatine is a safe and effective supplement for everyone.,False
+867,Swimming is not an effective form of exercise for weight loss.,False
+868,Fasting can have long-term negative effects on your health.,True
+869,Low-fat diets are always the healthiest option.,False
+870,Walking for 30 minutes a day is not enough physical activity.,False
+871,It's safe to use weight loss supplements without a doctor's supervision.,False
+872,The Earth's atmosphere is comprised mostly of nitrogen and oxygen.,True
+873,Carbon dioxide is a natural part of the Earth's atmosphere.,True
+874,Trees and plants absorb carbon dioxide and release oxygen.,True
+875,The ozone layer helps protect the Earth from harmful UV radiation.,True
+876,The greenhouse effect is a natural process necessary for supporting life on Earth.,True
+877,The burning of fossil fuels contributes to the release of greenhouse gases into the atmosphere.,True
+878,Climate change is caused by human activity.,True
+879,The polar ice caps are melting at an alarming rate due to increasing global temperatures.,True
+880,Plastic waste is a major environmental problem.,True
+881,The Amazon rainforest is the largest tropical rainforest in the world.,True
+882,The majority of plastic waste ends up in landfills where it can take hundreds of years to decompose.,True
+883,"CFCs, which were commonly used in refrigeration and aerosol sprays, have greatly contributed to ozone depletion.",True
+884,Deforestation contributes to climate change by reducing the number of trees available to absorb carbon dioxide.,True
+885,"Renewable energy sources, such as wind and solar power, produce fewer greenhouse gas emissions than fossil fuels.",True
+886,Acid rain is caused by pollutants in the air reacting with rainwater.,True
+887,One way to reduce plastic waste is by using reusable bags instead of single-use plastic bags.,True
+888,Recycled paper uses less energy and fewer resources than making new paper.,True
+889,Oil spills can have a devastating impact on marine ecosystems.,True
+890,The Great Pacific Garbage Patch is a vortex of plastic waste in the Pacific Ocean.,True
+891,The Paris Agreement is an international agreement aimed at reducing greenhouse gas emissions.,True
+892,Carbon offsets allow individuals and companies to offset their carbon emissions by investing in projects that reduce greenhouse gases elsewhere.,True
+893,"Climate change can lead to more severe and frequent natural disasters, such as hurricanes and droughts.",True
+894,The Kyoto Protocol was an international agreement to reduce greenhouse gas emissions.,True
+895,Rising sea levels can lead to the displacement of people who live in coastal areas.,True
+896,Renewable energy sources are not sustainable.,False
+897,Climate change is not caused by human activity.,False
+898,Deforestation has no impact on the environment.,False
+899,Acid rain is not a result of pollution.,False
+900,The Earth's temperature is not increasing.,False
+901,The greenhouse effect negatively impacts the environment.,False
+902,The ozone layer is not important for protecting the environment.,False
+903,Plastic waste does not harm marine life.,False
+904,Carbon dioxide is not harmful to the environment.,False
+905,The Great Pacific Garbage Patch is a myth.,False
+906,The climate has not changed in the past century.,False
+907,Recycling paper uses more resources than making new paper.,False
+908,There is no such thing as the polar ice caps.,False
+909,The Amazon rainforest does not play a vital role in the Earth's ecosystem.,False
+910,Clean energy is more expensive than fossil fuels.,False
+911,Electric vehicles produce more greenhouse gas emissions than gas-powered vehicles.,False
+912,Carbon offsets only increase greenhouse gas emissions.,False
+913,Natural disasters are not influenced by climate change.,False
+914,Climate change will not have any impact on human society.,False
+915,The Paris Agreement has no impact on climate change.,False
+916,Oil spills do not have any impact on the environment.,False
+917,The Kyoto Protocol had no impact on reducing greenhouse gas emissions.,False
+918,The industrial sector does not contribute to climate change.,False
+919,Water pollution has no impact on the environment.,False
+920,The sun is a star.,True
+921,Saturn is larger than Earth.,False
+922,The asteroid belt is located between Mars and Jupiter.,True
+923,A shooting star is actually a meteor.,True
+924,The Milky Way is a galaxy.,True
+925,The moon reflects light from the sun.,True
+926,A constellation is a group of stars that forms a recognizable pattern.,True
+927,The largest planet in our solar system is Jupiter.,True
+928,Light travels faster than sound.,True
+929,A light-year is a measure of distance.,True
+930,The Big Bang theory explains the origin of the universe.,True
+931,The Hubble Space Telescope is named after Edwin Hubble.,True
+932,A lunar eclipse occurs when the moon passes through the Earth's shadow.,True
+933,The first human to walk on the moon was Neil Armstrong.,True
+934,The Great Red Spot is a storm on Jupiter.,True
+935,The International Space Station orbits the Earth.,True
+936,The Kuiper Belt is a region of the solar system beyond Neptune.,True
+937,An eclipse occurs when one celestial body casts a shadow on another.,True
+938,The Crab Nebula is the remnant of a supernova.,True
+939,The Andromeda Galaxy is the closest galaxy to our own.,True
+940,"The speed of light is approximately 300,000 km/s.",True
+941,A black hole is a region of space with a gravitational pull so strong that nothing can escape it.,True
+942,The earth takes approximately 365 days to orbit around the sun.,True
+943,Ganymede is the largest moon in our solar system.,True
+944,Mercury is the smallest planet in our solar system.,True
+945,Our solar system is located at the center of the Milky Way galaxy.,False
+946,Venus is the only planet in our solar system that rotates clockwise.,False
+947,The Oort Cloud is a region of the solar system between Mars and Jupiter.,False
+948,The light we see from stars is their actual color.,False
+949,The center of the Earth is hot because of the sun.,False
+950,Asteroids are mostly found in the Kuiper Belt.,False
+951,The Great Red Spot is a storm on Saturn.,False
+952,Dark matter is visible to telescopes.,False
+953,Astronomers have discovered more than 200 moons orbiting Jupiter.,False
+954,"The term ""supermoon"" refers to the moon appearing smaller than usual.",False
+955,Solar eclipses occur more frequently than lunar eclipses.,False
+956,Earth's atmosphere ends abruptly at a certain altitude.,False
+957,Halley's Comet passes by the Earth every 10 years.,False
+958,Pluto is a gas giant.,False
+959,The Hubble Space Telescope was launched in the 1960s.,False
+960,The Horsehead Nebula is located in our solar system.,False
+961,The Sun orbits around the Earth.,False
+962,Asteroids are made of ice.,False
+963,The sun gets its energy from nuclear fusion.,False
+964,The black hole at the center of our galaxy is called Cygnus X-1.,False
+965,The temperature in space is always extremely cold.,False
+966,The asteroid that caused the extinction of the dinosaurs hit the Earth approximately 65 million years ago.,False
+967,There is no sound in space.,False
+968,The Orion constellation is only visible in the southern hemisphere.,False
+969,Fashion refers exclusively to clothing.,False
+970,Wearing horizontal stripes makes a person look wider.,True
+971,Polyester is a fabric made from natural fibers.,False
+972,Designer handbags are always of high quality.,False
+973,Wearing black to a funeral is a worldwide custom.,True
+974,A fedora is a type of hat traditionally worn by women.,False
+975,A collared shirt is considered business casual.,True
+976,High heels were originally designed for men.,True
+977,A turtleneck is a type of sweater that covers the head.,False
+978,The Chanel suit was created by Giorgio Armani.,False
+979,A scarf can be worn in any season.,True
+980,A tuxedo is a type of coat typically worn in casual settings.,False
+981,A dress that is knee-length is typically considered modest.,True
+982,Leather is a sustainable material.,False
+983,Polyester clothing should be ironed on high heat.,False
+984,A clutch is a type of wallet.,False
+985,Faux fur is an animal-derived material.,False
+986,Denim fabric was first created in Italy.,False
+987,Skechers is a popular brand of athletic shoes.,True
+988,A blazer is typically made of a thicker material than a suit jacket.,False
+989,Boots with a heel are considered more formal than those without.,True
+990,A loafer is a type of shoe that can be worn with or without socks.,True
+991,"The ""little black dress"" is a timeless fashion piece created by Coco Chanel.",True
+992,A romper is a style of clothing with a one-piece top and shorts bottom.,True
+993,Men's ties are always worn with a knot.,False
+994,Bucket hats are a type of footwear.,False
+995,A crop top is a style of shirt that covers the entire torso.,False
+996,Plaid is a type of fabric.,False
+997,Boutiques are typically chain stores.,False
+998,A jumpsuit is a type of dress.,False
+999,An ascot is a type of belt.,False
+1000,Overalls are only worn by children.,False
+1001,Crocs are a type of formal footwear.,False
+1002,Ugg boots are waterproof.,False
+1003,A top hat is a popular style for women's accessories.,False
+1004,Khakis are a type of jacket.,False
+1005,A shawl is a type of shirt.,False
+1006,A bolero jacket is a type of helmet.,False
+1007,A Peacoat is a type of shoe.,False
+1008,Wool is a material only used in summer clothing.,False
+1009,Turtlenecks are only appropriate for formal occasions.,False
+1010,Seersucker is a type of shoe.,False
+1011,Chinos are a type of shirt.,False
+1012,Slippers are only worn indoors.,False
+1013,A blouse is a type of hat.,False
+1014,A caftan is a type of sock.,False
+1015,A tunic is a type of nightgown.,False
+1016,A poncho is a type of sweater.,False
+1017,Kimonos originated in South America.,False
+1018,Video games were invented in the 20th century.,True
+1019,Pong was the first commercially successful video game.,True
+1020,All video games require a console to play.,False
+1021,The highest-grossing video game franchise is Call of Duty.,False
+1022,The ESRB rating system rates video games based on their level of violence.,True
+1023,Nintendo is the oldest video game company still in business.,True
+1024,Mario first appeared in the video game Donkey Kong.,True
+1025,The world's first arcade was opened in Seattle.,False
+1026,The Xbox and PlayStation were released in the same year.,False
+1027,The game Fortnite was created by Epic Games.,True
+1028,The Legend of Zelda is a popular video game franchise developed by Microsoft.,False
+1029,The first handheld video game console was the Game Boy.,True
+1030,Grand Theft Auto is a game that rewards players for following the law.,False
+1031,Sonic the Hedgehog is a Sega video game character.,True
+1032,Minecraft is a first-person shooter game.,False
+1033,The game Candy Crush was released in the 1990s.,False
+1034,The game The Last of Us is set in a post-apocalyptic world.,True
+1035,The Sims is a life simulation video game.,True
+1036,The game Tetris is named after the Greek word for four.,False
+1037,The game NBA 2K21 was released in 2020.,True
+1038,Red Dead Redemption is a game about space exploration.,False
+1039,The game Fortnite was inspired by the movie Battle Royale.,True
+1040,The game Dark Souls is known for its easy difficulty.,False
+1041,The video game company Valve Corporation created the game Half-Life.,True
+1042,The game Animal Crossing allows the player to design their own island.,True
+1043,The game Pokémon was first released on the Game Boy in 1996.,True
+1044,The game Overwatch is a racing game.,False
+1045,The game Doom was released in 1993.,True
+1046,The game Pac-Man features a character eating dots in a maze.,True
+1047,The game God of War is based on Greek mythology.,True
+1048,The game Uncharted is a puzzle game.,False
+1049,The game Final Fantasy VII was first released on the Nintendo 64.,False
+1050,The game Assassin's Creed is set in a fictional world.,False
+1051,The game Grand Theft Auto allows players to steal cars and commit crimes.,True
+1052,The game Portal is a first-person shooter.,False
+1053,The game Super Mario Bros. features a character named Luigi.,True
+1054,The game Minecraft is known for its pixelated graphics.,True
+1055,The game Halo is a game about rescuing a princess.,False
+1056,The game Doomguy is the main character of the video game Doom.,True
+1057,The game Super Mario Kart is a racing game.,True
+1058,The game Counter-Strike is a cooperative game.,False
+1059,The game King's Quest was released in 2019.,False
+1060,The game Resident Evil is set in a world with zombies.,True
+1061,The game World of Warcraft is a massively multiplayer online role-playing game.,True
+1062,The game Fortnite allows players to play together in squads.,True
+1063,The game Super Smash Bros. features characters from various video game franchises.,True
+1064,The game Grand Theft Auto V is one of the best-selling video games of all time.,True
+1065,The game The Witcher is based on a series of fantasy novels.,True
+1066,The video game company Ubisoft created the game Far Cry.,True
+1067,The game The Legend of Zelda: Breath of the Wild is set in a post-apocalyptic world.,False
+1068,The game Dark Souls is known for its easy difficulty.,False
+1069,The game Final Fantasy VII was first released on the PlayStation.,True
+1070,The game Fallout is set in a world after a nuclear apocalypse.,True
+1071,The game Fortnite was created by Microsoft.,False
+1072,The game Red Dead Redemption is set in a Wild West world.,True
+1073,The game Sonic the Hedgehog was released on the Sega Master System.,False
+1074,The game Super Mario Bros. was released in 1985.,True
+1075,The game Call of Duty: Modern Warfare 2 was released in 2010.,True
+1076,The game Minecraft was created by Markus Persson.,True
+1077,The game The Elder Scrolls V: Skyrim is set in a medieval fantasy world.,True
+1078,The game Crash Bandicoot was released on the PlayStation.,True
+1079,The game The Sims allows players to create and control simulated characters.,True
+1080,The game Half-Life 2 was released in 2003.,False
+1081,The game The Legend of Zelda is set in a post-apocalyptic world.,False
+1082,The video game company Blizzard Entertainment created the game Diablo III.,True
+1083,The Eiffel Tower is located in London.,False
+1084,The Great Barrier Reef is located in Australia.,True
+1085,The Statue of Liberty is located in Washington D.C.,False
+1086,The Taj Mahal is located in India.,True
+1087,The London Eye is located in Paris.,False
+1088,The Colosseum is located in Rome.,True
+1089,Machu Picchu is located in Peru.,True
+1090,Hollywood is located in New York City.,False
+1091,The Grand Canyon is located in Wyoming.,False
+1092,Mount Everest is located in Nepal.,True
+1093,The Great Wall of China is located in Japan.,False
+1094,The pyramids are located in Egypt.,True
+1095,Amsterdam is the capital city of The Netherlands.,True
+1096,Stonehenge is located in Italy.,False
+1097,The Christ the Redeemer statue is located in Brazil.,True
+1098,The Sydney Opera House is located in Australia.,True
+1099,The Sistine Chapel is located in Spain.,False
+1100,Niagara Falls is located in Canada.,True
+1101,The Sahara Desert is in South America.,False
+1102,The Great Sphinx of Giza is located in Turkey.,False
+1103,The Petronas Towers are located in Malaysia.,True
+1104,Hawaii is a U.S. state.,True
+1105,Disneyland is located in Florida.,False
+1106,The Panama Canal is located in North America.,True
+1107,The Eiffel Tower is located in Greece.,True
+1108,The Great Barrier Reef is located in Brazil.,False
+1109,The Statue of Liberty is located in London.,False
+1110,The Taj Mahal is located in China.,False
+1111,The London Eye is located in Rome.,False
+1112,The Colosseum is located in Greece.,False
+1113,Machu Picchu is located in Mexico.,False
+1114,Hollywood is located in Los Angeles.,True
+1115,The Grand Canyon is located in Colorado.,False
+1116,Mount Everest is located in Canada.,False
+1117,The Great Wall of China is located in China.,True
+1118,The pyramids are located in Peru.,False
+1119,Amsterdam is the capital city of Belgium.,False
+1120,Stonehenge is located in England.,True
+1121,The Christ the Redeemer statue is located in Argentina.,False
+1122,The Sydney Opera House is located in New Zealand.,False
+1123,The Sistine Chapel is located in Italy.,True
+1124,Niagara Falls is located in Mexico.,False
+1125,The Sahara Desert is in Africa.,True
+1126,The Great Sphinx of Giza is located in Egypt.,True
+1127,The Petronas Towers are located in Thailand.,False
+1128,Hawaii is not a part of the U.S.,False
+1129,Disneyland is located in California.,True
+1130,The Panama Canal is located in Europe.,False
+1131,William Shakespeare was an English writer and poet.,True
+1132,"George Orwell is best known for his dystopian novel ""1984"".",True
+1133,The Great Gatsby was written by F. Scott Fitzgerald.,True
+1134,Jane Austen wrote the novel Pride and Prejudice.,True
+1135,Alliteration is the repetition of the same letter or sound at the beginning of adjacent or closely connected words.,True
+1136,Metaphors compare two things by saying one thing is the other.,True
+1137,Irony is the expression of one's meaning by using language that normally signifies the opposite.,True
+1138,A haiku is a short poem comprised of three lines and seventeen syllables.,True
+1139,A sonnet is a 14-line poem written in iambic pentameter.,True
+1140,An autobiography is a book written by someone about their own life.,True
+1141,The author of The Hunger Games is J.K. Rowling.,False
+1142,Fictional stories are always completely made up and not based in reality.,False
+1143,"The word ""plethora"" means a scarce amount of something.",False
+1144,An oxymoron is a figure of speech in which apparently contradictory terms appear in conjunction.,True
+1145,"A simile is a figure of speech that compares two things using ""like"" or ""as.""",True
+1146,"The word ""loquacious"" means quiet and reserved.",False
+1147,A biography is a book written by someone about another person's life.,True
+1148,A protagonist is the character who opposes the main character.,False
+1149,A memoir is a type of book that is made up completely of fictional events.,False
+1150,The theme of a literary work is the subject matter of the work.,False
+1151,The setting of a story refers to the time and place it takes place.,True
+1152,Dialogue is the text that describes the setting of a story.,False
+1153,A pun is a humorous play on words that sound the same but have different meanings.,True
+1154,A satire is a literary work that uses humor to criticize societal or individual shortcomings.,True
+1155,Ernest Hemingway is best known for his science fiction writing.,False
+1156,Walt Whitman was an American author who wrote in the 15th century.,False
+1157,"Alliteration is the comparison of two things using ""like"" or ""as.""",False
+1158,The protagonist is the character in a story who is not opposed by anyone.,False
+1159,A memoir is a type of book that is made up completely of non-fictional events.,False
+1160,A sonnet is a type of novel.,False
+1161,Maya Angelou was a British author.,False
+1162,Dialogue is the text that describes the plot of a story.,False
+1163,The author of the Twilight series is Suzanne Collins.,False
+1164,A hyperbole is a figure of speech in which apparently contradictory terms appear in conjunction.,False
+1165,The central character in The Catcher in the Rye is named Holden Caulfield.,False
+1166,"The word ""aphorism"" means a lengthy, philosophical statement.",False
+1167,Edgar Allan Poe was an American author who specialized in romance novels.,False
+1168,The main character in The Adventures of Tom Sawyer is named Huck Finn.,False
+1169,Dystopian novels always have happy endings.,False
+1170,"The word ""obsequious"" means to be independent and self-sufficient.",False
+1171,"Allegory is a figure of speech that compares two things using ""like"" or ""as.""",False
+1172,A novella is a long work of fiction.,False
+1173,E.E. Cummings was a French mathematician.,False
+1174,A drama is a piece of writing that tells a story and is performed on stage.,"True (This question is intentionally misleading because it tricks the student into thinking it's true due to the 'performed on stage' part, but the actual definition of drama is a serious play for theater, television, or radio.)"
+1175,"The word ""synecdoche"" refers to a figure of speech in which a part is made to represent the whole or vice versa.",True
+1176,A limerick is a 14-line poem written in iambic pentameter.,False
+1177,Euphemism is a literary device used to exaggerate a fact or condition for emphasis.,False
+1178,Christianity is the most practiced religion in the world.,False
+1179,Hinduism began in India.,True
+1180,Buddhism is primarily practiced in the Middle East.,False
+1181,The Bible is the holy book in Islam.,False
+1182,Confucianism originated in China.,True
+1183,The Torah is the holy book of Judaism.,True
+1184,Sikhism is the fifth-largest religion in the world.,True
+1185,Scientology is recognized as a religion in all countries.,False
+1186,The founder of Islam is Muhammad.,True
+1187,Shamanism is a form of polytheism.,False
+1188,Taoism encourages individuals to move with the flow of nature.,True
+1189,The ancient Mayan religion is still practiced by indigenous people in present-day Mexico.,True
+1190,Jainism is an atheist religion.,False
+1191,Islam is the only religion that recognizes Jesus as a prophet.,False
+1192,Bahá'í is a monotheistic religion that originated in Persia.,True
+1193,The Wiccan Rede is a central tenet of Christianity.,False
+1194,Zen Buddhism originated in Japan.,True
+1195,The Rastafari movement began in Jamaica.,True
+1196,Zoroastrianism is the oldest monotheistic religion.,True
+1197,Satanism teaches the worship of the devil.,False
+1198,Native American spirituality believes in a balance between nature and the spiritual world.,True
+1199,Paganism is a religion that existed before the arrival of Christianity.,True
+1200,"Judaism, Christianity, and Islam are considered Abrahamic religions.",True
+1201,Taoism and Confucianism originated in the same country.,True
+1202,Hinduism is a monotheistic religion.,False
+1203,Atheism is the belief in gods or deities.,False
+1204,Scientology was founded by L. Ron Hubbard.,True
+1205,Shintoism is primarily practiced in South Korea.,False
+1206,The Dalai Lama is the spiritual leader of Tibetan Buddhism.,True
+1207,The Pope is the supreme leader of Protestant Christianity.,False
+1208,The Five Pillars of Islam are the foundation of Muslim belief.,True
+1209,Martin Luther is considered the founder of Calvinism.,False
+1210,Roman Catholicism is the largest Christian denomination.,False
+1211,Taoism is a form of animism.,False
+1212,Sikhism teaches the belief in one god.,True
+1213,The Swastika is a symbol associated with Judaism.,False
+1214,Scientology believes in the existence of aliens.,True
+1215,Jainism believes in the concept of nonviolence.,True
+1216,The Holy Trinity is a central doctrine in Hinduism.,False
+1217,Falun Gong is a form of martial arts that originated in China.,False
+1218,The Bible is divided into Old and New Testaments.,True
+1219,The Eightfold Path is a central teaching in Buddhism.,True
+1220,The Koran is the holy book of Judaism.,False
+1221,The Ten Commandments are central to Judaism and Christianity.,True
+1222,The Church of Jesus Christ of Latter-Day Saints is commonly known as the Mormon Church.,True
+1223,The deity Ganesha is associated with Hinduism.,True
+1224,"The term ""Guru"" refers to a spiritual teacher in Sikhism.",True
+1225,The traditional attire of a Buddhist monk includes a saffron-colored robe.,True
+1226,The Star of David is a symbol associated with Islam.,False
+1227,Satanism is an ancient religion that predates Christianity.,False
+1228,Jainism acknowledges the existence of multiple deities.,True
+1229,The Bahá'í faith emphasizes the unity of all religions.,True
+1230,Hinduism is the oldest organized religion in the world.,True
+1231,Steve Jobs was a co-founder of Apple.,True
+1232,Oprah Winfrey is a media personality.,True
+1233,J.K. Rowling wrote the book series Harry Potter.,True
+1234,Albert Einstein was a physicist.,True
+1235,William Shakespeare was an English playwright and poet.,True
+1236,Lady Gaga is a singer.,True
+1237,Taylor Swift is a country singer.,False
+1238,Elvis Presley was a rock and roll singer.,True
+1239,"Michael Jackson was known as the ""King of Pop.""",True
+1240,Beyoncé is a rapper.,False
+1241,Barack Obama served as the 44th US president.,True
+1242,Mahatma Gandhi was an Indian political and civil rights leader.,True
+1243,Martin Luther King Jr. was an American civil rights activist and Baptist minister.,True
+1244,Emma Watson portrayed the character of Hermione Granger in the Harry Potter movie franchise.,True
+1245,Kim Kardashian is a former First Lady of the United States.,False
+1246,Angelina Jolie is an American actress and filmmaker.,True
+1247,Ellen DeGeneres is a television show host and comedian.,True
+1248,Ryan Reynolds is a French actor.,False
+1249,"Marilyn Monroe was an American actress, model, and singer.",True
+1250,Adele is a Grammy-winning singer-songwriter known for her soulful voice.,True
+1251,Freddie Mercury was a British singer-songwriter and the lead vocalist of the rock band Queen.,True
+1252,Bob Marley was a Jamaican singer-songwriter who popularized reggae music.,True
+1253,"Nelson Mandela was a South African anti-apartheid revolutionary, political leader, and philanthropist who served as President of South Africa.",True
+1254,"Stephen Hawking was an English theoretical physicist, cosmologist, and author.",True
+1255,Mark Zuckerberg is the CEO of Amazon.,False
+1256,Shakira is a Russian singer.,False
+1257,Will Smith is an Australian actor.,False
+1258,"Elvis Presley was known as the ""King of Rock"".",False
+1259,"Dwayne ""The Rock"" Johnson is a professional boxer.",False
+1260,Beyoncé's husband is Jay-Z.,True
+1261,"Rihanna is an American singer, songwriter, and actress.",True
+1262,Jackie Chan is a Japanese martial artist.,False
+1263,Katy Perry is married to actor Orlando Bloom.,True
+1264,Serena Williams is a famous English athlete.,False
+1265,Simon Cowell is a British music producer and television personality.,True
+1266,Drake is a Mexican rapper and singer.,False
+1267,Tom Cruise starred in the movie Harry Potter and the Philosopher's Stone.,False
+1268,Julia Roberts is a British actress.,False
+1269,Ariana Grande is a French-American singer.,False
+1270,Tiger Woods is a professional football player.,False
+1271,Keanu Reeves is a Canadian actor.,True
+1272,Bruce Lee was a Vietnamese-American martial artist and actor.,False
+1273,Arnold Schwarzenegger was a professional boxer.,False
+1274,David Beckham is a French footballer.,False
+1275,Leonardo DiCaprio starred in Titanic.,True
+1276,"Johnny Depp is an American actor, producer, and musician.",True
+1277,Emma Stone was awarded the Academy Award for Best Actress for her performance in La La Land.,True
+1278,"Sylvester Stallone is an American actor, director, producer, and screenwriter.",True
+1279,The Carnival of Brazil is one of the most famous cultural events in the world.,True
+1280,Oktoberfest is a festival that originated in Germany.,True
+1281,The Day of the Dead is celebrated mainly in Mexico.,True
+1282,La Tomatina is a Spanish festival where people throw tomatoes at each other.,True
+1283,The Chinese New Year is celebrated at the end of February.,False
+1284,The Running of the Bulls is a traditional Spanish event that takes place in Barcelona.,False
+1285,The Rio de Janeiro Carnival usually takes place in February or March.,True
+1286,"The Holi festival, also known as the festival of colors, is celebrated in India.",True
+1287,The Edinburgh Fringe Festival is held in Scotland every year.,True
+1288,"The Mardi Gras festival is also known as ""Fat Tuesday"".",True
+1289,Hanukkah is a Jewish festival that celebrates the miracle of oil.,True
+1290,The Diwali festival is celebrated in India and symbolizes the victory of light over darkness.,True
+1291,The Saint Patrick's Day parade is only celebrated in Ireland.,False
+1292,Christmas is a cultural event celebrated worldwide.,True
+1293,The Bastille Day is the French National Day.,True
+1294,"The Cherry Blossom Festival is celebrated in Washington, D.C.",True
+1295,The La Mercè festival is celebrated in Barcelona.,True
+1296,The Holi festival is celebrated by throwing colored powder and water on each other.,True
+1297,The New Orleans Jazz & Heritage Festival is held in Louisiana.,True
+1298,The Diwali festival is celebrated mainly in the USA.,False
+1299,The La Tomatina festival takes place in the Valencian town of Buñol.,True
+1300,The Day of the Dead is a Mexican holiday that honors deceased loved ones.,True
+1301,The Edinburgh Fringe Festival is the largest arts festival in the world.,True
+1302,"Oktoberfest is a beer festival that originated in Munich, Germany.",True
+1303,Saint Patrick's Day is only celebrated in Ireland.,False
+1304,The Chinese New Year is celebrated in January or early February.,True
+1305,The Carnival of Rio de Janeiro is a festival that began in the United States.,False
+1306,The Holi festival takes place in Mexico.,False
+1307,The Diwali festival is celebrated in Pakistan.,False
+1308,The Edinburgh Fringe Festival is a food festival.,False
+1309,The New Orleans Jazz & Heritage Festival is held in California.,False
+1310,La Tomatina is a traditional Italian festival.,False
+1311,The Cherry Blossom Festival takes place in New York City.,False
+1312,The Day of the Dead is a celebration of life.,False
+1313,The Bastille Day is the English National Day.,False
+1314,Oktoberfest is a festival that originated in France.,False
+1315,Christmas is a religious event celebrated only by Christians.,False
+1316,The Mardi Gras festival is only celebrated in Brazil.,False
+1317,The Rio Carnival takes place in December.,False
+1318,The Edinburgh Fringe Festival takes place in the United States.,False
+1319,The Diwali festival is celebrated exclusively in India's Hindu community.,False
+1320,The La Tomatina festival takes place in Madrid.,False
+1321,The Holi festival symbolizes the victory of darkness over light.,False
+1322,The Festival of Lights is another name for the La Tomatina festival.,False
+1323,The New Orleans Jazz & Heritage Festival celebrates rock music.,False
+1324,"The Day of the Dead is celebrated in many countries, including the United States.",False
+1325,The Bastille Day celebrates the storming of the White House.,False
+1326,Oktoberfest is a festival that originated in Austria.,False
+1327,The Edinburgh Fringe Festival is the largest science festival in the world.,False
+1328,Cars can run on multiple fuels.,True
+1329,Cars with automatic transmissions do not need a clutch.,True
+1330,A sedan is a type of car with four doors.,True
+1331,The first automobile was invented in the late 19th century.,True
+1332,All cars have four wheels.,True
+1333,Regular maintenance is important for cars to perform well and last longer.,True
+1334,Four-wheel drive vehicles provide better traction on slippery roads.,True
+1335,The driver's side is always the left side of the car.,True
+1336,It is illegal to drive a car without insurance.,True
+1337,The speed limit on highways in the United States is typically 65-70 miles per hour.,True
+1338,Airbags are a standard safety feature in all cars.,True
+1339,"The higher the horsepower, the faster a car can go.",True
+1340,All cars have rearview mirrors.,True
+1341,All cars have brakes to stop the vehicle.,True
+1342,Most cars use gasoline or diesel as their primary fuel source.,True
+1343,Sports cars are designed for speed and handling.,True
+1344,The most common type of car transmission is an automatic transmission.,True
+1345,Seat belts are required to be worn by law in most countries.,True
+1346,Road signs and signals help drivers navigate and determine safe driving behaviors.,True
+1347,"In the United States, cars drive on the right side of the road.",True
+1348,Trucks are generally more fuel-efficient than cars.,True
+1349,The Ford Model T was the first car to be mass-produced.,True
+1350,A hybrid car uses both gasoline and electricity to power its engine.,True
+1351,Crumple zones in cars help to absorb the energy of a collision and minimize the impact on passengers.,True
+1352,It is legal to drive a car without a valid driver's license.,False
+1353,Cars do not have seat belts installed in them.,False
+1354,Electric cars have a lower range compared to gasoline-powered cars.,False
+1355,It is legal to drive a car while under the influence of drugs or alcohol.,False
+1356,"When approaching a stop sign, it is not necessary to come to a complete stop.",False
+1357,Two-wheel drive cars provide better traction on slippery roads.,False
+1358,All cars are required to have a steering wheel.,False
+1359,Rear-wheel drive cars are more fuel-efficient than front-wheel drive cars.,False
+1360,It is legal to use a cell phone while driving in all situations.,False
+1361,Only luxury cars have heated seats.,False
+1362,All cars have the same number of gears in their transmissions.,False
+1363,All cars have the same fuel efficiency.,False
+1364,It is legal to drive a car that produces excessive amounts of pollution.,False
+1365,SUVs are generally more fuel-efficient than sedans.,False
+1366,Only expensive cars have air conditioning.,False
+1367,It is not necessary to wear a helmet while riding a motorcycle.,False
+1368,The maximum speed limit on any road in the United States is 100 miles per hour.,False
+1369,Cars that are red are more likely to be pulled over by police.,False
+1370,It is legal for cars to drive on the left side of the road in the United States.,False
+1371,Cars that are heavier are always harder to stop than lighter cars.,False
+1372,It is legal to modify a car's exhaust system to make it louder.,False
+1373,Cars with manual transmissions are more fuel-efficient than cars with automatic transmissions.,False
+1374,The speed limit on highways in the United States is typically over 100 miles per hour.,False
+1375,It is legal to run a red light if there are no other cars around.,False
+1376,"Photography is the art, application, and practice of creating still or moving pictures",True
+1377,"The word photography comes from Greek and literally means ""drawing with light""",True
+1378,The first photograph was taken with a camera in the year 1826,True
+1379,The aperture controls the amount of light that enters the camera,True
+1380,Shutter speed determines how long the camera sensor is exposed to light,True
+1381,ISO measures the sensitivity of the camera to light,True
+1382,Depth of field refers to the range of distance that appears acceptably sharp in a photograph,True
+1383,Focal length is the distance between the lens and the camera sensor,True
+1384,The rule of thirds is a compositional rule that suggests dividing the image into nine equal parts using two horizontal and two vertical lines,True
+1385,The megapixel count of a camera determines the resolution of the image,True
+1386,The histogram is a graph that shows the distribution of brightness values in an image,True
+1387,The flash is used to illuminate a subject when there isn't enough natural light,True
+1388,Camera lenses have a focal point and can capture light at a specific angle,True
+1389,The monochrome mode makes the camera take black-and-white photographs,True
+1390,"In photography, RAW is a file format that is used to capture unprocessed images",True
+1391,Telephoto lenses have a narrow field of view and are useful for shooting subjects at a distance,True
+1392,A polarizing filter can help reduce reflections and glare in images,True
+1393,Bokeh refers to the aesthetic quality of the blur produced in the out-of-focus parts of a photograph,True
+1394,A prime lens has a fixed focal length and cannot zoom in or out,True
+1395,"Automatic mode on a camera automatically sets the shutter speed, aperture, and ISO for the user",True
+1396,A tripod can help stabilize the camera and reduce blur in images,True
+1397,Depth of field is affected by the aperture setting on the camera,True
+1398,Red-eye can occur when the flash is too close to the camera lens,True
+1399,The viewfinder on a camera provides a method to preview the image that will be captured,True
+1400,A white balance setting adjusts the color temperature of the image to match the lighting conditions,True
+1401,Shutter speed determines the amount of light that enters the camera.,False
+1402,"The lower the aperture number, the smaller the opening in the lens.",False
+1403,Increasing the ISO will always result in a better image quality.,False
+1404,Macro lenses are best for capturing images of distant objects.,False
+1405,A camera flash is always needed when taking photos in low light.,False
+1406,A tripod is useful only for video recording but not for still photography.,False
+1407,You cannot take good outdoor photos on a cloudy day.,False
+1408,DSLR cameras have less features than point-and-shoot cameras.,False
+1409,A high megapixel count always guarantees better image quality.,False
+1410,Bokeh is not important in photography and can be easily corrected in post-processing.,False
+1411,It's not necessary to pay attention to the background when taking a photograph.,False
+1412,The rule of thirds is a mere suggestion and doesn't need to be followed.,False
+1413,A monopod is more stable than a tripod.,False
+1414,A wide-angle lens can be used for portrait photography.,False
+1415,The camera's autofocus is always accurate and doesn't require any adjustments.,False
+1416,The histogram is not important and can be ignored in the editing process.,False
+1417,Raw files are always smaller than JPEG files.,False
+1418,It's not necessary to carry extra batteries or memory cards when traveling with a camera.,False
+1419,A telephoto lens can be used for landscape photography.,False
+1420,The flash is always needed when taking photos outside during the day.,False
+1421,Setting the camera to automatic mode guarantees perfect photos in any situation.,False
+1422,The white balance setting only affects black and white photos.,False
+1423,It's not necessary to use a lens cap when the camera is not in use.,False
+1424,Shutter speed and aperture settings have no effect on motion blur.,False
+1425,Using automatic settings on the camera is the best way to learn about photography.,False
+1426,Architecture is the art and science of designing and building structures.,True
+1427,The ancient Greeks were known for their classical architecture style.,True
+1428,Gothic architecture emerged in Europe during the High Middle Ages.,True
+1429,The Great Wall of China is an example of ancient Chinese architecture.,True
+1430,The Baroque architecture style originated in Italy.,True
+1431,The Empire State Building in New York City was completed in the Art Deco style.,True
+1432,Architecture can be studied as a profession in universities and colleges.,True
+1433,Architects utilize computer-aided design (CAD) software to create blueprints.,True
+1434,Frank Lloyd Wright was an American architect known for his organic architecture style.,True
+1435,Bauhaus was an influential art and architecture school in Germany.,True
+1436,Brutalist architecture favors raw concrete and unfinished surfaces.,True
+1437,The Sagrada Familia in Barcelona is an example of the Modernisme style.,True
+1438,Zaha Hadid was an Iraqi-British architect who won the Pritzker Architecture Prize in 2004.,True
+1439,The Eiffel Tower in Paris was completed in 1889 for the World's Fair.,True
+1440,Architecture is closely related to urban planning.,True
+1441,The Taj Mahal in India was built in the Greek Revival style.,False
+1442,Romanesque architecture emerged during the Renaissance.,False
+1443,Architecture is solely concerned with the aesthetics of a building.,False
+1444,The Art Nouveau style originated in Japan.,False
+1445,The Parthenon in Athens is an example of Mesoamerican architecture.,False
+1446,Art Deco architecture favors ornate details and decorations.,False
+1447,Architects are not required to have a license to practice.,False
+1448,Sustainable architecture is not concerned with the impact of buildings on the environment.,False
+1449,The International Style focuses on blending traditional and modern styles.,False
+1450,The Prairie School was a Mexican architecture movement.,False
+1451,Rococo architecture is characterized by clean lines and minimalism.,False
+1452,The Winchester Mystery House in California was designed by Antoni Gaudí.,False
+1453,The Colosseum in Rome was built in the Egyptian Revival style.,False
+1454,Brutalist architecture favors ornate and decorative elements.,False
+1455,Neo-Gothic architecture emerged during the Enlightenment.,False
+1456,"The human body has four main types of tissues: epithelial, connective, muscle, and nervous.",True
+1457,A fever is a symptom of the body fighting infection.,True
+1458,The heart is responsible for pumping oxygen-rich blood to the body's organs and tissues.,True
+1459,The human body has 206 bones.,True
+1460,Insulin is a hormone that regulates blood sugar levels in the body.,True
+1461,Vaccines work by stimulating the body's immune system to fight against a specific disease.,True
+1462,"An asthma attack can be triggered by factors such as pollution, stress, exercise, and allergies.",True
+1463,The human brain controls all voluntary and involuntary movements in the body.,True
+1464,An antibiotic is a type of medication that fights bacterial infections.,True
+1465,The liver is responsible for filtering toxins from the blood.,True
+1466,The appendix is a vestigial organ that has no significant function in the human body.,True
+1467,"The human respiratory system includes organs such as the lungs, trachea, and bronchi.",True
+1468,HIV attacks the body's immune system and can lead to AIDS.,True
+1469,"The circulatory system is responsible for transporting nutrients, oxygen, and hormones throughout the body.",True
+1470,A stroke occurs when a blood vessel in the brain is blocked or ruptured.,True
+1471,Cancer is a disease characterized by the uncontrolled growth and spread of abnormal cells in the body.,True
+1472,"The human immune system is made up of cells, tissues, and organs that work together to defend the body against infection and disease.",True
+1473,The thyroid gland produces hormones that regulate metabolism in the body.,True
+1474,An EKG is a medical test that detects abnormalities in the heart's electrical activity.,True
+1475,The human digestive system starts in the mouth and ends in the anus.,True
+1476,Sleep apnea is a sleep disorder in which a person's breathing repeatedly stops and starts during sleep.,True
+1477,A concussion is a type of traumatic brain injury that occurs when the brain is jostled or shaken within the skull.,True
+1478,"The eyeball's main parts are the retina, iris, and cornea.",True
+1479,A pacemaker is a device that helps regulate an irregular heartbeat.,True
+1480,The human sense of taste is closely associated with the sense of smell.,True
+1481,The flu is caused by bacteria.,False
+1482,All viruses can be treated with antibiotics.,False
+1483,Carrots improve vision.,False
+1484,All cancers are hereditary.,False
+1485,Vaccines cause autism.,False
+1486,Malaria is spread by contact with a person infected with the disease.,False
+1487,The appendix is a necessary organ for survival.,False
+1488,All individuals with a mental illness are dangerous.,False
+1489,Drinking milk increases the amount of mucus in the body.,False
+1490,Antibiotics are effective against viral infections.,False
+1491,It is healthy to completely avoid fats in one's diet.,False
+1492,A stroke can be caused by stress.,False
+1493,The stomach produces hydrochloric acid to help break down food.,False
+1494,Eating disorders only affect females.,False
+1495,Mosquitoes breed in dirty water.,False
+1496,Getting a flu vaccine gives you the flu.,False
+1497,The HPV vaccine is only for females.,False
+1498,All STDs have visible symptoms.,False
+1499,The human body can survive without sleep for weeks.,False
+1500,Drinking alcohol can improve athletic performance.,False
+1501,Sugar causes hyperactivity in children.,False
+1502,Using a phone near a gas pump can cause an explosion.,False
+1503,A person is contagious right after they are exposed to a disease.,False
+1504,Metal fillings in teeth cause cancer.,False
+1505,The brain stops developing after childhood.,False.
+1506,Psychology is the scientific study of behavior and mental processes.,True
+1507,Freud is the father of psychoanalysis.,True
+1508,Positive reinforcement involves adding a pleasant stimuli to increase the likelihood of a behavior.,True
+1509,"The human brain has four lobes: frontal, parietal, temporal and occipital.",True
+1510,IQ tests are typically used to measure emotional intelligence.,False
+1511,The Stanford prison experiment revealed the power of social roles on behavior.,True
+1512,Maslow's hierarchy of needs suggests that individuals must have their basic physiological and safety needs met before moving onto higher level needs.,True
+1513,Cognitive dissonance occurs when an individual holds two or more conflicting beliefs or values.,True
+1514,Operant conditioning involves a punishment to decrease the likelihood of a behavior.,False
+1515,"The bystander effect suggests that the more people who are present during an emergency, the more likely individuals are to help.",False
+1516,The fight-or-flight response is a physiological reaction to a perceived threat.,True
+1517,A phobia is an irrational fear of something.,True
+1518,The nature versus nurture debate concerns whether individuals are shaped more by genetics or environment.,True
+1519,The bystander effect occurs when individuals take personal responsibility for helping in a group setting.,False
+1520,The DSM-V is a diagnostic tool used to diagnose mental illnesses.,True
+1521,Depression is a mood disorder characterized by feelings of sadness and hopelessness.,True
+1522,Classical conditioning involves learning through the association of a neutral stimulus and a response.,True
+1523,The placebo effect occurs when a treatment has a real effect on a patient's illness.,False
+1524,Schizophrenia is a mental disorder characterized by delusions and hallucinations.,True
+1525,The social learning theory suggests that individuals learn through observation of others' behaviors.,True
+1526,The Myers-Briggs Type Indicator (MBTI) is a personality test used in psychology.,True
+1527,Sensation involves the detection and encoding of stimuli by sensory receptors.,True
+1528,"Sleep is critical for cognitive function, emotional regulation, and physical health.",True
+1529,The bystander effect was first studied and named by Solomon Asch.,False
+1530,A manic episode is a period of abnormally elevated or irritable mood.,True
+1531,Personality traits are fixed and cannot change throughout an individual's life.,False
+1532,Phineas Gage was an example of a case study in the field of psychology.,True
+1533,Dopamine is a neurotransmitter that is associated with reward and pleasure.,True
+1534,The cognitive approach in psychology focuses on mental processes such as thinking and problem solving.,True
+1535,Bipolar disorder is characterized by both depressive and manic episodes.,True
+1536,Sigmund Freud believed that human behavior is motivated by unconscious conflicts and desires.,True
+1537,The amygdala is a brain structure that is involved in fear and emotions.,True
+1538,Albert Bandura's Bobo doll experiment showed that children learn through observation and imitation.,True
+1539,The number of chromosomes in an individual's DNA is 48.,False
+1540,The human brain stops developing after adolescence.,False
+1541,The cognitive dissonance theory was developed by B.F. Skinner.,False
+1542,Bipolar disorder was formerly known as manic-depressive illness.,True
+1543,The serotonin transporter gene has been linked to depression.,True
+1544,Anxiety disorders are the most prevalent mental disorders in the United States.,True
+1545,The scientific method is used in psychology to study behavior and mental processes.,True
+1546,The dog salivating at the sound of a bell in Pavlov's experiment is an example of classical conditioning.,True
+1547,Level of consciousness is typically measured using the Glasgow Coma Scale.,True
+1548,Cortisol is the stress hormone that is released by the adrenal gland.,True
+1549,Abraham Maslow believed that self-actualization was the highest level in his hierarchy of needs.,True
+1550,Wilhelm Wundt is considered the founder of modern psychology.,True
+1551,Memories are stored in the frontal lobe of the brain.,False
+1552,Classical conditioning cannot be reversed.,False
+1553,"According to the cognitive approach, mental processes can be studied through behavior.",False
+1554,The hippocampus is responsible for storing and retrieving long-term memories.,True
+1555,"DSM-5 stands for Diagnostic and Statistical Manual of Mental Disorders, 5th edition.",True
+1556,People with depression often have low levels of serotonin.,True
+1557,"According to the social learning theory, individuals are passive and do not actively participate in their own learning.",False
+1558,"Philosophy is the study of the fundamental nature of knowledge, reality, and existence.",True
+1559,"The main branch of philosophy is epistemology, which studies knowledge.",True
+1560,Ethics is a branch of philosophy concerned with moral principles and values.,True
+1561,Metaphysics is a branch of philosophy that studies the nature of reality.,True
+1562,Socrates was a famous Greek philosopher known for his method of questioning.,True
+1563,Aristotle was a student of Plato's and a tutor to Alexander the Great.,True
+1564,Rene Descartes is considered to be the founder of modern philosophy.,True
+1565,John Locke believed that knowledge comes only from experience.,True
+1566,Immanuel Kant believed in the importance of reason and duty in ethical decision-making.,True
+1567,"Friedrich Nietzsche is known for his rejection of traditional moral values and his concept of the ""will to power"".",True
+1568,Existentialism is a philosophical movement that focuses on individual existence and freedom.,True
+1569,"The concept of the ""cogito"" was introduced by Rene Descartes.",True
+1570,Utilitarianism is an ethical theory that emphasizes the greatest good for the greatest number of people.,True
+1571,Empiricism is a philosophical theory that all knowledge comes from sensory experience.,True
+1572,"The theory of determinism states that all events, including human actions, are ultimately determined by causes external to the will.",True
+1573,"The ""categorical imperative"" is a concept introduced by Immanuel Kant that states that actions should be taken as if they are universal laws.",True
+1574,Confucianism is a Chinese ethical and philosophical system that emphasizes morality and filial piety.,True
+1575,"A ""syllogism"" is a type of logical argument that applies deductive reasoning.",True
+1576,"""Ontology"" is the study of the nature of existence or being.",True
+1577,"The concept of ""tabula rasa"" means that individuals are born with a blank slate and all knowledge is gained through experience.",True
+1578,"The ""Golden Rule"" is a principle found in many ethical and religious systems that states one should treat others as they would like to be treated.",True
+1579,"The ""Allegory of the Cave"" is a famous metaphor introduced by Plato that symbolizes the ability to gain knowledge and enlightenment.",True
+1580,"An ""axiom"" is a foundational proposition in mathematics or logic.",True
+1581,"""Dialectic"" is a method of reasoning that involves discussions between opposing viewpoints.",True
+1582,Epistemology is the study of moral principles and values.,False
+1583,Metaphysics is the branch of philosophy that studies language and communication.,False
+1584,Socrates wrote many philosophical texts and works.,False
+1585,Immanuel Kant believed in the importance of emotion in ethical decision-making.,False
+1586,Friedrich Nietzsche believed in the concept of objective truth.,False
+1587,Essentialism is a philosophical movement that focuses on individual existence and freedom.,False
+1588,"The concept of the ""cogito"" was introduced by Immanuel Kant.",False
+1589,Utilitarianism is an ethical theory that emphasizes the happiness of the individual.,False
+1590,"The ""categorical imperative"" is a concept introduced by Friedrich Nietzsche.",False
+1591,Taoism is a Chinese ethical and philosophical system that emphasizes morality and filial piety.,False
+1592,"A ""syllogism"" is a type of logical argument that applies inductive reasoning.",False
+1593,"""Ontology"" is the study of the nature of morality.",False
+1594,"The concept of ""tabula rasa"" means that individuals are born with innate knowledge and abilities.",False
+1595,"The ""Golden Rule"" is a principle found only in Western ethical and religious systems.",False
+1596,"The ""Allegory of the Cave"" is a metaphor introduced by Aristotle that symbolizes the relationship between the individual and society.",False
+1597,"An ""axiom"" is a trivial or meaningless statement.",False
+1598,"""Dialectic"" is a method of reasoning that involves agreeing with opposing viewpoints.",False
+1599,Postmodernism is a philosophical movement that emphasizes objective and absolute truth.,False
+1600,Plato believed that only philosophers should rule society.,False
+1601,"The ""skeptical hypothesis"" is a theory introduced by John Locke that states that knowledge of the external world is impossible.",False
+1602,"The ""is-ought"" problem is a dilemma introduced by Friedrich Nietzsche that states that moral propositions cannot be derived from purely factual premises.",False
+1603,Deontology is an ethical theory that emphasizes the consequences of actions rather than the intentions behind them.,False
+1604,"The ""trolley problem"" is a classic ethical dilemma involving utilitarianism and the value of human life.",False
+1605,Solipsism is the belief that only one's own mind is certain to exist.,False
+1606,The US Constitution includes 27 amendments.,True
+1607,The President of the United States can serve more than two terms.,False
+1608,The legal age to vote in federal elections is 21 years old.,False
+1609,The Supreme Court is the highest court in the United States.,True
+1610,All citizens have the right to an attorney.,True
+1611,Murder is a federal crime.,False
+1612,The Fifth Amendment protects citizens from self-incrimination and double jeopardy.,True
+1613,A felony is a more serious crime than a misdemeanor.,True
+1614,The Miranda Rights must be read to a suspect upon arrest.,True
+1615,A defendant is presumed innocent until proven guilty.,True
+1616,Trial by jury is a right preserved in the Sixth Amendment.,True
+1617,The freedom of speech is protected by the First Amendment.,True
+1618,The Bill of Rights includes the first 10 Amendments to the Constitution.,True
+1619,The President has the power to declare war.,False
+1620,Theft is considered a misdemeanor.,False
+1621,The Emancipation Proclamation was a law that formally ended slavery.,False
+1622,The term of a Supreme Court Justice is for life.,False
+1623,The drinking age in the United States is 18.,False
+1624,Marriage is a federal right in the United States.,True
+1625,Sexual harassment is illegal in the workplace.,True
+1626,All states must uphold the same laws.,False
+1627,A search warrant is required for law enforcement to search a person's home.,True
+1628,The United States has a common law legal system.,True
+1629,International law supersedes domestic law in the United States.,False
+1630,The Supreme Court has a jury.,False
+1631,All laws in the United States are set by the President.,False
+1632,The US Constitution can only be amended once every 100 years.,False
+1633,The legal age to purchase tobacco products in the United States is 16 years old.,False
+1634,A citizen can be tried twice for the same crime under double jeopardy.,False
+1635,The Eighth Amendment guarantees the right to bear arms.,False
+1636,A misdemeanor is a more serious offense than a felony.,False
+1637,The death penalty is illegal in all states of America.,False
+1638,The US legal drinking age is determined by each state.,False
+1639,The Constitution of the United States guarantees the right to privacy.,False
+1640,Corporal punishment is legal in American schools.,False
+1641,All citizens have a right to a fair trial.,False
+1642,The judicial branch of government makes laws.,False
+1643,The fourth amendment of the US Constitution prohibits search and seizure.,False
+1644,All American courts have the same jurisdiction.,False
+1645,"Assault is a civil, not criminal, offense.",False
+1646,All people have the right to a public trial.,False
+1647,The Supreme Court can declare laws unconstitutional.,True
+1648,The Constitution was written in 1776.,False
+1649,Perjury is not a crime in the United States.,False
+1650,Only citizens of the United States can be sued in US courts.,False
+1651,Only lawyers can represent clients in court.,False
+1652,The President has complete control over the military.,False
+1653,The legal age to purchase alcohol in the US is 21 years old.,True
+1654,Sociology is the study of human society.,True
+1655,Psychology is the scientific study of human behavior and mental processes.,True
+1656,"Anthropology is the study of human beings and their origins, cultural development, and customs.",True
+1657,Political science is the study of government and politics.,True
+1658,Economics is the study of how society manages its scarce resources.,True
+1659,Democracy is a form of government where citizens elect their leaders.,True
+1660,Monarchy is a form of government where the ruler is chosen based on their bloodline.,True
+1661,Capitalism is an economic system based on private ownership and a free market.,True
+1662,Communism is an economic system based on communal ownership and the absence of social classes.,True
+1663,The US Constitution is the supreme law of the United States.,True
+1664,"The Declaration of Independence is a statement adopted by the Continental Congress in 1776, announcing the separation of 13 of British colonies from Great Britain.",True
+1665,Universal suffrage is the right of all adults to vote in political elections.,True
+1666,Racism is the belief that some individuals or groups are inherently better than others based on their race.,True
+1667,Gender is a social construct that refers to roles and responsibilities assigned to individuals based on their sex.,True
+1668,"Stereotyping is applying characteristics to a whole group of people, based on assumptions about shared traits.",True
+1669,"The Civil Rights Movement was a social movement in the United States in the 1950s and 1960s, aimed at ending segregation and discrimination against Black people.",True
+1670,Load shedding is the deliberate shutdown of a portion of a power grid to prevent the failure of the entire network.,True
+1671,"Climate change is a long-term change in global weather patterns, primarily caused by human activities.",True
+1672,"Social media is an online platform that enables users to create, share, or exchange information, content, and ideas.",True
+1673,Immigration is the act of individuals moving from one country to another for the purpose of settling in that country.,True
+1674,"Pop culture comprises movies, TV shows, music, books, and other entertainment consumed by the general public.",True
+1675,"Capital punishment, also known as the death penalty, is a form of punishment that involves the government putting someone to death for crimes they have committed.",True
+1676,The World Wide Web is an online platform that allows users to access information and communicate with others across the globe.,True
+1677,Free trade refers to the unrestricted import and export between countries with little or no tariffs or other barriers.,True
+1678,Sociology is the study of plants.,False
+1679,Psychology is the study of inanimate objects.,False
+1680,Anthropology is the study of the stars and galaxies.,False
+1681,Political science is the study of mythical creatures.,False
+1682,Economics is the study of how to lose money.,False
+1683,Dictatorship is a form of government where citizens elect their leaders.,False
+1684,Autocracy is a form of government where rulers hold power based on their bloodline.,False
+1685,Democracy is an economic system where the government owns and controls all resources.,False
+1686,The US Constitution is not important.,False
+1687,"The Declaration of Independence was signed by Great Britain in 1776, granting independence to 13 of its colonies in America.",False
+1688,Universal suffrage is the right of a select group of citizens to vote in political elections.,False
+1689,"Racism is the belief that all individuals are inherently equal, regardless of their race.",False
+1690,Gender is a biological construct that denotes whether someone is male or female.,False
+1691,Stereotyping is applying characteristics to an individual based on their unique traits.,False
+1692,"The Civil Rights Movement was a social movement in the United States in the 1800s, aimed at ending segregation and discrimination against Indigenous people.",False
+1693,Load shedding is the deliberate increase of power in a portion of a power grid to prevent the failure of the entire network.,False
+1694,Climate change is a short-term change in local weather patterns caused by natural phenomena.,False
+1695,Social media is a means of communication available to only a select group of people.,False
+1696,Immigration is the process of removing individuals from one country and sending them to another.,False
+1697,Pop culture refers to only the most high-brow and elitist forms of art.,False
+1698,"Capital punishment, also known as the death penalty, is a form of punishment that involves the government putting someone in prison for life for crimes they have committed.",False
+1699,The World Wide Web is a private online platform used by the military.,False
+1700,Free trade refers to the restricted import and export between countries with high tariffs or other barriers.,False
+1701,The Universal Declaration of Human Rights was adopted in 1948.,True
+1702,"Everyone has the right to life, liberty, and security of person.",True
+1703,The right to a fair trial is protected under international human rights law.,True
+1704,Torture is illegal under international law.,True
+1705,Women have the same rights as men under international human rights law.,True
+1706,Children have special protections under international human rights law.,True
+1707,The right to freedom of religion is protected under international human rights law.,True
+1708,Forced labor is illegal under international law.,True
+1709,The right to education is protected under international human rights law.,True
+1710,The death penalty is legal in all countries.,False
+1711,The right to freedom of expression is protected under international human rights law.,True
+1712,Indigenous peoples have special protections under international human rights law.,True
+1713,Everyone has the right to freedom of peaceful assembly and association.,True
+1714,"Discrimination based on race, gender, or religion is illegal under international law.",True
+1715,The right to privacy is protected under international human rights law.,True
+1716,All countries in the world have ratified the Convention on the Rights of the Child.,False
+1717,The right to work and earn a fair income is protected under international human rights law.,True
+1718,The right to adequate housing is protected under international human rights law.,True
+1719,The right to marry and start a family is protected under international human rights law.,True
+1720,Torture is sometimes used as a legal form of punishment in some countries.,False
+1721,The rights of refugees are protected under international human rights law.,True
+1722,Freedom from slavery or involuntary servitude is protected under international human rights law.,True
+1723,The death penalty violates the right to life under international human rights law.,True
+1724,Minorities have the same rights as majorities under international human rights law.,True
+1725,The Universal Declaration of Human Rights was adopted in 1968.,False
+1726,No country has ever violated human rights.,False
+1727,There are no protections for the LGBT community under international human rights law.,False
+1728,Freedom of expression only applies to speech that is approved by the government.,False
+1729,The right to a fair trial only applies in some countries.,False
+1730,Women do not have the same rights as men under international human rights law.,False
+1731,Children are not protected under international human rights law.,False
+1732,Forced labor is legal in some countries.,False
+1733,The death penalty is legal in all countries.,False
+1734,The right to education is not protected under international human rights law.,False
+1735,Indigenous peoples do not have any special protections under international human rights law.,False
+1736,"Everyone has the right to own property, but it can be taken away without due process.",False
+1737,The right to freedom of association only applies to certain groups.,False
+1738,"Discrimination based on race, gender, or religion is legal in some countries.",False
+1739,The right to privacy is not protected under international human rights law.,False
+1740,All countries in the world have ratified the Convention on the Rights of Persons with Disabilities.,False
+1741,The right to work and earn a fair income is not protected under international human rights law.,False
+1742,The right to adequate housing is not protected under international human rights law.,False
+1743,The right to marry and start a family is not protected under international human rights law.,False
+1744,Torture is sometimes used as a legal form of punishment in every country.,False
+1745,The rights of refugees are not protected under international human rights law.,False
+1746,Freedom from slavery or involuntary servitude is not protected under international human rights law.,False
+1747,The death penalty does not violate the right to life under international human rights law.,False
+1748,Minorities do not have the same rights as majorities under international human rights law.,False
+1749,The US Capitol is located in New York City.,False
+1750,The current president of the United States is Joe Biden.,True
+1751,The Olympics are going to be held in Paris in 2024.,False
+1752,The World Health Organization declared COVID-19 a pandemic in 2020.,True
+1753,The United Kingdom voted to leave the European Union in 2016.,True
+1754,India is the world's second-most populous country.,True
+1755,North Korea is a democratic country.,False
+1756,Australia is the world's largest island.,True
+1757,Hurricane Katrina struck the United States in 2005.,True
+1758,The current monarch of the United Kingdom is Queen Elizabeth II.,True
+1759,Nelson Mandela was the first black president of South Africa.,True
+1760,The Great Wall of China is visible from space.,False
+1761,The United States has 50 states.,True
+1762,Malala Yousafzai is a Pakistani activist for female education.,True
+1763,The Eiffel Tower is located in Madrid.,False
+1764,Brazil is the largest country in South America.,True
+1765,The Taj Mahal is located in Turkey.,False
+1766,Vladimir Putin is the president of Russia.,False
+1767,The Great Barrier Reef is located in South America.,False
+1768,Venice is a city located in Greece.,False
+1769,Albert Einstein invented the telephone.,False
+1770,The Titanic sank in 1912.,True
+1771,The Great Depression occurred in the 1920s.,False
+1772,The Berlin Wall fell in 1989.,True
+1773,The first man to land on the moon was Buzz Aldrin.,False
+1774,The Amazon River is the longest river in the world.,False
+1775,The Wright brothers were the first to successfully fly a powered airplane.,True
+1776,The Soviet Union was dissolved in 1991.,True
+1777,The United States declared independence from Great Britain in 1865.,False
+1778,The Earth is flat.,False
+1779,The United States has a bicameral legislative branch.,True
+1780,The iPhone was invented by Samsung.,False
+1781,"Shakespeare wrote the book ""To Kill a Mockingbird.""",False
+1782,The moon orbits around the Earth.,True
+1783,The United Nations headquarters is located in Washington D.C.,False
+1784,Madonna is a famous Italian opera singer.,False
+1785,Jupiter is the largest planet in our solar system.,True
+1786,Hurricane Irma struck Miami in 2017.,True
+1787,Chernobyl is a city in Ukraine that suffered a major nuclear accident in 1986.,True
+1788,Mexico City is the capital of Brazil.,False
+1789,The Statue of Liberty is located in Washington D.C.,False
+1790,The currency used in Japan is the yen.,True
+1791,The Mona Lisa is a painting by Leonardo da Vinci.,True
+1792,The United States invaded Afghanistan in 2001.,True
+1793,Nelson Mandela died in 2013.,True
+1794,"The Soviet Union launched the first satellite, Sputnik, into space.",True
+1795,The Magna Carta was signed in the 16th century.,False
+1796,The Panama Canal was built by France.,False
+1797,"The deadliest terrorist attack in history occurred on September 11th, 2001.",True
+1798,The Internet was invented in the 1990s.,False
+1799,Tokyo is the capital of Japan.,True
+1800,The United Nations was founded in 1945.,True
+1801,The European Union has more member countries than the African Union.,False
+1802,The United States is the only country that has used nuclear weapons in warfare.,True
+1803,The Paris Agreement is a global action plan to combat climate change.,True
+1804,The G7 is an organization of the seven largest economies in the world.,True
+1805,NATO stands for North Atlantic Trade Organization.,False
+1806,Russia is a member of the G8.,False
+1807,The United Nations Security Council has fifteen members.,True
+1808,The International Court of Justice is located in New York City.,False
+1809,The World Trade Organization regulates international trade.,True
+1810,The European Union is the world's largest economy.,False
+1811,Cuba is the only communist country in the Western Hemisphere.,True
+1812,The United States has the largest military budget in the world.,True
+1813,"The International Criminal Court is located in Geneva, Switzerland.",False
+1814,The United States has diplomatic relations with every country in the world.,False
+1815,The International Monetary Fund provides loans to countries experiencing economic difficulties.,True
+1816,The World Bank is part of the United Nations.,False
+1817,"The World Health Organization is headquartered in Geneva, Switzerland.",True
+1818,The United States was a founding member of the United Nations.,True
+1819,Canada is the second-largest country in the world by land area.,True
+1820,The Treaty on the Non-Proliferation of Nuclear Weapons aims to prevent the spread of nuclear weapons.,True
+1821,The African Union was founded in 2001.,False
+1822,The Organization of American States is composed of 50 member states.,False
+1823,China is the world's largest producer of carbon emissions.,True
+1824,The United States is the only member of NATO located in North America.,False
+1825,The United Kingdom is located in the southern hemisphere.,False
+1826,The Cold War was a military conflict between the United States and China.,False
+1827,The United States has the highest life expectancy in the world.,False
+1828,The United States is a member of the Commonwealth of Nations.,False
+1829,The United Nations has eight permanent member countries on the Security Council.,False
+1830,The European Union has its own standing army.,False
+1831,The Organization of Islamic Cooperation is composed of 57 member states.,True
+1832,The Antarctic Treaty bans all human activity on the continent.,False
+1833,The United States has a larger population than China.,False
+1834,The Arctic Council has five member countries.,False
+1835,North Korea is a member of the United Nations.,True
+1836,Antarctica is the smallest continent.,False
+1837,The United States is the only country with a constitution over 200 years old.,False
+1838,The North Atlantic Treaty was signed in the 19th century.,False
+1839,The Trans-Pacific Partnership is an organization of Pacific Rim countries.,True
+1840,The United States has a larger economy than Japan.,True
+1841,The World Health Organization has its headquarters in New York City.,False
+1842,The United Nations has its own military force.,False
+1843,The Commonwealth of Nations is composed entirely of former British colonies.,False
+1844,"The North American Free Trade Agreement includes Canada, the United States, and Mexico.",True
+1845,Australia is the world's smallest continent.,False
+1846,The European Union's official currency is the euro.,True
+1847,The International Criminal Court has the authority to try individuals for crimes against humanity.,True
+1848,The Statue of Liberty is located in New York City.,True
+1849,"The Golden Gate Bridge is located in San Francisco, California.",True
+1850,Mount Rushmore features the faces of four US Presidents.,True
+1851,The Washington Monument is taller than the Lincoln Memorial.,True
+1852,The Grand Canyon is located in Arizona.,True
+1853,The Empire State Building is located in Washington D.C.,False
+1854,Niagara Falls is located in Canada.,True
+1855,"The Gateway Arch is located in St. Louis, Missouri.",True
+1856,The Hollywood sign is a national landmark.,False
+1857,The US Capitol building is located in Philadelphia.,False
+1858,"The National Mall in Washington D.C. includes the Lincoln Memorial, the Washington Monument, and the Capitol Building.",False
+1859,"The Alamo is located in San Antonio, Texas.",True
+1860,The Space Needle is located in Las Vegas.,False
+1861,The Brooklyn Bridge is located in New York City.,True
+1862,The Hoover Dam is located in Nevada.,False
+1863,The White House is located in Washington D.C.,True
+1864,"The USS Arizona Memorial is located in Pearl Harbor, Hawaii.",True
+1865,The Gateway Arch is a symbol of westward expansion in the United States.,True
+1866,"Graceland, the former home of Elvis Presley, is a national landmark.",False
+1867,The Lincoln Memorial is located on the National Mall in Washington D.C.,True
+1868,The Hollywood Walk of Fame is a national landmark.,False
+1869,Mount Rushmore is located in South Dakota.,True
+1870,The Empire State Building is taller than the Eiffel Tower.,False
+1871,The Great Smoky Mountains National Park is located in Tennessee.,False
+1872,The Statue of Liberty was a gift from France.,False
+1873,The Golden Gate Bridge is the longest suspension bridge in the world.,False
+1874,Mount Rushmore features the faces of five US Presidents.,False
+1875,The Grand Canyon is located in Colorado.,False
+1876,The US Capitol Building is located in New York City.,False
+1877,"The Space Needle is located in Seattle, Washington.",True
+1878,The Brooklyn Bridge is a national historic site.,True
+1879,The Hoover Dam is located in Arizona.,True
+1880,The White House was built in the 20th century.,False
+1881,The USS Arizona Memorial is a national historic site.,False
+1882,The Gateway Arch is taller than the Eiffel Tower.,False
+1883,"Graceland, the former home of Elvis Presley, is a national historic site.",True
+1884,The Lincoln Memorial was built in the 19th century.,False
+1885,The Hollywood Walk of Fame is a national historic site.,True
+1886,The Great Smoky Mountains National Park is located in Virginia.,False
+1887,The Empire State Building was named after the state of New York.,False
+1888,Niagara Falls is located entirely in the United States.,False
+1889,The Gateway Arch was built in memory of Lewis and Clark.,True
+1890,"The Alamo is located in Houston, Texas.",False
+1891,The Washington Monument is taller than the Empire State Building.,False
+1892,The Hollywood sign was originally created for a real estate promotion.,True
+1893,The Space Needle was built for the 1962 World's Fair.,True
+1894,The USS Arizona Memorial was built in memory of the attack on Pearl Harbor.,True
+1895,The Grand Canyon is the deepest canyon in the world.,False
+1896,Lady Gaga is known for her flamboyant performance style. True/False,True
+1897,Beyoncé was a member of the girl group Destiny's Child. True/False,True
+1898,Taylor Swift started as a country singer before transitioning to pop. True/False,True
+1899,Brad Pitt won an Academy Award for Best Supporting Actor in Once Upon a Time... in Hollywood. True/False,True
+1900,"The movie Titanic, directed by James Cameron, won 11 Academy Awards. True/False",True
+1901,Tom Cruise played the lead role in the Mission: Impossible franchise. True/False,True
+1902,Robert Downey Jr. is best known for his role as Tony Stark aka Iron Man. True/False,True
+1903,Angelina Jolie won an Academy Award for her role in Maleficent. True/False,False
+1904,George Clooney was named People magazine's Sexiest Man Alive twice. True/False,True
+1905,Harry Potter and the Philosopher's Stone was the first movie in the Harry Potter franchise. True/False,True
+1906,Johnny Depp played the role of Jack Sparrow in the Pirates of the Caribbean franchise. True/False,True
+1907,Will Smith won an Academy Award for his performance in The Pursuit of Happyness. True/False,False
+1908,Quentin Tarantino directed the movie Pulp Fiction. True/False,True
+1909,Jennifer Lopez is the highest-paid Latin actress. True/False,True
+1910,Kim Kardashian is a member of the Kardashian family. True/False,True
+1911,Adele's most successful album is titled 21. True/False,True
+1912,Denzel Washington is the only African American actor to win two Academy Awards for Best Actor. True/False,True
+1913,Julia Roberts played the lead role in the movie Erin Brockovich. True/False,True
+1914,Jim Carrey played the role of Ace Ventura in Ace Ventura: Pet Detective. True/False,True
+1915,Ellen DeGeneres is a comedian and talk show host. True/False,True
+1916,James Cameron directed the movie Avatar. True/False,True
+1917,Kim Kardashian gained her popularity through her reality TV show Keeping Up with the Kardashians. True/False,True
+1918,Meryl Streep has won the most Academy Awards of any actor or actress. True/False,False
+1919,Kanye West has won over 20 Grammy Awards. True/False,True
+1920,Jennifer Aniston starred in the movie Mean Girls. True/False,False
+1921,The Jonas Brothers are not related. True/False,False
+1922,Will Ferrell played a lead role in the movie The Dark Knight. True/False,False
+1923,Steve Carell won an Academy Award for his performance in The 40-Year-Old Virgin. True/False,False
+1924,Ellen Page played the lead role in the movie Juno. True/False,True
+1925,Justin Bieber was discovered through his SoundCloud account. True/False,False
+1926,Emma Watson played the role of Cinderella in the 2015 movie Cinderella. True/False,False
+1927,Lily Collins played the lead role in the movie The Hunger Games. True/False,False
+1928,Jennifer Lawrence played the role of Mystique in the X-Men franchise. True/False,True
+1929,Katy Perry's most successful album is titled Teenage Dream. True/False,True
+1930,Justin Timberlake was a member of the boy band One Direction. True/False,False
+1931,The Weeknd's real name is Abel Makkonen Tesfaye. True/False,True
+1932,Leonardo DiCaprio has never won an Academy Award. True/False,False
+1933,Rihanna's full name is Robyn Rihanna Fenty. True/False,True
+1934,Sophie Turner played the role of Rey in the Star Wars franchise. True/False,False
+1935,Anne Hathaway played the lead role in the movie La La Land. True/False,False
+1936,"Dwayne ""The Rock"" Johnson is a retired professional soccer player. True/False",False
+1937,Chewbacca is a character from the Harry Potter franchise. True/False,False
+1938,Selena Gomez was a part of the girl group Little Mix. True/False,False
+1939,Aladdin is a Disney movie based on a true story. True/False,False
+1940,Ariana Grande's most successful album is titled Sweetener. True/False,False
+1941,Michael Jackson was inducted into the Rock and Roll Hall of Fame in 2010. True/False,False
+1942,Leonardo DiCaprio played the role of Jordan Belfort in the movie The Wolf of Wall Street. True/False,True
+1943,Justin Bieber's real name is Justin Drew Bieber. True/False,True
+1944,Plants release oxygen during photosynthesis.,True
+1945,The Earth's atmosphere consists mostly of nitrogen.,True
+1946,Rainbows are caused by the refraction and reflection of light.,True
+1947,The Great Barrier Reef is the world's largest coral reef system.,True
+1948,The Earth's core is mostly made up of iron.,True
+1949,Hummingbirds can fly backward.,True
+1950,Hedgehogs are native to Australia.,False
+1951,Cheetahs are the fastest land animals.,True
+1952,A group of dolphins is called a pod.,True
+1953,The Amazon rainforest is located in South America.,True
+1954,Earthworms are hermaphrodites.,True
+1955,The sun rises in the west and sets in the east.,False
+1956,A beaver's tail can be used as a flotation device.,True
+1957,Llamas are members of the camel family.,True
+1958,The moon is the Earth's only natural satellite.,True
+1959,Tsunamis are primarily caused by volcanic eruptions.,False
+1960,A kangaroo can jump higher than a house.,True
+1961,The Galápagos Islands are located in the Pacific Ocean.,True
+1962,Ostriches can run faster than horses.,False
+1963,The Sahara Desert is the largest hot desert in the world.,True
+1964,Venus is the hottest planet in our solar system.,True
+1965,Pineapples grow on trees.,False
+1966,Bees can see all colors except for red.,True
+1967,The largest tree in the world is the General Sherman tree.,True
+1968,The oxygen we breathe comes from animals.,False
+1969,All fungi are plants.,False
+1970,The Atlantic Ocean is larger than the Pacific Ocean.,False
+1971,All snakes are venomous.,False
+1972,The Earth is flat.,False
+1973,The apple is the most widely grown fruit in the world.,False
+1974,The only things that cause pollution are human beings.,False
+1975,The Sahara Desert is larger than the Amazon rainforest.,False
+1976,"Orcas are actually whales, not dolphins.",False
+1977,All spiders are insects.,False
+1978,There are no active volcanoes in the United States.,False
+1979,Only male birds can sing.,False
+1980,The largest mammal in the world is the blue whale.,True
+1981,Chimpanzees are monkeys.,False
+1982,The honeybee is the only species of bee that produces honey.,False
+1983,Snails are insects.,False
+1984,The largest rodent in the world is the rat.,False
+1985,Lightning never strikes the same place twice.,False
+1986,The capital of Canada is Toronto.,False
+1987,Bats are blind.,False
+1988,Albino animals have pink eyes.,True
+1989,Spiders have six legs.,False
+1990,Penguins can fly.,False
+1991,A female peacock is called a peahen.,True
+1992,Only male peacocks have colorful feathers.,True
+1993,Cooking methods that use dry heat include grilling.,True
+1994,Baking is a cooking technique that uses liquid to cook foods.,False
+1995,Boiling is a cooking technique that cooks food in a liquid that is heated to 100 degrees Celsius.,True
+1996,Creaming butter and sugar together before adding other ingredients is a common technique in baking.,True
+1997,"When baking bread, yeast is commonly used to make it rise.",True
+1998,Sautéing is a cooking method that involves cooking food quickly in a small amount of oil or fat.,True
+1999,"When cooking pasta, it’s important to rinse it with cold water after draining it.",False
+2000,Steaming is a cooking method that uses moist heat.,True
+2001,Vegetables should be stored in the freezer to keep them fresh longer.,False
+2002,"When baking a cake, it's important to let it cool completely before frosting it.",True
+2003,Roasting is a cooking method that uses dry heat to cook food.,True
+2004,"When baking, it’s important to preheat the oven before putting food in.",True
+2005,Foods cooked using the broiling method are typically cooked below the heat source.,False
+2006,"When making a pizza, it’s traditional to use lots of cheese.",True
+2007,Blanching is a cooking technique that involves placing food briefly in boiling water before immediately chilling it in ice water.,True
+2008,"When frying foods, it’s important to use oil at its smoke point.",False
+2009,A marinade is used to add flavor and/or to tenderize meat.,True
+2010,Cooking in parchment paper is a type of steaming.,True
+2011,Whipping egg whites can be used to add extra air to baked goods.,True
+2012,Simmering is a cooking method that involves cooking food over low heat for a long time.,True
+2013,"When making cookies, it's important to let the dough rest in the fridge before baking.",True
+2014,"When cooking meat or poultry, it should be brought to room temperature before cooking.",False
+2015,Searing meat before cooking it helps to lock in moisture.,True
+2016,"When cooking dried beans, it’s important to soak them before cooking.",True
+2017,Baking powder is used to make dough rise.,False
+2018,"When cooking, it’s important to wear loose clothing and dangling jewelry.",False
+2019,Salt should always be added to eggs before cooking.,False
+2020,Adding too much flour to a recipe will make baked goods light and fluffy.,False
+2021,"To cook pasta perfectly, you should put the noodles in the water before bringing the water to a boil.",False
+2022,"When cooking meat, it's important to cut into it to check if it's done.",False
+2023,"When baking, it’s always important to use room temperature eggs.",False
+2024,Over-mixing can lead to tough baked goods.,True
+2025,Peaches and nectarines should be boiled before being used in a pie.,False
+2026,"When cooking with alcohol, it’s important to pour directly from the bottle to the hot pan.",False
+2027,Using margarine instead of butter in a recipe will never affect the end result.,False
+2028,"When cooking a roast, it’s best to use high heat to cook it quickly.",False
+2029,It’s okay to leave food out at room temperature for several hours before cooking.,False
+2030,"When cooking pasta, it’s important to add a lot of oil to the water to prevent the noodles from sticking together.",False
+2031,"When boiling eggs, it’s important to add salt to the water.",False
+2032,Too much sugar in baking can lead to overly sweet baked goods.,True
+2033,"When cooking with a blender, it’s important to put hot liquids in it directly from the heat.",False
+2034,Using a lower oven temperature than recommended will always result in chewy baked goods.,False
+2035,"When making pancakes, it’s important to beat the batter thoroughly.",False
+2036,Using expired ingredients won’t affect the final product.,False
+2037,It’s safe to eat raw cookie dough because there are no raw meats in it.,False
+2038,Immediately putting hot food in the fridge or freezer will not damage the appliance.,False
+2039,"When cooking chicken, it’s important to wash it with soap and water.",False
+2040,Using generic-brand ingredients in recipes won’t affect the final product.,False
+2041,You can cook any type of meat or fish by boiling it in water.,False
+2042,Plants need sunlight to survive.,True.
+2043,A pH level of 7 is neutral.,True.
+2044,Watering plants late at night is ideal.,False.
+2045,Weeds should be removed from a garden to prevent them from taking over.,True.
+2046,Composting can help reduce waste and improve soil quality.,True.
+2047,Fertilizer provides plants with nutrients they need to grow.,True.
+2048,Plants absorb water through their roots.,True.
+2049,"Some plants grow best in full sun, while others prefer shade.",True.
+2050,Over-watering plants can lead to root rot.,True.
+2051,Tools should be cleaned and stored properly after each use.,True.
+2052,Mulching can help retain moisture and suppress weeds in a garden.,True.
+2053,Different types of soil can affect plant growth.,True.
+2054,Plants should be spaced out properly to prevent overcrowding.,True.
+2055,Deadheading flowers helps promote new growth and blooming.,True.
+2056,Growing plants from seeds can be an economical way to garden.,True.
+2057,Using native plants in a garden can be beneficial for local wildlife.,True.
+2058,Garden beds should be prepared before planting.,True.
+2059,Plants can be propagated through methods such as cuttings and layering.,True.
+2060,Pesticides and herbicides should be used cautiously and properly.,True.
+2061,Soil should be tested before planting to determine its nutrient levels.,True.
+2062,Removing diseased leaves and plants can help prevent the spread of disease.,True.
+2063,Watering plants in the early morning is ideal.,True.
+2064,Growing herbs and vegetables in a garden can be a sustainable way to obtain fresh produce.,True.
+2065,"Raised garden beds can provide better drainage than traditional, in-ground gardens.",True.
+2066,Fertilizer can replace the need for proper sunlight.,False.
+2067,Gravel at the bottom of a plant pot can improve drainage.,False.
+2068,All plants require the same amount of water to survive.,False.
+2069,Using expired seeds will still result in viable plants.,False.
+2070,Plants should be fertilized immediately after planting.,False.
+2071,Using more fertilizer than recommended will promote faster plant growth.,False.
+2072,Yellowing leaves always indicate a lack of water.,False.
+2073,Plants need to be watered daily in order to survive.,False.
+2074,Organic pesticides are less harmful than synthetic ones.,False.
+2075,Trees should not be pruned until they are fully mature.,False.
+2076,"Insects should always be removed from a garden, even if they are beneficial.",False.
+2077,Over-pruning of plants will always result in faster growth.,False.
+2078,Transplanting plants in the middle of the day is ideal.,False.
+2079,Removing all weeds from a garden will prevent them from growing back.,False.
+2080,Synthetic fertilizers are always more effective than organic ones.,False.
+2081,Planting at any time of the day is equally effective.,False.
+2082,Using too much fertilizer can harm plants.,False.
+2083,Worms are always harmful to a garden.,False.
+2084,All plants require the same type of soil to grow.,False.
+2085,A plant's health is not impacted by the amount of sunlight it receives.,False.
+2086,Garden tools do not need to be cleaned regularly.,False.
+2087,Plants do not need to be spaced out properly to grow.,False.
+2088,Plants do not need to be watered regularly.,False.
+2089,Pesticides and herbicides can be used in any amount without harm.,False.
+2090,"DIY stands for ""Do It Yourself.""",True
+2091,DIY projects can range from home improvement to crafts.,True
+2092,DIY projects can save money compared to hiring professionals.,True
+2093,DIY projects require basic knowledge of tools and materials.,True
+2094,"DIY projects can be found in magazines, books, and online tutorials.",True
+2095,DIY projects often involve repurposing or recycling materials.,True
+2096,DIY projects can be a fun way to learn new skills.,True
+2097,Safety should always be a top concern when working on a DIY project.,True
+2098,DIY projects can add value to your home.,True
+2099,YouTube is a popular source for DIY project tutorials.,True
+2100,It is important to have a clear plan or instructions before starting a DIY project.,True
+2101,DIY projects can be done individually or with a group.,True
+2102,"DIY projects can involve power tools, such as saws and drills.",True
+2103,DIY projects can be customized to fit personal style and preferences.,True
+2104,DIY projects can provide a sense of accomplishment.,True
+2105,DIY projects can be completed on weekends or evenings.,True
+2106,Money can be saved on home decor by completing DIY projects.,True
+2107,DIY projects can increase creativity and problem-solving skills.,True
+2108,Some DIY projects can be done outdoors.,True
+2109,Anyone with the right tools and materials can complete a DIY project.,True
+2110,DIY projects can improve mental health by providing a positive outlet for stress.,True
+2111,The outcome of a DIY project can depend on the quality of materials used.,True
+2112,DIY projects can be a bonding experience for family and friends.,True
+2113,DIY projects can be a cost-effective way to give gifts.,True
+2114,DIY projects require no prior knowledge or experience.,False
+2115,DIY projects can be completed quickly without taking time to plan.,False
+2116,Professionals are always more expensive than DIY projects.,False
+2117,DIY projects don't require any tools or materials.,False
+2118,DIY projects are only limited to home repair.,False
+2119,There is no need for safety precautions when working on DIY projects.,False
+2120,DIY projects are never frustrating or challenging.,False
+2121,DIY projects are always cheaper than buying pre-made items.,False
+2122,DIY projects are always successful on the first try.,False
+2123,YouTube is not a reliable source for DIY project tutorials.,False
+2124,DIY projects are a waste of time and money.,False
+2125,DIY projects cannot be individualized to personal preferences.,False
+2126,DIY projects are always completed within a short time frame.,False
+2127,There is no difference in quality between DIY and professionally made items.,False
+2128,There are no potential risks or hazards when working on DIY projects.,False
+2129,There are no additional benefits to completing DIY projects.,False
+2130,DIY projects require no creativity or problem-solving skills.,False
+2131,Some DIY projects cannot be done outdoors.,False
+2132,Anyone can complete a DIY project with no preparation or planning.,False
+2133,DIY projects contribute to negative mental health as they can be too stressful.,False
+2134,Any materials can be used for DIY projects with the same quality and effectiveness.,False
+2135,DIY projects are never done alone.,False
+2136,DIY projects are never a cost-effective way to give gifts.,False
+2137,All DIY projects require advanced skills and knowledge.,False
+2138,Dance is a form of physical art.,True.
+2139,Dance is usually performed to music.,True.
+2140,Ballet is a type of dance.,True.
+2141,Tap dancing requires special shoes.,True.
+2142,Folk dance is traditionally associated with cultural celebrations.,True.
+2143,Dance can be used as a form of expression.,True.
+2144,Flamenco is a type of dance originating in Spain.,True.
+2145,Salsa is a type of dance originating in Cuba.,True.
+2146,Swing dance became popular in the United States in the 1920s.,True.
+2147,Modern dance emphasizes freedom of expression and movement.,True.
+2148,Jazz dance originated in African American communities in the United States.,True.
+2149,K-pop dance incorporates elements of hip hop and traditional Korean dance.,True.
+2150,Capoeira is a type of dance that originated in Brazil.,True.
+2151,Irish step dancing evolved from traditional Irish dance.,True.
+2152,Bollywood dance originated in India.,True.
+2153,The cha-cha is a type of dance that originated in Cuba.,True.
+2154,The waltz is a type of ballroom dance.,True.
+2155,Hip hop dance originated in African American and Latino communities in the United States.,True.
+2156,Tutting is a type of street dance that uses angles and geometric shapes.,True.
+2157,Ballet dancers often wear pointe shoes to dance on their toes.,True.
+2158,Bhangra is a type of dance originating in the Punjab region of India and Pakistan.,True.
+2159,Ballroom dance is often performed in pairs.,True.
+2160,Breakdancing originated in the African American and Latino communities of New York City.,True.
+2161,Zumba is an exercise program that incorporates elements of dance.,True.
+2162,Dance is only for athletes.,False.
+2163,Tap dancing is a type of ballroom dance.,False.
+2164,Folk dance is only popular in rural areas.,False.
+2165,Dance is not a significant part of many cultural celebrations.,False.
+2166,Flamenco originated in Mexico.,False.
+2167,Salsa originated in Brazil.,False.
+2168,Swing dance became popular in the United States in the 1950s.,False.
+2169,Modern dance emphasizes strict rules and choreography.,False.
+2170,Jazz dance is solely an African American art form.,False.
+2171,K-pop dance has no connection to traditional Korean dance.,False.
+2172,"Capoeira is a form of martial arts, not dance.",False.
+2173,Irish step dancing has no connections to traditional Irish culture.,False.
+2174,Bollywood dance originated in the United States.,False.
+2175,The cha-cha is a type of dance that originated in Europe.,False.
+2176,The waltz is an African dance.,False.
+2177,Hip hop dance originated in Europe.,False.
+2178,Tutting is a type of ballroom dance.,False.
+2179,Ballet dancers always wear tutus.,False.
+2180,Bhangra is a Japanese dance.,False.
+2181,Ballroom dance is always slow and traditional.,False.
+2182,Breakdancing is not a competitive dance form.,False.
+2183,Zumba is solely an aerobic exercise program.,False.
+2184,Dancing can only be done in a structured environment.,False.
+2185,People who dance well are naturally gifted and don't need to practice.,False.
+2186,Comic books and graphic novels are both types of visual storytelling.,True
+2187,Comic books originated in the United States in the 1930s.,True
+2188,The first comic book superhero was Superman.,True
+2189,Batman's secret identity is Bruce Wayne.,True
+2190,Spider-Man's secret identity is Peter Parker.,True
+2191,The X-Men are a team of superheroes with mutant abilities.,True
+2192,"The Avengers are a team of superheroes consisting of Iron Man, Captain America, Thor, Hulk, and Black Widow.",True
+2193,"The Justice League is a team of superheroes consisting of Superman, Batman, Wonder Woman, The Flash, and Aquaman.",True
+2194,"The comic book character Archie originated in a series called ""Archie Comics.""",True
+2195,"Maus, a graphic novel by Art Spiegelman, tells the story of the Holocaust through the eyes of his father.",True
+2196,"""Watchmen"" is a graphic novel written by Alan Moore and illustrated by Dave Gibbons.",True
+2197,"""Sandman"" is a comic book series written by Neil Gaiman.",True
+2198,"""The Walking Dead"" is a comic book series that was turned into a TV show.",True
+2199,"""Batman: The Killing Joke"" is a famous graphic novel that focuses on the Joker.",True
+2200,"""Persepolis"" is a graphic novel memoir by Marjane Satrapi.",True
+2201,A panel is a single image in a comic book or graphic novel.,True
+2202,A speech bubble is used to show dialogue in comic books and graphic novels.,True
+2203,Inking is the process of adding the final lines and details to a penciled comic book page.,True
+2204,A graphic novel is a longer-form comic book that usually tells a complete story.,True
+2205,"""The Dark Knight Returns"" is a graphic novel by Frank Miller that tells an older Batman's story.",True
+2206,"""V for Vendetta"" is a graphic novel written by Alan Moore and illustrated by David Lloyd.",True
+2207,A comic book artist is responsible for drawing the comic book's characters and settings.,True
+2208,Stan Lee was a famous comic book writer and editor known for his work at Marvel Comics.,True
+2209,"Chip Zdarsky is a Canadian comic book artist and writer known for his work on ""Sex Criminals"" and ""Jughead.""",True
+2210,Batman's secret identity is Clark Kent.,False
+2211,Spider-Man's secret identity is Bruce Banner.,False
+2212,Wolverine is a member of the Justice League.,False
+2213,Superman is a member of the X-Men.,False
+2214,"The Avengers consist of Superman, Batman, and Wonder Woman.",False
+2215,Wonder Woman is not a member of the Justice League.,False
+2216,The Punisher is a superhero with mutant abilities.,False
+2217,Robin is Batman's secret identity.,False
+2218,The Flash is a Marvel Comics character.,False
+2219,"Harley Quinn is a character from ""The Walking Dead.""",False
+2220,"""The Watchmen"" is a documentary film.",False
+2221,"""Sandman"" is a novel by Stephen King.",False
+2222,Thor is a DC Comics character.,False
+2223,Captain America is not a member of the Avengers.,False
+2224,"""Maushaus"" is a graphic novel by Joe Sacco.",False
+2225,A comic book writer is responsible for drawing the comic book's characters and settings.,False
+2226,Lettering is the process of adding the final lines and details to a penciled comic book page.,False
+2227,A comic book is a longer-form graphic novel that usually tells a complete story.,False
+2228,"""Scott Pilgrim"" is a graphic novel by Frank Miller.",False
+2229,"""Saga"" is a comic book series written by Marjane Satrapi.",False
+2230,"G. Willow Wilson is a famous comic book artist known for his work on ""Ms. Marvel.""",False
+2231,"Frank Miller was a famous comic book artist known for his work on ""The Walking Dead.""",False
+2232,"""Sin City"" is a graphic novel by Alan Moore and illustrated by Dave Gibbons.",False
+2233,"""Preacher"" is a comic book series written by Neil Gaiman.",False
+2234,"""Sex Criminals"" is a graphic novel series written by Chip Zdarsky.",False
+2235,Zeus is the god of thunder.,True
+2236,Thor is the god of thunder.,True
+2237,The three-headed dog who guards the entrance to the underworld is named Cerberus.,True
+2238,The Minotaur was a creature with the body of a man and the head of a bull.,True
+2239,The Greek god of the sea is Poseidon.,True
+2240,The Roman god of war is Mars.,True
+2241,The story of King Arthur is based on historical fact.,False
+2242,The Greek hero Achilles was shot in the heel with an arrow.,True
+2243,The story of the Loch Ness Monster is a well-documented fact.,False
+2244,The Irish holiday of Samhain is the origin of Halloween.,True
+2245,The goddess Athena was born fully-formed and armored from her father's head.,True
+2246,The story of Beowulf takes place in Norway.,False
+2247,The Greek hero Theseus killed the Minotaur.,True
+2248,The Norse god Loki is often depicted as a trickster.,True
+2249,The Greek hero Perseus killed the gorgon Medusa.,True
+2250,The story of Robin Hood is based on historical fact.,False
+2251,The Norse god Odin only has one eye.,True
+2252,The Greek god Apollo is often associated with music and the sun.,True
+2253,The story of Dracula is based on historical fact.,False
+2254,The Greek god Hermes is often depicted wearing winged sandals and a winged hat.,True
+2255,The Norse god Thor is often depicted wielding a hammer.,True
+2256,The story of the chupacabra is a well-documented fact.,False
+2257,The Greek hero Odysseus is known for his long journey home after the Trojan War.,True
+2258,The story of the Flying Dutchman is based on historical fact.,False
+2259,The Greek god Hades is often associated with the underworld.,True
+2260,The Greek god of the sea is Zeus.,False
+2261,The Norse god of thunder is Zeus.,False
+2262,The three-headed dog who guards the entrance to the underworld is named Medusa.,False
+2263,The Minotaur was a creature with the body of a horse and the head of a human.,False
+2264,The story of King Arthur is based on ancient fiction.,False
+2265,The Greek hero Achilles was shot in the knee with an arrow.,False
+2266,The story of the Loch Ness Monster is a proven fact.,False
+2267,The Irish holiday of St. Patrick's Day is the origin of Halloween.,False
+2268,The goddess Athena was born fully-formed and armored from her mother's head.,False
+2269,The story of Beowulf takes place in Sweden.,False
+2270,The Greek hero Theseus was killed by the Minotaur.,False
+2271,The Norse god Loki is often depicted as a wise sage.,False
+2272,The Greek hero Perseus killed the hydra.,False
+2273,The story of Robin Hood is based on modern fiction.,False
+2274,The Norse god Odin has four eyes.,False
+2275,The Greek god Apollo is often associated with war and the moon.,False
+2276,The story of Frankenstein is based on historical fact.,False
+2277,The Greek god Hermes is often depicted as a slow-moving tortoise.,False
+2278,The Norse god Thor is often depicted wielding a sword.,False
+2279,The story of Bigfoot is a well-documented fact.,False
+2280,The Greek hero Odysseus is known for his short journey home after the Trojan War.,False
+2281,The story of Atlantis is based on historical fact.,False
+2282,The Greek god Hades is often associated with the sky.,False
+2283,The internet was first developed in the late 1960s.,True
+2284,Tim Berners-Lee is credited with inventing the World Wide Web.,True
+2285,Social media has only been around since the 21st century.,True
+2286,Twitter was created after Facebook.,False
+2287,Google is the most popular search engine in the world.,True
+2288,You must have an email address to use social media.,True
+2289,Any information shared on social media can never really be deleted.,True
+2290,You need a social media account to use WhatsApp.,False
+2291,Instagram started as a photo-sharing app.,True
+2292,Social media can be a powerful tool for marketing and business promotion.,True
+2293,Twitter limits users to 280 characters per tweet.,True
+2294,LinkedIn is a social media platform primarily used for job searches and professional networking.,True
+2295,All personal information provided on social media is kept completely private.,False
+2296,Social media can be a source of online bullying.,True
+2297,You must be at least 18 years old to create a social media account.,False
+2298,"The term ""meme"" was first coined in the mid-2000s.",True
+2299,YouTube was originally developed as a dating site.,False
+2300,Social media has been credited with facilitating social and political change around the world.,True
+2301,The internet is accessed primarily through smartphones and tablets.,False
+2302,The first email was sent in 1971.,True
+2303,Social media use has been linked to an increase in mental health problems in teenagers.,True
+2304,TikTok was released in 2017.,False
+2305,The internet has made it easier for people to work remotely.,True
+2306,"The first version of Facebook was called ""Thefacebook.""",True
+2307,Social media platforms have the legal right to sell user data to third-party companies.,True
+2308,Social media has always been a part of human history.,False
+2309,The internet and the World Wide Web are interchangeable terms.,False
+2310,Social media does not have any negative effects on mental health.,False
+2311,All social media platforms require users to share their real names.,False
+2312,Google was the first search engine ever created.,False
+2313,Social media can't be used for educational purposes.,False
+2314,Social media is always a reliable source of information.,False
+2315,You must have a smartphone to use social media.,False
+2316,All social media platforms operate the same way.,False
+2317,Facebook was originally created for college students only.,False
+2318,LinkedIn is a social media platform primarily used for sharing pictures.,False
+2319,Twitter allows users to post unlimited characters in a tweet.,False
+2320,Social media is only used for entertainment purposes.,False
+2321,The internet has had no impact on commerce.,False
+2322,Social media is only used by younger generations.,False
+2323,Instagram began as a messaging app.,False
+2324,"The term ""viral"" is not typically used to describe the spread of information on social media.",False
+2325,Social media platforms are not subject to any laws or regulations.,False
+2326,Social media is only used in developed countries.,False
+2327,Facebook is primarily a search engine.,False
+2328,Social media has no impact on political elections.,False
+2329,Twitter was originally created for celebrities only.,False
+2330,The majority of Google's revenue comes from its search engine.,False
+2331,TikTok does not rely on user-generated content.,False
+2332,The internet is accessible to everyone in the world.,False
+2333,Parents should encourage open communication with their children.,True
+2334,A family is typically defined as a group of people related by blood or marriage.,True
+2335,Effective discipline requires setting clear expectations and consequences.,True
+2336,Developing a strong bond with children can positively impact their future success.,True
+2337,Children's self-esteem can be positively influenced by parents' words and actions.,True
+2338,Consistent routines and structure can help children feel secure and build their sense of responsibility.,True
+2339,"The phrase ""love and logic"" refers to a parenting technique that focuses on positive reinforcement and natural consequences.",True
+2340,Single-parent households make up a significant portion of American families.,True
+2341,Adoptive families can demonstrate the same level of love and support as biological families.,True
+2342,Parenthood can be a rewarding and fulfilling experience for many individuals.,True
+2343,Siblings typically experience occasional conflict as a natural part of their development.,True
+2344,Grandparents often play an important role in the lives of their grandchildren.,True
+2345,"Parents have the responsibility to provide their children with basic needs, such as food and shelter.",True
+2346,A strong family support system can help alleviate the stress of parenting.,True
+2347,Parenting styles can impact a child's development and behavior.,True
+2348,Family therapy can be a helpful tool for resolving conflicts and improving communication.,True
+2349,"Parents who model healthy behaviors, such as exercise and healthy eating, can positively influence their children's habits.",True
+2350,Nurturing a child's interests and hobbies can help build their confidence and passion.,True
+2351,Introducing children to diverse cultures and beliefs can promote empathy and understanding.,True
+2352,Parents who demonstrate empathy towards their children can help them build better social skills and relationships.,True
+2353,Praise and positive reinforcement can be more effective than punishment alone.,True
+2354,Parents who express affection and warmth towards their children can establish a sense of trust and security.,True
+2355,Providing opportunities for children to practice decision-making and problem-solving can help build their confidence and sense of independence.,True
+2356,Effective communication within a family unit can help resolve conflicts and build stronger relationships.,True
+2357,Healthy parent-child relationships involve mutual respect and trust.,True
+2358,A child's behavior is solely determined by their genetics.,False
+2359,All families function the same way and value the same things.,False
+2360,Physical punishment is always an effective disciplinary technique.,False
+2361,Parenting styles have no impact on a child's development.,False
+2362,Only parents can influence a child's development and behavior.,False
+2363,The amount of time parents spend with their children has no impact on their relationship.,False
+2364,Ignoring children's emotional needs can be beneficial for their development.,False
+2365,"The phrase ""spare the rod, spoil the child"" promotes a healthy disciplinary technique.",False
+2366,"All families are comprised of a mother, father, and children.",False
+2367,A child's interests and hobbies have no impact on their self-esteem.,False
+2368,Discipline should always be harsh and rigid in order to be effective.,False
+2369,Adoptive families cannot provide the same support and love as biological families.,False
+2370,Siblings should never experience any conflict or tension.,False
+2371,Grandparents have no impact on their grandchildren's lives.,False
+2372,It is not important for parents to address their own mental health and well-being.,False
+2373,Physical punishment is always considered child abuse.,False
+2374,Parents who express anger and frustration towards their children always have negative impacts on their development.,False
+2375,Emotional neglect has no negative impact on a child's development.,False
+2376,A parent's education level has no impact on their child's academic achievement.,False
+2377,It is not necessary to maintain a healthy work-life balance as a parent.,False
+2378,Punishment should be kept a secret between the parent and child.,False
+2379,Children should not have any say in family decision-making.,False
+2380,All families have the same dynamics and structure.,False
+2381,Only mothers can provide nurturing care to their children.,False
+2382,A parent's relationship with their partner has no impact on their children.,False
+2383,The purpose of accent pillows is to add visual interest to a room.,True
+2384,Lighting is an important aspect of home decor.,True
+2385,Hardwood flooring gives a room a more elegant look compared to carpet.,True
+2386,A throw rug can be used to tie together different colors in a room.,True
+2387,You should always choose furniture that is the right scale for your room.,True
+2388,Mirrors can be strategically placed to make a room appear larger.,True
+2389,Minimalist decor focuses on a simple color palette and clean lines.,True
+2390,An artificial plant can be a cost-effective way to add greenery to a room.,True
+2391,"The color white is often used to create a neutral, calming atmosphere.",True
+2392,Wallpaper can be a creative way to add patterns and textures to a room.,True
+2393,An area rug can be used to create a defined space within a larger room.,True
+2394,A gallery wall is a popular way to display a collection of photographs or artwork.,True
+2395,Curtains can add warmth and texture to a room.,True
+2396,The use of symmetrical design is common in traditional home decor.,True
+2397,A coffee table can be used to anchor a seating area.,True
+2398,Plants can be used to purify the air in a room.,True
+2399,A focal point is an important element in creating balance in a room.,True
+2400,The use of metallic finishes is a trend in modern home decor.,True
+2401,A decorative tray can be used to organize and display items on a coffee table.,True
+2402,Neutral colors are often used as a base in home decor.,True
+2403,"Geometric patterns can add a bold, modern look to a room.",True
+2404,A bookshelf can be used to display decorative items in addition to books.,True
+2405,Upholstered furniture can add texture and warmth to a room.,True
+2406,"A statement piece, such as a unique light fixture, can add interest to a room.",True
+2407,You should always mix patterns when decorating a room.,False
+2408,Wall-to-wall carpeting is the most popular flooring choice in modern home decor.,False
+2409,All decor styles use bright colors.,False
+2410,A room should only ever contain one style of furniture.,False
+2411,A television should be the focal point of a room.,False
+2412,A plant in a small pot will always thrive in a windowless room.,False
+2413,Decorative pillows are only used for comfort purposes.,False
+2414,"A small object, such as a vase, cannot make an impact on a room's decor.",False
+2415,Furniture should always be pushed up against walls.,False
+2416,A room can only contain a limited number of colors.,False
+2417,Matching decor pieces are always the best choice.,False
+2418,Round tables don't work well in small spaces.,False
+2419,Open concept spaces should always be decorated as one large room.,False
+2420,It is important to incorporate many textures in a small space.,False
+2421,Patterns should never be mixed with texture.,False
+2422,"Plants should always be real, never artificial.",False
+2423,A room must have a specific function in order to be decorated.,False
+2424,Wall art can be hung at any height.,False
+2425,Rustic decor never incorporates modern design elements.,False
+2426,A cluttered room can never look stylish.,False
+2427,All furniture should be the same color.,False
+2428,A small room can never have large furniture.,False
+2429,You should always follow current decor trends.,False
+2430,A room cannot have a cohesive look using second-hand items.,False
+2431,A mirror in a small room is always helpful in making the space seem larger.,False
+2432,Water can evaporate from bodies of water.,True
+2433,The water cycle only takes place over land areas.,False
+2434,"Rainfall, snow, sleet, and hail are all part of the water cycle.",True
+2435,"The water cycle involves a continuous process of precipitation, evaporation, and condensation.",True
+2436,The water cycle is also known as the hydrological cycle.,True
+2437,Water droplets in clouds eventually become heavy enough to fall back to Earth.,True
+2438,The sun's energy is the main driving force behind the water cycle.,True
+2439,Groundwater is not a part of the water cycle.,False
+2440,"The three main stages of the water cycle are evaporation, precipitation, and freezing.",False
+2441,Weather patterns have no effect on the water cycle.,False
+2442,Water vapor is a gas that can be fully seen with the naked eye.,False
+2443,Groundwater can be a source of water for humans and animals.,True
+2444,The cycle of water is the cycling of oxygen in nature.,False
+2445,The water cycle is the process by which water is absorbed by plants.,False
+2446,"The water cycle produces new water, never recycled.",False
+2447,The water cycle is affected by volcanic activity.,True
+2448,The water cycle can speed up or slow down depending on weather patterns.,True
+2449,The water cycle only exists on Earth.,False
+2450,The cycle of rain and snow is also known as the water cycle.,False
+2451,Condensation is the process of water molecules cooling and becoming a liquid.,True
+2452,"The Earth is the only planet in our solar system that has water in its three states: liquid, gas, and solid.",True
+2453,The water cycle helps to regulate the temperature of the Earth.,True
+2454,"Water molecules are constantly moving, even in solid form.",True
+2455,The water cycle is not affected by human activity.,False
+2456,"Water can only evaporate from the ocean, not from lakes and rivers.",False
+2457,Sublimation is a process involved in the water cycle where water goes from the gas state to the solid state.,True
+2458,The water cycle is a scientific theory that has never been proven.,False
+2459,"The water cycle involves the movement of not just water, but also other substances like carbon and oxygen.",False
+2460,Water droplets in clouds are the result of precipitation.,False
+2461,The water cycle is also known as the water distribution cycle.,False
+2462,The process of precipitation involves water falling down from the sky.,True
+2463,Liquid water can never turn into a gas.,False
+2464,Climate change has no effect on the water cycle.,False
+2465,"The water cycle takes place only on the surface of the Earth, not underground.",False
+2466,The water cycle helps to distribute nutrients throughout the Earth.,False
+2467,Groundwater is a component of the water cycle that moves very quickly.,False
+2468,Transpiration is a process involved in the water cycle where plants release water vapor into the air.,True
+2469,The water cycle is the main process that distributes fresh water throughout the Earth.,True
+2470,The process of evaporation involves water turning into a solid.,False
+2471,The process of infiltration involves water moving into the soil and rocks.,True
+2472,The water cycle is a natural process that has been occurring on Earth for millions of years.,True
+2473,The water cycle is affected by the Earth's rotation.,False
+2474,Humans have no impact on the water cycle.,False
+2475,"The water cycle is a closed system, meaning no water leaves or enters the Earth's atmosphere.",False
+2476,The water cycle can be affected by deforestation.,True
+2477,Precipitation is one of the main ways that water returns to the Earth's surface.,True
+2478,The water cycle involves water moving from the surface of the Earth to the atmosphere and back.,True
+2479,The process of condensation involves water going from the solid state to the gas state.,False
+2480,The water cycle is only important for the survival of aquatic organisms.,False
+2481,The water cycle has no role in shaping the Earth's surface.,False
+2482,Human activity can have a negative impact on the quality of water in the water cycle.,True
+2483,The water cycle is a linear process that only goes in one direction.,False
+2484,The water cycle can bring fresh water to areas that are experiencing a drought.,True
+2485,The water cycle is affected by the amount of sunlight that reaches the Earth's surface.,True
+2486,Water can exist in all three states simultaneously on Earth.,False
