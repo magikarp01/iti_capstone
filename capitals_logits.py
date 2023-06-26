@@ -61,7 +61,7 @@ model.cfg.total_heads = model.cfg.n_heads * model.cfg.n_layers
 def query_logits(logits, return_type = "logits", TOP_N = 10):
 
         """
-        Gets top 10 predictions after last token in a prompt
+        Gets TOP_N predictions after last token in a prompt
         """
         last_tok_logits = logits[0, -1]
         
@@ -181,7 +181,55 @@ few_shot_capitals_no_space_prompts[0]
 
 # WITHOUT A SPACE
 n_correct = 0 
-dataset_size=50
+dataset_size=300
+for row in tqdm(few_shot_capitals_no_space_prompts[:dataset_size]):
+    prompt = row["input"]
+    label = row["label"]
+
+    logits = model(prompt)
+    
+    ranked_logits = query_logits(logits, TOP_N = 1)
+    
+    if is_logits_contain_label(ranked_logits, label):
+        n_correct +=1
+        row["model_correct"] = 1
+    else:
+        row["model_correct"] = 0
+    # print(ranked_logits)
+    # print(label)
+    
+n_correct / len(few_shot_capitals_no_space_prompts[:dataset_size])
+# %%
+from dataset_utils import Capitals_Dataset
+from probing_utils import ModelActs
+from iti_utils import patch_iti
+
+random_seed = 5
+n_acts = 400
+
+capitals_data = Capitals_Dataset(model.tokenizer, seed=random_seed)
+
+capitals_acts = ModelActs(model, capitals_data)
+capitals_acts.get_acts(N=n_acts, id=f"capitals_gpt2xl_{n_acts}")
+# ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
+capitals_acts.train_probes(max_iter=1000)
+
+#%%
+
+cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
+patch_iti(model, capitals_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=5, topk=20)
+
+# reset ez_mc so that samples will be the same
+capitals_data = Capitals_Dataset(model.tokenizer, seed=random_seed)
+capitals_acts_iti = ModelActs(model, capitals_data)
+capitals_acts_iti.get_acts(N = n_acts, id = f"iti_capitals_gpt2xl_{n_acts}", indices=capitals_acts.indices)
+capitals_acts_iti.control_for_iti(cache_interventions)
+
+# %%
+
+# WITHOUT A SPACE
+n_correct = 0 
+dataset_size=300
 for row in tqdm(few_shot_capitals_no_space_prompts[:dataset_size]):
     prompt = row["input"]
     label = row["label"]

@@ -192,10 +192,11 @@ class Capitals_Dataset():
     capital may be correct or incorrect capital of country.
     Notable: dataset has 248*2=496 examples, much fewer than others.
     """
-    def load_dataset(self, csv_file, wrong_seed):
+    def load_dataset(self, tokenizer, csv_file, wrong_seed=5, omit_capital=False):
         """
         Load Pandas dataframe from world_capitals.csv, then generate dataset of prompts (either true or
         false) in form "Q: What is the capital of {str(country)}? A: {capital}".
+        If omit_capital is provided, then don't add (correct or incorrect) capital to prompt. Returned labels are meaningless if this option is True.
         Wrong seed is used to generate incorrect capital for false prompts.
         """
         dataframe = pd.read_csv(csv_file)
@@ -205,23 +206,31 @@ class Capitals_Dataset():
 
         np.random.seed(wrong_seed) # so that wrong capital is consistent or replicable
         for idx in range(dataframe.shape[0]):
-            country = dataframe.at[idx, 'country']
-            capital = dataframe.at[idx, 'capital']
-            prompts.append(f"Q: What is the capital of {str(country)}? A: {capital}")
-            labels.append(1)
 
-            wrong_capital = dataframe.at[np.random.randint(dataframe.shape[0]), 'capital']
-            while wrong_capital == capital: # regenerate until not equal to correct capital
+            if omit_capital:
+                country = dataframe.at[idx, 'country']
+                prompts.append(f"Q: What is the capital of {str(country)}? A:")
+            else:
+                country = dataframe.at[idx, 'country']
+                capital = dataframe.at[idx, 'capital']
+                prompts.append(f"Q: What is the capital of {str(country)}? A: {capital}")
+                labels.append(1)
+
                 wrong_capital = dataframe.at[np.random.randint(dataframe.shape[0]), 'capital']
+                while wrong_capital == capital: # regenerate until not equal to correct capital
+                    wrong_capital = dataframe.at[np.random.randint(dataframe.shape[0]), 'capital']
 
-            prompts.append(f"Q: What is the capital of {str(country)}? A: {wrong_capital}")
-            labels.append(0)
+                prompts.append(f"Q: What is the capital of {str(country)}? A: {wrong_capital}")
+                labels.append(0)   
 
-        return prompts, labels
+        tokenized_prompts = []
+        for prompt in prompts:
+            tokenized_prompts.append(tokenizer(prompt, return_tensors = 'pt').input_ids)
+        return tokenized_prompts, labels
 
     def __init__(self, tokenizer, seed:int = 0):
         # self.dataset = load_dataset("csv", data_files = "world_capitals.csv")
-        self.all_prompts, self.all_labels = self.load_dataset("world_capitals.csv", wrong_seed=5)
+        self.all_prompts, self.all_labels = self.load_dataset(tokenizer, "world_capitals.csv", wrong_seed=5)
 
         np.random.seed(seed)
         
@@ -233,3 +242,21 @@ class Capitals_Dataset():
             sample_prompts.append(self.all_prompts[i])
             sample_labels.append(self.all_labels[i])
         return indices, sample_prompts, sample_labels
+    
+    def sample_questions(self, sample_size: int, seed=None):
+        """
+        Alternative sample function to sample questions without the capital given.
+        This allows us to test causal interventions, seeing if ITI actually does improve response rate.
+        No labels are returned.
+        """
+        question_prompts, _ = self.load_dataset("world_capitals.csv", omit_capital=True)
+
+        if seed is not None:
+            np.random.seed(seed)
+        
+        indices = np.random.choice(len(question_prompts), size = sample_size, replace = False)
+        sample_prompts = []
+        for i in indices:
+            sample_prompts.append(question_prompts[i])
+        return indices, sample_prompts
+        
