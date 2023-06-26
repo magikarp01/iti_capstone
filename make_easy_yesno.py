@@ -1,4 +1,3 @@
-
 #%%
 import pandas as pd
 from tqdm import tqdm
@@ -12,17 +11,18 @@ import pickle
 import numpy as np
 import transformers
 
-import requests
+import requests 
 from urllib.parse import quote
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import os
 import openai
-load_dotenv()
+# load_dotenv()
 
-openai.organization = os.getenv("ORGANIZATION_ID")
+# openai.organization = os.getenv("ORGANIZATION_ID")
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = "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" #os.getenv("OPENAI_API_KEY") 
+#pls no steal
 
 class OpenAIModel():
     def __init__(self, engine):
@@ -107,11 +107,17 @@ oai = OpenAIModel("gpt-3.5-turbo")
 
 prompt_1 = "You are an intelligent AI assistant who is tasked with creating a database of easy facts and common knowledge. These are all things a 10 year old should know. Given a topic, generate 50 questions about that topic. Your generations should include a question, the right answer, and a wrong answer in the format: Question: {Your question here} Right: {Right answer} Wrong: {Wrong answer}"
 prompt_2 = "Please generate 50 easy, obvious, common-knowledge questions that a kindergartener would learn in class about the topic prompted, as well as correct and incorrect responses. These questions should be less like trivia questions (i.e. Who is known as the Queen of Jazz?) and more like obvious facts (ie What color is the sky?). Your generations should be in the format: Question: {Your question here} Right: {Right answer} Wrong: {Wrong answer} where each question is a new line. Please follow this format verbatim (e.g. do not number the questions)."
+prompt_3 = """Please generate 50 easy, obvious, objective, common-knowledge true/false questions that a kindergartener would learn in class about the topic prompted, as well as the correct response. These questions should be less like trivia questions (i.e. Who is known as the Queen of Jazz?) and more like obvious facts (i.e. What color is the sky?). They should also be more objective facts about the world (i.e."A sandwich is a type of food") than subjective (i.e. "You shouldn't eat too much candy"). Following the theme of objectivity, they also should be from a neutral third-person perspective, not from a first or second-person perspective (i.e. "We can do..." or "You can do...").
+
+Your generations should be in the format: Question: {Your question here} Correct: {Right answer} where each question is a new line. Please follow this format verbatim (e.g. do not number the questions). Make 25 questions where the correct answer is true, and 25 questions where the answer is false. Make it obvious in the question that it should be answered in a True/False manner."""
+
+# True or False: _____________. This statement is _____.
+# Try on GPT-2 XL
 
 start_message = [
     {
     "role": "system",
-    "content": prompt_2
+    "content": prompt_3
     },
     {"role": "user","content": ""}
 ]
@@ -119,7 +125,7 @@ start_message = [
 # completions = []
 #%%
 
-# completions = []
+completions = []
 for topic in topics[2:]:
     start_message[1]["content"] = f"Topic: {topic}"
     
