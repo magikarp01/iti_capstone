@@ -290,14 +290,14 @@ def TF_helper(prompts, labels, tokenizer):
         label = labels[i]
 
         prompt_true = "True or False: " + prompt + " True"
-        all_prompts.append(tokenizer(prompt, return_tensors = 'pt').input_ids)
+        all_prompts.append(tokenizer(prompt_true, return_tensors = 'pt').input_ids)
         if label == True:
             all_labels.append(1)
         else:
             all_labels.append(0)
         
         prompt_false = "True or False: " + prompt + " False"
-        all_prompts.append(tokenizer(prompt, return_tensors = 'pt').input_ids)
+        all_prompts.append(tokenizer(prompt_false, return_tensors = 'pt').input_ids)
         if label == False:
             all_labels.append(1)
         else:
@@ -340,7 +340,12 @@ class MisCons_Dataset(ChatGPTGen_Dataset):
 
 class Kinder_Dataset(ChatGPTGen_Dataset):
     def __init__(self, tokenizer, seed:int = 0):
-        self.dataset = load_dataset("notrichardren/kindergarten_Tf")["train"]
+        self.dataset = load_dataset("notrichardren/kindergarten_tf")["train"]
+        super().__init__(tokenizer, seed)
+
+class HS_Dataset(ChatGPTGen_Dataset):
+    def __init__(self, tokenizer, seed:int = 0):
+        self.dataset = load_dataset("notrichardren/hs_tf")["train"]
         super().__init__(tokenizer, seed)
 
 #%%

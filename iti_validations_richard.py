@@ -70,12 +70,14 @@ model.cfg.total_heads = model.cfg.n_heads * model.cfg.n_layers
 #%%
 
 n_acts = 1000
-random_seed = 5
+random_seed = 8 # was 5 before
 
 model.reset_hooks()
-from utils.dataset_utils import MS_Dataset
+from utils.dataset_utils import MS_Dataset, MisCons_Dataset, Kinder_Dataset, HS_Dataset, EZ_Dataset
 
-ez_data = MS_Dataset(model.tokenizer, seed=random_seed)
+Dataset_Init = EZ_Dataset
+
+ez_data = Dataset_Init(model.tokenizer, seed=random_seed)
 
 #%%
 model.reset_hooks()
@@ -93,7 +95,7 @@ patch_iti(model, ez_acts, use_MMD=True, cache_interventions=cache_interventions,
 # patch_iti(model, ez_acts, use_probe=True, cache_interventions=cache_interventions, model_device=device, alpha=10)
 
 # reset ez_mc so that samples will be the same
-ez_data = MS_Dataset(model.tokenizer, seed=random_seed)
+ez_data = Dataset_Init(model.tokenizer, seed=random_seed)
 ez_acts_iti = ModelActs(model, ez_data)
 ez_acts_iti.gen_acts(N = n_acts, id = f"iti_ez_gpt2xl_{n_acts}", indices=ez_acts.indices)
 ez_acts_iti.control_for_iti(cache_interventions)

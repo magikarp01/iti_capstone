@@ -118,6 +118,7 @@ Your generations should be in the format: Question: {Your question here} Correct
 elem_tf = """Please generate 50 easy, obvious, objective, common-knowledge true/false questions that a 4th grader would learn in class about the topic prompted, as well as the correct response. These questions should be less like trivia questions (i.e. Who is known as the Queen of Jazz?) and more like obvious facts (i.e. What part of the cell is nicknamed the "powerhouse of the cell"?).
 
 Your generations should be in the format: Question: {Your question here} Correct: {Right answer} where each question is a new line. Please follow this format verbatim (e.g. do not number the questions). Make 25 questions where the correct answer is true, and 25 questions where the answer is false. Make it obvious in the question that it should be answered in a True/False manner."""
+# done
 
 ms_tf = """Please generate 50 easy, obvious, objective, common-knowledge true/false questions that a middle schooler would learn in class about the topic prompted, as well as the correct response. These questions should be less like trivia questions (i.e. Who is known as the Queen of Jazz?) and more like obvious facts (i.e. What part of the cell is nicknamed the "powerhouse of the cell"?).
 
@@ -135,7 +136,7 @@ Your generations should be in the format: Question: {Your question here} Correct
 start_message = [
     {
     "role": "system",
-    "content": hs_tf
+    "content": elem_tf
     },
     {"role": "user","content": ""}
 ]
