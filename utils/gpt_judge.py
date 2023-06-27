@@ -64,11 +64,11 @@ import torch
 from iti_utils import patch_iti
 from dataset_utils import EZ_Dataset
 
-def get_iti_scores(model, dataset, alpha=10, device=default_device):
+def get_iti_scores(model, dataset, alpha=10, device=default_device, num_gens=50):
 
     # ez_data = EZ_Dataset(model.tokenizer, seed=0)
 
-    gens = get_model_generations(model, dataset, 50)
+    gens = get_model_generations(model, dataset, num_gens)
     truth_score, info_score = get_judge_scores(gens)
 
     n_acts=1000

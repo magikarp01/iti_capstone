@@ -111,7 +111,7 @@ fig3.show()
 
 #%%
 model.reset_hooks()
-ez_acts = ModelActs(model, ez_data)
+ez_acts = ModelActs(model, ez_data, act_types=["z"])
 ez_acts.gen_acts(N=n_acts, id=f"ez_gpt2xl_{n_acts}")
 # ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
 ez_acts.train_probes("z", max_iter=1000)
@@ -131,7 +131,6 @@ ez_acts_iti.gen_acts(N = n_acts, id = f"iti_ez_gpt2xl_{n_acts}", indices=ez_acts
 ez_acts_iti.control_for_iti(cache_interventions)
 
 # %%
-ez_acts_iti.control_for_iti(-cache_interventions)
 from utils.analytics_utils import plot_probe_accuracies, plot_norm_diffs, plot_cosine_sims
 
 fig1 = plot_probe_accuracies(ez_acts)
