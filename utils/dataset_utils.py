@@ -9,8 +9,17 @@ import pandas as pd
 
 """
 A class for defining our own Dataset classes for probing and ITI. Code written by Kevin Wang and Phillip Guo.
-Datasets have many statements that are either true or false.
+Datasets have many statements that are either true or false. They need a sample method that returns random
+indices of statements in the dataset, the tokenized statements, and labels.
+Their init method needs to define self.all_prompts (integer tokens) and self.all_labels.
 """ 
+
+class Abstract_Dataset:
+    def __init__(self, tokenizer, seed:int = 0):
+        raise NotImplementedError
+
+    def sample(self, sample_size: int):
+        raise NotImplementedError
 
 def format_truthfulqa(question, choice):
     return f"Q: {question} A: {choice}"
@@ -336,9 +345,40 @@ class Kinder_Dataset(ChatGPTGen_Dataset):
 
 #%%
 
-class BoolQ_Dataset():
-    def __init__(self, tokenizer, seed:int = 0):
-        self.dataset = load_dataset("boolq")
+class BoolQ_Dataset:
+    """
+    Dataset of True/False questions. For some reason, dataset is all in lowercase, may degrade performance.
+    18854 examples if train=True, 6540 if train=False.
+    """
+    def __init__(self, tokenizer, seed:int = 0, train=True):
+        self.dataset = load_dataset("boolq")["train" if train else "validation"]
         # self.all_prompts, self.all_labels = tokenized_boolq(self.dataset, tokenizer)
         
+        prompts = []
+        labels = []
+        for idx, question in enumerate(self.dataset['question']):
+            prompt = f"true or false: {question}? A:"
+            prompts.append(tokenizer(prompt + " true", return_tensors='pt').input_ids)
+            prompts.append(tokenizer(prompt + " false", return_tensors='pt').input_ids)
+
+            if self.dataset['answer'][idx]:
+                labels.append(1)
+                labels.append(0)
+            else:
+                labels.append(0)
+                labels.append(1)
         np.random.seed(seed)
+
+        self.all_prompts = prompts
+        self.all_labels = labels
+
+    def sample(self, sample_size: int):
+        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
+        sample_prompts = []
+        sample_labels =[]
+        for i in indices:
+            sample_prompts.append(self.all_prompts[i])
+            sample_labels.append(self.all_labels[i])
+        return indices, sample_prompts, sample_labels
+
+#%%

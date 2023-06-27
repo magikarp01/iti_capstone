@@ -73,9 +73,41 @@ n_acts = 1000
 random_seed = 5
 
 model.reset_hooks()
-from utils.dataset_utils import EZ_Dataset
+from utils.dataset_utils import EZ_Dataset, BoolQ_Dataset
 
 ez_data = EZ_Dataset(model.tokenizer, seed=random_seed)
+boolq_data = BoolQ_Dataset(model.tokenizer, seed=random_seed)
+
+#%%
+model.reset_hooks()
+boolq_acts = ModelActs(model, boolq_data)
+boolq_acts.gen_acts(N=n_acts, id=f"boolq_gpt2xl_{n_acts}")
+# ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
+boolq_acts.train_probes("z", max_iter=1000)
+
+# ez_acts.save_probes(id="ez_gpt2xl_200")
+
+#%%
+
+cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
+patch_iti(model, boolq_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=10)
+# patch_iti(model, ez_acts, use_probe=True, cache_interventions=cache_interventions, model_device=device, alpha=10)
+
+# reset ez_mc so that samples will be the same
+boolq_data = BoolQ_Dataset(model.tokenizer, seed=random_seed)
+boolq_acts_iti = ModelActs(model, boolq_data)
+boolq_acts_iti.gen_acts(N = n_acts, id = f"iti_boolq_gpt2xl_{n_acts}", indices=boolq_acts.indices)
+boolq_acts_iti.control_for_iti(cache_interventions)
+
+# %%
+from utils.analytics_utils import plot_probe_accuracies, plot_norm_diffs, plot_cosine_sims
+
+fig1 = plot_probe_accuracies(boolq_acts)
+fig1.show()
+fig2 = plot_norm_diffs(boolq_acts_iti, boolq_acts)
+fig2.show()
+fig3 = plot_cosine_sims(boolq_acts_iti, boolq_acts)
+fig3.show()
 
 #%%
 model.reset_hooks()
@@ -99,6 +131,7 @@ ez_acts_iti.gen_acts(N = n_acts, id = f"iti_ez_gpt2xl_{n_acts}", indices=ez_acts
 ez_acts_iti.control_for_iti(cache_interventions)
 
 # %%
+ez_acts_iti.control_for_iti(-cache_interventions)
 from utils.analytics_utils import plot_probe_accuracies, plot_norm_diffs, plot_cosine_sims
 
 fig1 = plot_probe_accuracies(ez_acts)
@@ -107,3 +140,4 @@ fig2 = plot_norm_diffs(ez_acts_iti, ez_acts)
 fig2.show()
 fig3 = plot_cosine_sims(ez_acts_iti, ez_acts)
 fig3.show()
+# %%
