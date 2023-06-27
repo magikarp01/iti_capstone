@@ -28,6 +28,11 @@ for dataset_tuple in dataset_names:
     all_prompts = DatasetTemplates(dataset_name)
     print(all_prompts)
 
+data = datasets[0]
+
+#%%
+
+
 #%%
 
 label_dict = {
@@ -43,52 +48,45 @@ label_dict = {
     "story-cloze": ["choice 1", "choice 2"],
 }
 
-def format_imdb(text, text1, text2, dataset = "imdb", label):
+def format_prompt(label, text, text1, text2, dataset = "imdb"):
     """
     Given an imdb example ("text") and corresponding label (0 for negative, or 1 for positive), 
     returns a zero-shot prompt for that example (which includes that label as the answer).
     
     (This is just one example of a simple, manually created prompt.)
     """
-
     if dataset == "imdb":
         return "The following movie review expresses a " + label_dict[dataset][label] + " sentiment:\n" + text
     if dataset == "amazon-polarity":
         return "The following Amazon review expresses a " + label_dict[dataset][label] + " sentiment:\n" + text
         # text = title and content
     if dataset == "ag-news":
-        "The topic of the following news article is about " + label_dict[dataset][label] + ":\n" + text
-        
+        return "The topic of the following news article is about " + label_dict[dataset][label] + ":\n" + text
     if dataset == "dbpedia-14":
-        "The topic of the following article is about " + label_dict[dataset][label] + ":\n" + text
+        return "The topic of the following article is about " + label_dict[dataset][label] + ":\n" + text
         # text = title and content
     if dataset == "copa":
-        f'{text}. In this story, out of "{text1}" and "{text2}", the sentence is most likely to follow is {["the former", "the latter"][label]}'
+        return f'{text}. In this story, out of "{text1}" and "{text2}", the sentence is most likely to follow is {["the former", "the latter"][label]}'
         # text = premise. text1 and text2 are choice1 choice2
-
     if dataset == "rte":
-        f"{text}\nQuestion: Does this imply that {text1}? {['Yes', 'no'][label]}"
+        return f"{text}\nQuestion: Does this imply that {text1}? {['Yes', 'no'][label]}"
         # text = premise
         # text1 = hypothesis
-
     if dataset == "boolq":
-        f"{text}\nQuestion: {text1}? {['Yes', 'no'][label]}"
+        return f"{text}\nQuestion: {text1}? {['Yes', 'no'][label]}"
         # text = passage
         # text1 = question
-
     if dataset == "qnli":
-        f"Question: {text}\nAnswer: {text1}\n Does the information in the provided answer help completely the question? {['yes', 'no'][label]}"
+        return f"Question: {text}\nAnswer: {text1}\n Does the information in the provided answer help completely the question? {['yes', 'no'][label]}"
         # text = question
         # text1 = answer
-
     if dataset == "piqa":
-        f"Which choice makes the most sense? \nQuestion: {text}\nChoice 1: {text1}\nChoice2:{text2}? {['Choice 1', 'Choice 2'][label]}"
+        return f"Which choice makes the most sense? \nQuestion: {text}\nChoice 1: {text1}\nChoice2:{text2}? {['Choice 1', 'Choice 2'][label]}"
         # text = question
         # text1 = sol1
         # text2 = sol2
-
     if dataset == "story-cloze":
-        f"Which choice makes the most sense? \Story: {text}\nContinuation 1: {text1}\nContinuation 2:{text2}? {['Continuation 1', 'Continuation 2'][label]}"
+        return f"Which choice makes the most sense? \Story: {text}\nContinuation 1: {text1}\nContinuation 2:{text2}? {['Continuation 1', 'Continuation 2'][label]}"
         # text = context
         # text1 = sentence_quiz1
         # text2 = sentence_quiz2
@@ -208,8 +206,6 @@ def get_hidden_states(model, tokenizer, input_text, layer=-1, model_type="encode
 
     return fn(model, tokenizer, input_text, layer=layer)
 
-#%%
-
 def get_hidden_states_many_examples(model, tokenizer, data, model_type, n=100):
     """
     Given an encoder-decoder model, a list of data, computes the contrast hidden states on n random examples.
@@ -228,14 +224,19 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, n=100):
         # (most examples should be a reasonable length, so this is just to make sure)
         while True:
             idx = np.random.randint(len(data))
-            text, true_label = data[idx]["content"], data[idx]["label"]
+            text, true_label = data[idx]["text"], data[idx]["label"]
             # the actual formatted input will be longer, so include a bit of a marign
             if len(tokenizer(text)) < 400:  
                 break
                 
         # get hidden states
-        neg_hs = get_hidden_states(model, tokenizer, format_imdb(text, 0), model_type=model_type)
-        pos_hs = get_hidden_states(model, tokenizer, format_imdb(text, 1), model_type=model_type)
+        neg_prompt = format_prompt(0, text, "", "", dataset = "imdb")
+        print(neg_prompt)
+        neg_hs = get_hidden_states(model, tokenizer, neg_prompt, model_type=model_type)
+
+        pos_prompt = format_prompt(0, text, "", "", dataset = "imdb")
+        print(pos_prompt)
+        pos_hs = get_hidden_states(model, tokenizer, pos_prompt, model_type=model_type)
 
         # collect
         all_neg_hs.append(neg_hs)
@@ -248,6 +249,7 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, n=100):
 
     return all_neg_hs, all_pos_hs, all_gt_labels
 
+#%%
 neg_hs, pos_hs, y = get_hidden_states_many_examples(model, tokenizer, data, model_type)
 
 #%% Run a probe on neg and pos hidden states
@@ -339,6 +341,9 @@ class CCS(object):
         consistent_loss = ((p0 - (1-p1))**2).mean(0)
         return informative_loss + consistent_loss
 
+    def get_train_dir(self):
+
+
 
     def get_acc(self, x0_test, x1_test, y_test):
         """
@@ -403,7 +408,7 @@ class CCS(object):
 #%% 
 # Train CCS without any labels
 ccs = CCS(neg_hs_train, pos_hs_train)
-ccs.repeated_train()
+print(ccs.repeated_train())
 
 # Evaluate
 ccs_acc = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)

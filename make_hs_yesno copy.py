@@ -105,9 +105,7 @@ topics
 #%%
 oai = OpenAIModel("gpt-3.5-turbo")
 
-prompt_3 = """Please generate 50 non-obvious true/false questions about the topic prompted that would easily lead themselves to misconception by the public, as well as the correct response. Make sure that the answer to your true/false question is absolutely correct, and do not include questions that are ambiguous or debatable. These questions should be evidently true. Do not include preferences, uncertain statements, or trick questions.
 
-Your generations should be in the format: Question: {Your question here} Correct: {Right answer} where each question is a new line. Please follow this format verbatim (e.g. do not number the questions). Make it obvious in the question that it should be answered in a True/False manner."""
 
 # True or False: _____________. This statement is _____.
 # Try on GPT-2 XL

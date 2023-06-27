@@ -105,9 +105,13 @@ topics
 #%%
 oai = OpenAIModel("gpt-3.5-turbo")
 
-prompt_3 = """Please generate 50 easy, obvious, objective, common-knowledge true/false questions that a middle schooler would learn in class about the topic prompted, as well as the correct response. These questions should be less like trivia questions (i.e. Who is known as the Queen of Jazz?) and more like obvious facts (i.e. What part of the cell is nicknamed the "powerhouse of the cell"?).
+ms_qa = """Please generate 50 easy, obvious, objective, common-knowledge true/false questions that a middle schooler would learn in class about the topic prompted, as well as the correct response. These questions should be less like trivia questions (i.e. Who is known as the Queen of Jazz?) and more like obvious facts (i.e. What part of the cell is nicknamed the "powerhouse of the cell"?).
 
 Your generations should be in the format: Question: {Your question here} Correct: {Right answer} where each question is a new line. Please follow this format verbatim (e.g. do not number the questions). Make 25 questions where the correct answer is true, and 25 questions where the answer is false. Make it obvious in the question that it should be answered in a True/False manner."""
+
+adult_misconceptions = """Please generate 50 non-obvious true/false questions about the topic prompted that would easily lead themselves to misconception by the public, as well as the correct response. Make sure that the answer to your true/false question is absolutely correct, and do not include questions that are ambiguous or debatable. These questions should be evidently true. Do not include preferences, uncertain statements, or trick questions.
+
+Your generations should be in the format: Question: {Your question here} Correct: {Right answer} where each question is a new line. Please follow this format verbatim (e.g. do not number the questions). Make it obvious in the question that it should be answered in a True/False manner."""
 
 # True or False: _____________. This statement is _____.
 # Try on GPT-2 XL
@@ -120,28 +124,18 @@ start_message = [
     {"role": "user","content": ""}
 ]
 
-# completions = []
 #%%
-
 completions = []
-for topic in topics[2:]:
-    start_message[1]["content"] = f"Topic: {topic}"
-    
-    completion = oai.get_chat_completion(start_message)
-    print(completion)
-    completions.append(completion)
-    
-# %%
-i=0
-for topic in topics[2:]:
-    if i > 25:
+#%%
+for i, topic in enumerate(topics):
+    if i >= len(completions):
         start_message[1]["content"] = f"Topic: {topic}"
         
         completion = oai.get_chat_completion(start_message)
         print(completion)
         completions.append(completion)
-    i = i+1
-
+        print(topic)
+    
 # %%
 completions
 # %%
@@ -155,14 +149,16 @@ def grouper(n, iterable, fillvalue=None):
     args = [iter(iterable)] * n
     return zip_longest(fillvalue=fillvalue, *args)
 
-for completion in completions:
+for i, completion in enumerate(completions):
+    topic = topics[i]
     # completion = re.sub(r"[\n\t]*", "", completion)
     question_list = grouper(2, re.split('Question: |Correct:', completion)[1:])
         
     for q in question_list:
-        answer = q[1].split("\n", 1)[0]
         try:
+            answer = q[1].split("\n", 1)[0]
             dataset.append({
+                "Topic": topic,
                 "Question": q[0].strip(),
                 "Correct": answer.strip(),
             })
