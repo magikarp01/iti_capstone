@@ -13,13 +13,15 @@ Ideally, provided datasets are balanced with true and false statements.
 # Activation Caching and Probing
 Both activation caching and probing is done in the ModelActs class, defined in the utils/probing_utils.py file. ModelActs is a class to handle all preparation for probing and ITI. 
 
-To use ModelActs, first initialize a ModelActs object with a model and a dataset from utils.dataset_utils. You can optionally include an act_types parameter of a list of activation types to cache (you can cache any activations from the provided HookedTransformer's hook_dict).
+To use ModelActs, first initialize a ModelActs object with a model and a dataset from utils.dataset_utils. You can optionally include an act_types parameter of a list of activation types to cache (you can cache any activations from the provided HookedTransformer's hook_dict). (Example in iti_validations.py)
 
 Then, generate activations (also stored in the ModelActs class) using the gen_acts method, which handles sampling from prompts/labels and caching. You can optionally store and load activations in a file. Activations are stored in the self.stored_acts dictionary (keys are act_types).
 
 Once activations have been generated, use the train_probes() method to automatically train probes on the already sampled activations and labels. The train_probes method takes an activation type, so you can specify any activation type (e.g. "z" for ITI) in act_types to train probes on.
 
 Probes and probe accuracies are stored in the self.probes and self.probe_accs dictionaries (keys are also act_types).
+
+To determine how probing generalizes, call the get_transfer_acc() method from a ModelActs object. get_transfer_acc determines how the calling ModelActs object's probes perform on the test data from a different ModelActs object, returning a list of transfer accuracies for every probe.
 
 # Inference Time Intervention
 utils/iti_utils.py has utilities to automatically apply the inference-time interventions as hooks to a HookedTransformer model. The easiest method to use is patch_iti(), which takes a model, a ModelActs object (that must have already called gen_acts() and train_probes()), ITI hyperparameters, and a choice of use_MMD (mass mean direction) or use_probe (probe weight) as the truthful direction, and applies the hooks. The optional parameter cache_intervention stores the actual intervention vectors added.
