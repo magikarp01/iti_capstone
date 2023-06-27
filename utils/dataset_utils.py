@@ -1,7 +1,11 @@
+#%%
+
 from datasets import load_dataset
 from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
+
+#%%
 
 """
 A class for defining our own Dataset classes for probing and ITI. Code written by Kevin Wang and Phillip Guo.
@@ -262,6 +266,74 @@ class Capitals_Dataset():
         for i in indices:
             sample_prompts.append(question_prompts[i])
         return indices, sample_prompts
+
+#%%
+
+def TF_helper(prompts, labels):
+    """
+    Helper function for ChatGPTGen_Dataset.
+    """
+    all_prompts = []
+    all_labels = []
+    for i in range(len(prompts)):
+
+        prompt = prompts[i]
+        label = labels[i]
+
+        prompt_true = "True or False: " + prompt + " True"
+        all_prompts.append(tokenizer(prompt, return_tensors = 'pt').input_ids)
+        if label == True:
+            all_labels.append(1)
+        else:
+            all_labels.append(0)
+        
+        prompt_false = "True or False: " + prompt + " False"
+        all_prompts.append(tokenizer(prompt, return_tensors = 'pt').input_ids)
+        if label == False:
+            all_labels.append(1)
+        else:
+            all_labels.append(0)
+    
+    return all_prompts, all_labels
+
+class ChatGPTGen_Dataset():
+    def __init__(self, tokenizer, seed:int = 0):
+        # define self.dataset
+        self.all_prompts, self.all_labels = TF_helper(self.dataset['Question'], self.dataset['Correct'])
+        self.seed = np.random.seed(seed)
+
+    def sample(self, sample_size: int, reset_seed = False):
+        """
+        indices is of type numpy array
+        sample_prompts is of type List of Tensors
+        sample_labels is of type List of Ints
+        """
+        if reset_seed:
+            np.random.seed(self.seed)
+        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
+        sample_prompts = []
+        sample_labels =[]
+        for i in indices:
+            sample_prompts.append(self.all_prompts[i])
+            sample_labels.append(self.all_labels[i])
+        return indices, sample_prompts, sample_labels
+
+class MS_Dataset(ChatGPTGen_Dataset):
+    def __init__(self, tokenizer, seed:int = 0):
+        self.dataset = load_dataset("notrichardren/ms_tf")["train"]
+        super().__init__(tokenizer, seed)
+
+class MisCons_Dataset(ChatGPTGen_Dataset):
+    def __init__(self, tokenizer, seed:int = 0):
+        self.dataset = load_dataset("notrichardren/misconceptions")["train"]
+        super().__init__(tokenizer, seed)
+
+class Kinder_Dataset(ChatGPTGen_Dataset):
+    def __init__(self, tokenizer, seed:int = 0):
+        self.dataset = load_dataset("notrichardren/kindergarten_Tf")["train"]
+        super().__init__(tokenizer, seed)
+
+#%%
 
 class BoolQ_Dataset():
     def __init__(self, tokenizer, seed:int = 0):
