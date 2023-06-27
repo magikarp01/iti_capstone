@@ -15,25 +15,58 @@ from sklearn.linear_model import LogisticRegression
 
 dataset_names = [("imdb",), ("amazon_polarity",), ("ag_news",), ("dbpedia_14",), ("super_glue", "copa"),
                  ("super_glue", "rte"), ("boolq",), ("glue", "qnli"), ("piqa",), ("chenxwh/gen-storycloze",)]
+dataset_names_singular = ["imdb", "amazon_polarity", "ag_news", "dbpedia_14", "copa", "rte", "boolq", "qnli", "piqa", "story-cloze"]
 
-datasets = []
+datasets = {}
 
-for dataset_tuple in dataset_names:
+def add_new_column(dataset):
+    dataset["text"] = "Title: "+dataset["title"] + "\nContent: " + dataset["content"]
+    return dataset
+
+for i, dataset_tuple in enumerate(dataset_names):
     dataset = load_dataset(*dataset_tuple)["train"]
-    datasets.append(dataset)
+
+    if dataset_names_singular[i] == "amazon_polarity" or dataset_names_singular[i] == "dbpedia":
+        dataset = dataset.map(add_new_column)
+    elif dataset_names_singular[i] == "copa":
+        dataset = dataset.rename_column('choice1', 'text1')
+        dataset = dataset.rename_column('choice2', 'text2')
+        dataset = dataset.rename_column('premise', 'text')
+    elif dataset_names_singular[i] == "rte":
+        dataset = dataset.rename_column('premise', 'text')
+        dataset = dataset.rename_column('hypothesis', 'text1')
+    elif dataset_names_singular[i] == "boolq":
+        dataset = dataset.rename_column('question', 'text')
+        dataset = dataset.rename_column('answer', 'text1')
+    elif dataset_names_singular[i] == "qnli":
+        dataset = dataset.rename_column('question', 'text')
+        dataset = dataset.rename_column('sentence', 'text1')
+    elif dataset_names_singular[i] == "piqa":
+        dataset = dataset.rename_column('goal', 'text')
+        dataset = dataset.rename_column('sol1', 'text1')
+        dataset = dataset.rename_column('sol2', 'text2')
+    elif dataset_names_singular[i] == "story-cloze":
+        dataset = dataset.rename_column('context', 'text')
+        dataset = dataset.rename_column('sentence_quiz1', 'text1')
+        dataset = dataset.rename_column('sentence_quiz2', 'text2')
+
+    # add dataset_names_Singular as key and dataset as value to datasets
+    datasets.update({dataset_names_singular[i]: dataset})
 
     dataset_name = "/".join(dataset_tuple)
     print("Loaded dataset:", dataset_name)
     print(dataset)
-    all_prompts = DatasetTemplates(dataset_name)
-    print(all_prompts)
 
-data = datasets[0]
-
-#%%
+    # all_prompts = DatasetTemplates(dataset_name)
+    # print(all_prompts)
 
 
 #%%
+dataset_name = "imdb"
+data = datasets[dataset_name]
+
+#%%
+
 
 label_dict = {
     "imdb": ["negative", "positive"], # This is for normal IMDB
@@ -48,44 +81,44 @@ label_dict = {
     "story-cloze": ["choice 1", "choice 2"],
 }
 
-def format_prompt(label, text, text1, text2, dataset = "imdb"):
+def format_prompt(label, text, text1, text2, dataset_name = "imdb"):
     """
     Given an imdb example ("text") and corresponding label (0 for negative, or 1 for positive), 
     returns a zero-shot prompt for that example (which includes that label as the answer).
     
     (This is just one example of a simple, manually created prompt.)
     """
-    if dataset == "imdb":
-        return "The following movie review expresses a " + label_dict[dataset][label] + " sentiment:\n" + text
-    if dataset == "amazon-polarity":
-        return "The following Amazon review expresses a " + label_dict[dataset][label] + " sentiment:\n" + text
+    if dataset_name == "imdb":
+        return "The following movie review expresses a " + label_dict[dataset_name][label] + " sentiment:\n" + text
+    if dataset_name == "amazon-polarity":
+        return "The following Amazon review expresses a " + label_dict[dataset_name][label] + " sentiment:\n" + text
         # text = title and content
-    if dataset == "ag-news":
-        return "The topic of the following news article is about " + label_dict[dataset][label] + ":\n" + text
-    if dataset == "dbpedia-14":
-        return "The topic of the following article is about " + label_dict[dataset][label] + ":\n" + text
+    if dataset_name == "ag-news":
+        return "The topic of the following news article is about " + label_dict[dataset_name][label] + ":\n" + text
+    if dataset_name == "dbpedia-14":
+        return "The topic of the following article is about " + label_dict[dataset_name][label] + ":\n" + text
         # text = title and content
-    if dataset == "copa":
+    if dataset_name == "copa":
         return f'{text}. In this story, out of "{text1}" and "{text2}", the sentence is most likely to follow is {["the former", "the latter"][label]}'
         # text = premise. text1 and text2 are choice1 choice2
-    if dataset == "rte":
+    if dataset_name == "rte":
         return f"{text}\nQuestion: Does this imply that {text1}? {['Yes', 'no'][label]}"
         # text = premise
         # text1 = hypothesis
-    if dataset == "boolq":
+    if dataset_name == "boolq":
         return f"{text}\nQuestion: {text1}? {['Yes', 'no'][label]}"
         # text = passage
         # text1 = question
-    if dataset == "qnli":
+    if dataset_name == "qnli":
         return f"Question: {text}\nAnswer: {text1}\n Does the information in the provided answer help completely the question? {['yes', 'no'][label]}"
         # text = question
         # text1 = answer
-    if dataset == "piqa":
+    if dataset_name == "piqa":
         return f"Which choice makes the most sense? \nQuestion: {text}\nChoice 1: {text1}\nChoice2:{text2}? {['Choice 1', 'Choice 2'][label]}"
         # text = question
         # text1 = sol1
         # text2 = sol2
-    if dataset == "story-cloze":
+    if dataset_name == "story-cloze":
         return f"Which choice makes the most sense? \Story: {text}\nContinuation 1: {text1}\nContinuation 2:{text2}? {['Continuation 1', 'Continuation 2'][label]}"
         # text = context
         # text1 = sentence_quiz1
@@ -225,16 +258,24 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, n=100):
         while True:
             idx = np.random.randint(len(data))
             text, true_label = data[idx]["text"], data[idx]["label"]
+            try:
+                text1 = data[idx]["text1"]
+            except:
+                text1 = ""
+            try:
+                text2 = data[idx]["text2"]
+            except:
+                text2 = ""
             # the actual formatted input will be longer, so include a bit of a marign
             if len(tokenizer(text)) < 400:  
                 break
                 
         # get hidden states
-        neg_prompt = format_prompt(0, text, "", "", dataset = "imdb")
+        neg_prompt = format_prompt(0, text, text1, text2, dataset_name = dataset_name)
         print(neg_prompt)
         neg_hs = get_hidden_states(model, tokenizer, neg_prompt, model_type=model_type)
 
-        pos_prompt = format_prompt(0, text, "", "", dataset = "imdb")
+        pos_prompt = format_prompt(true_label, text, text1, text2, dataset_name = dataset_name)
         print(pos_prompt)
         pos_hs = get_hidden_states(model, tokenizer, pos_prompt, model_type=model_type)
 
@@ -342,8 +383,19 @@ class CCS(object):
         return informative_loss + consistent_loss
 
     def get_train_dir(self):
-
-
+        """
+        Returns the correct probe direction for "true" on the train data.
+        """
+        x0, x1 = self.get_tensor_data()
+        with torch.no_grad():
+            p0, p1 = self.probe(x0), self.probe(x1)
+        avg_confidence = 0.5*(p0 + (1-p1))
+        predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
+        acc = (predictions == y_test).mean()
+        if acc > 0.5:
+            return False # don't turn
+        else:
+            return True # do turn
 
     def get_acc(self, x0_test, x1_test, y_test):
         """
@@ -356,8 +408,9 @@ class CCS(object):
         avg_confidence = 0.5*(p0 + (1-p1))
         predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
         acc = (predictions == y_test).mean()
-        acc = max(acc, 1 - acc)
-
+        if self.get_train_dir(): # Apply train_direction
+            acc = max(acc, 1 - acc)
+        # acc = max(acc, 1-acc)
         return acc
     
         
@@ -408,9 +461,11 @@ class CCS(object):
 #%% 
 # Train CCS without any labels
 ccs = CCS(neg_hs_train, pos_hs_train)
-print(ccs.repeated_train())
+ccs.repeated_train()
 
 # Evaluate
-ccs_acc = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
-print("CCS accuracy: {}".format(ccs_acc))
+ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
+ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
+print("CCS accuracy: {}".format(ccs_acc_test))
+print("CCS accuracy on train: {}".format(ccs_acc_train))
 # %%

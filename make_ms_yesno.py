@@ -105,13 +105,27 @@ topics
 #%%
 oai = OpenAIModel("gpt-3.5-turbo")
 
-ms_qa = """Please generate 50 easy, obvious, objective, common-knowledge true/false questions that a middle schooler would learn in class about the topic prompted, as well as the correct response. These questions should be less like trivia questions (i.e. Who is known as the Queen of Jazz?) and more like obvious facts (i.e. What part of the cell is nicknamed the "powerhouse of the cell"?).
-
-Your generations should be in the format: Question: {Your question here} Correct: {Right answer} where each question is a new line. Please follow this format verbatim (e.g. do not number the questions). Make 25 questions where the correct answer is true, and 25 questions where the answer is false. Make it obvious in the question that it should be answered in a True/False manner."""
-
 adult_misconceptions = """Please generate 50 non-obvious true/false questions about the topic prompted that would easily lead themselves to misconception by the public, as well as the correct response. Make sure that the answer to your true/false question is absolutely correct, and do not include questions that are ambiguous or debatable. These questions should be evidently true. Do not include preferences, uncertain statements, or trick questions.
 
 Your generations should be in the format: Question: {Your question here} Correct: {Right answer} where each question is a new line. Please follow this format verbatim (e.g. do not number the questions). Make it obvious in the question that it should be answered in a True/False manner."""
+
+easy_qa = """Please generate 50 easy, obvious, objective, common-knowledge true/false questions that a kindergartener would learn in class about the topic prompted, as well as the correct response. These questions should be less like trivia questions (i.e. Who is known as the Queen of Jazz?) and more like obvious facts (i.e. What color is the sky?). They should also be more objective facts about the world (i.e."A sandwich is a type of food") than subjective (i.e. "You shouldn't eat too much candy"). Following the theme of objectivity, they also should be from a neutral third-person perspective, not from a first or second-person perspective (i.e. "We can do..." or "You can do...").
+
+Your generations should be in the format: Question: {Your question here} Correct: {Right answer} where each question is a new line. Please follow this format verbatim (e.g. do not number the questions). Make 25 questions where the correct answer is true, and 25 questions where the answer is false. Make it obvious in the question that it should be answered in a True/False manner."""
+
+elem_qa = """Please generate 50 easy, obvious, objective, common-knowledge true/false questions that a 4th grader would learn in class about the topic prompted, as well as the correct response. These questions should be less like trivia questions (i.e. Who is known as the Queen of Jazz?) and more like obvious facts (i.e. What part of the cell is nicknamed the "powerhouse of the cell"?).
+
+Your generations should be in the format: Question: {Your question here} Correct: {Right answer} where each question is a new line. Please follow this format verbatim (e.g. do not number the questions). Make 25 questions where the correct answer is true, and 25 questions where the answer is false. Make it obvious in the question that it should be answered in a True/False manner."""
+
+ms_qa = """Please generate 50 easy, obvious, objective, common-knowledge true/false questions that a middle schooler would learn in class about the topic prompted, as well as the correct response. These questions should be less like trivia questions (i.e. Who is known as the Queen of Jazz?) and more like obvious facts (i.e. What part of the cell is nicknamed the "powerhouse of the cell"?).
+
+Your generations should be in the format: Question: {Your question here} Correct: {Right answer} where each question is a new line. Please follow this format verbatim (e.g. do not number the questions). Make 25 questions where the correct answer is true, and 25 questions where the answer is false. Make it obvious in the question that it should be answered in a True/False manner."""
+# done
+
+hs_qa = """Please generate 50 obvious, objective, common-knowledge true/false questions that a high schooler would learn in class about the topic prompted, as well as the correct response. These questions should be less like trivia questions (i.e. Is XYZ known as the Queen of Jazz?) and more like obvious facts (i.e. The central limit theorem states XYZ).
+
+Your generations should be in the format: Question: {Your question here} Correct: {Right answer} where each question is a new line. Please follow this format verbatim (e.g. do not number the questions). Make 25 questions where the correct answer is true, and 25 questions where the answer is false. Make it obvious in the question that it should be answered in a True/False manner."""
+
 
 # True or False: _____________. This statement is _____.
 # Try on GPT-2 XL
@@ -119,7 +133,7 @@ Your generations should be in the format: Question: {Your question here} Correct
 start_message = [
     {
     "role": "system",
-    "content": prompt_3
+    "content": adult_misconceptions
     },
     {"role": "user","content": ""}
 ]
@@ -175,5 +189,5 @@ import pandas as pd
 easy_questions = pd.DataFrame.from_dict(dataset)
 easy_questions.head()
 # %%
-easy_questions.to_csv("ms_qa.csv")
+easy_questions.to_csv("adult_misconceptions.csv")
 # %%
