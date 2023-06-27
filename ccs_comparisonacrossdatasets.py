@@ -272,11 +272,11 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_
 
                 # get hidden states
                 neg_prompt = format_prompt(i, text, text1, text2, dataset_name = dataset_name)
-                print(neg_prompt)
+                # print(neg_prompt)
                 neg_hs = get_hidden_states(model, tokenizer, neg_prompt, model_type=model_type)
 
                 pos_prompt = format_prompt(true_label, text, text1, text2, dataset_name = dataset_name)
-                print(pos_prompt)
+                # print(pos_prompt)
                 pos_hs = get_hidden_states(model, tokenizer, pos_prompt, model_type=model_type)
 
                 # collect
