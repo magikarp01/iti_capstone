@@ -284,11 +284,11 @@ class ModelActs:
         
         return np.array(accs)
 
-    def show_top_probes(self, act_type, topk=50):
+    def show_top_z_probes(self, topk=50):
         """
         Utility to print the most accurate heads. Out of date with probe_generalization merge.
         """
-        probe_accuracies = torch.tensor(einops.rearrange(self.all_head_accs_np, "(n_l n_h) -> n_l n_h", n_l=self.model.cfg.n_layers))
+        probe_accuracies = torch.tensor(einops.rearrange(self.probe_accs["z"], "(n_l n_h) -> n_l n_h", n_l=self.model.cfg.n_layers))
         top_head_indices = torch.topk(einops.rearrange(probe_accuracies, "n_l n_h -> (n_l n_h)"), k=topk).indices # take top k indices
 
         top_probe_heads = torch.zeros(size=(self.model.cfg.total_heads,))
