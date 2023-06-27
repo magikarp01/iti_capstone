@@ -269,7 +269,7 @@ class Capitals_Dataset():
 
 #%%
 
-def TF_helper(prompts, labels):
+def TF_helper(prompts, labels, tokenizer):
     """
     Helper function for ChatGPTGen_Dataset.
     """
@@ -299,7 +299,8 @@ def TF_helper(prompts, labels):
 class ChatGPTGen_Dataset():
     def __init__(self, tokenizer, seed:int = 0):
         # define self.dataset
-        self.all_prompts, self.all_labels = TF_helper(self.dataset['Question'], self.dataset['Correct'])
+        self.all_prompts, self.all_labels = TF_helper(self.dataset['Question'], self.dataset['Correct'], tokenizer)
+        self.tokenizer = tokenizer
         self.seed = np.random.seed(seed)
 
     def sample(self, sample_size: int, reset_seed = False):
