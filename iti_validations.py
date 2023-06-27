@@ -110,6 +110,8 @@ fig3 = plot_cosine_sims(boolq_acts_iti, boolq_acts)
 fig3.show()
 
 #%%
+
+random_seed = 100
 model.reset_hooks()
 ez_acts = ModelActs(model, ez_data, act_types=["z", "resid_pre"])
 ez_acts.gen_acts(N=n_acts, id=f"ez_gpt2xl_{n_acts}")

@@ -79,7 +79,7 @@ def calc_truth_proj(activation, use_MMD=False, use_probe=False, truth_indices=No
     # return einops.einsum(act_std, truthful_dir, "d_h, d_h -> d_h")
     return act_std * truthful_dir
 
-def patch_activation_hook_fn(activations, hook, head, old_activations, alpha, use_MMD=True, use_probe=False, truth_indices=None, probe=None, cache_interventions=None, device='cpu'):
+def patch_activation_hook_fn(activations, hook, head, term_to_add):
     """
     activations: (batch, n_heads, d_head)
     hook: HookPoint
@@ -89,17 +89,7 @@ def patch_activation_hook_fn(activations, hook, head, old_activations, alpha, us
 
     A hook that is meant to act on the "z" (output) of a given head, and add the "term_to_add" on top of it. Only meant to work a certain head. Will broadcast.
     """
-    # print(f"in hook fn, old act shape is {old_activations.shape}")
-    term_to_add = calc_truth_proj(old_activations[:,head], use_MMD, use_probe, truth_indices, probe, device=device).to(device=device)
-    # print(f"v shape is {term_to_add.shape}")
-    # print(f"activations shape is {activations.shape}")
-    
-    # add to activations in last sequence position (according to paper figure 3)
-    activations[:,-1,head] += alpha * term_to_add #.to(device=device)
-
-    if cache_interventions is not None:
-        cache_interventions[hook.layer(), head] = alpha * term_to_add
-
+    activations[:,-1,head] += term_to_add #.to(device=device)
 
 def patch_arbitrary_heads(model, head_bools, old_activations, topk=20, alpha=20, use_MMD=False, use_probe=False, truth_indices=None, probes=None, cache_interventions=None, model_device='cpu', permanent=False):
     """
@@ -108,11 +98,17 @@ def patch_arbitrary_heads(model, head_bools, old_activations, topk=20, alpha=20,
     for layer in range(head_bools.shape[0]):
         for head in range(head_bools.shape[1]):
             if head_bools[layer, head] == 1:
+                
 
-                if use_probe:
-                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=False, use_probe=use_probe, truth_indices=None, probe=probes[layer * model.cfg.n_heads + head], cache_interventions=cache_interventions, device=model_device)
+                if use_probe:                    
+                    term_to_add = calc_truth_proj(old_activations[:,layer,head], use_MMD, use_probe, probe=probes[layer * model.cfg.n_heads + head], device=model_device) * alpha
+
                 else:
-                    patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=use_MMD, use_probe=False, truth_indices=truth_indices, probe=None, cache_interventions=cache_interventions, device=model_device)
+                    term_to_add = calc_truth_proj(old_activations[:,layer,head], use_MMD, use_probe, truth_indices=truth_indices, device=model_device) * alpha
+
+                patch_activation_with_head = partial(patch_activation_hook_fn, head = head, term_to_add=term_to_add)
+
+                cache_interventions[layer, head] = term_to_add
 
                 if permanent:
                     model.add_perma_hook(utils.get_act_name("z", layer), patch_activation_with_head)
