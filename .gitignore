@@ -5,3 +5,4 @@ convert_llama_weights_to_hf.py
 /activations
 /.hypothesis
 .pytest_cache
+*__pycache__*
