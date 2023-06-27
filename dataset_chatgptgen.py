@@ -192,7 +192,7 @@ import pandas as pd
 easy_questions = pd.DataFrame.from_dict(dataset)
 easy_questions.head()
 # %%
-easy_questions.to_csv("hs_tf.csv")
+easy_questions.to_csv("es_tf.csv")
 # %%
 
 
@@ -201,8 +201,8 @@ easy_questions.to_csv("hs_tf.csv")
 import pandas as pd
 from datasets import Dataset, DatasetDict, DatasetInfo
 
-df = pd.read_csv('hs_tf.csv')
-df['Correct'] = df['Correct'].astype('bool')
+df = pd.read_csv('datasets/es_tf.csv')
+df['Correct'] = df['Correct'].map({'True': 1, 'False': 0})
 
 info = DatasetInfo(
     description="Many truthfulness datasets, compiled",
@@ -217,7 +217,7 @@ dataset_dict = DatasetDict({
 
 # # %%
 # dataset_dict.save_to_disk("./truthfulness")
-dataset.push_to_hub("notrichardren/hs_tf")
+dataset.push_to_hub("notrichardren/elem_tf")
 # # %%
 
 from datasets import load_from_disk, load_dataset
