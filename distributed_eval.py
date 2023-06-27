@@ -11,7 +11,7 @@ import argparse
 import csv
 import gc
 
-WORLD_SIZE = 8
+WORLD_SIZE = 1
 
 device = torch.device('cuda')
 
@@ -19,7 +19,7 @@ torch.set_grad_enabled(False)
 
 model_name = "llama-13b-hf"
 
-batch_size = 8
+batch_size = 1
 
 def load_llama():
     checkpoint_location = snapshot_download(f"decapoda-research/{model_name}")
@@ -40,7 +40,7 @@ def load_llama():
     return model, tokenizer
 
 
-def main(args):
+def main(args, batch_enabled=False):
     model, tokenizer = load_llama()
 
     dataset = load_dataset("notrichardren/truthfulness")
@@ -55,15 +55,20 @@ def main(args):
     true_ids = [tokenizer("true")['input_ids'][-1], tokenizer("True")['input_ids'][-1]]
     false_ids = [tokenizer("false")['input_ids'][-1], tokenizer("False")['input_ids'][-1]]
 
-    loader = DataLoader(dataset, batch_size=1, shuffle=False,)
+    loader = DataLoader(dataset, batch_size=1, shuffle=False)
+    if batch_enabled:
+        loader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
     model.eval()
 
     buffer = {}
     for idx, batch in tqdm(enumerate(loader)):
+        #start_idx = batch_size*idx
+        #end_idx = start_idx + batch_size
+
         text = batch['claim']
-        label = batch['label']
-            
+        #label = batch['label']
+        
         token_ids = tokenizer(text, return_tensors="pt").to(device)
         output = model(**token_ids)
         output = output['logits'][:,-1,:] #last sequence position
@@ -73,6 +78,10 @@ def main(args):
         false_prob = output[..., false_ids[0]] + output[..., false_ids[1]]
         guess = true_prob / (true_prob + false_prob)
 
+        #guess = guess.squeeze()
+        #for rel_idx in range(start_idx, end_idx):
+        #    buffer[start_idx + rel_idx] = guess[rel_idx]
+        
         buffer[idx] = guess.item()
 
         if idx % 1000 == 0:
@@ -87,19 +96,20 @@ def main(args):
 
 
     #    tokenizer.batch_decode(output[0])
-
-
 if __name__ == '__main__':
-    args = argparse.Namespace(cluster_id=0, rank=-1, world_size=WORLD_SIZE)
-    if args.rank == -1:
-        # we are the parent process, spawn children
-        for rank in range(args.cluster_id, WORLD_SIZE):
-            pid = os.fork()
-            if pid == 0:
-                # child process
-                args.rank = rank
-                main(args=args)
-                break
-    # wait for all children to finish
-    if args.rank == -1:
-        os.waitid(os.P_ALL, 0, os.WEXITED)
+    text = main(1)
+
+# if __name__ == '__main__':
+#     args = argparse.Namespace(cluster_id=0, rank=-1, world_size=WORLD_SIZE)
+#     if args.rank == -1:
+#         # we are the parent process, spawn children
+#         for rank in range(args.cluster_id, WORLD_SIZE):
+#             pid = os.fork()
+#             if pid == 0:
+#                 # child process
+#                 args.rank = rank
+#                 main(args=args)
+#                 break
+#     # wait for all children to finish
+#     if args.rank == -1:
+#         os.waitid(os.P_ALL, 0, os.WEXITED)
