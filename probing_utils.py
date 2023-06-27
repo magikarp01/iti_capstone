@@ -35,12 +35,14 @@ from collections import defaultdict
 from typing import TypeVar
 ModelActs = TypeVar("ModelActs")
 
-"""
-A class to handle model activations ran on a user-defined dataset. Class has utilities to generate new
-activations based on a given model and dataset, and to store those activations for later use. ModelActs also
-has utilities to train probes on the activations of every head.
-"""
+
 class ModelActs:
+    """
+    A class to handle model activations ran on a user-defined dataset. Class has utilities to generate new activations based on a given model and dataset, and to store those activations for later use. ModelActs also has utilities to train probes on the activations of every head.
+
+    Initialize ModelActs class specifying which activation types to store.
+    First, generate acts using gen_acts. Acts can be saved/loaded. Then, train probes on these acts using train_probes: these probes are stored in self.probes dictionary and accuracies are stored in self.probe_accs dictionary.
+    """
     def __init__(self, model: HookedTransformer, dataset, seed = None, act_types = ["z"]):
         """
         dataset must have sample(sample_size) method returning indices of samples, sample_prompts, and sample_labels.
@@ -140,8 +142,8 @@ class ModelActs:
         Subtracts the actual iti intervention vectors from the cached activations: this removes the direct
         effect of ITI and helps us see the downstream effects.
         """
-        self.attn_head_acts -= einops.rearrange(cache_interventions, "n_l n_h d_h -> (n_l n_h) d_h")
-
+        # self.stored_acts["z"] -= einops.rearrange(cache_interventions, "n_l n_h d_h -> (n_l n_h) d_h")
+        self.stored_acts["z"] -= cache_interventions
 
     def get_train_test_split(self, X_acts, test_ratio = 0.2, N = None):
         """
@@ -224,15 +226,37 @@ class ModelActs:
 
         probes, probe_accs = self._train_probes(self.stored_acts["mlp_out"].shape[1], X_train, X_test, y_train, y_test, max_iter=max_iter)
 
-        self.X_test = X_test
-        self.y_test = y_test
+        self.X_tests["mlp_out"] = X_test
+        self.y_tests["mlp_out"] = y_test
         
         self.probes["mlp_out"] = probes
         self.probe_accs["mlp_out"] = probe_accs
 
+    def train_probes(self, act_type, max_iter=1000):
+        """
+        Train arbitrary probes on any act type's activations (must've been included in self.act_types).
+        self.stored_acts[act_type] should be shape (num_examples, ..., d_probe), will be flattened in the middle
+        """
+        assert act_type in self.act_types
+        formatted_acts = torch.flatten(self.stored_acts[act_type], start_dim=1, end_dim=-2)
+
+        assert len(formatted_acts.shape) == 3
+
+        X_train, X_test, y_train, y_test = self.get_train_test_split(formatted_acts)
+        print(f"{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}")
+
+        probes, probe_accs = self._train_probes(formatted_acts.shape[1], X_train, X_test, y_train, y_test, max_iter=max_iter)
+
+        self.X_tests[act_type] = X_test
+        self.y_tests[act_type] = y_test
+        
+        self.probes[act_type] = probes
+        self.probe_accs[act_type] = probe_accs
+
 
     def save_probes(self, id, filepath = "activations/"):
         """
+        Don't use, out of date since all_head_accs_np doesn't exist anymore.
         Save probes and probe accuracies to activations folder. Must be called after train_probes.
         """
         with open(f'{filepath}{id}_probes.pickle', 'wb') as handle:
@@ -260,11 +284,10 @@ class ModelActs:
         
         return np.array(accs)
 
-    """
-    Utility to print the most accurate heads.
-    """
     def show_top_probes(self, topk=50):
-
+        """
+        Utility to print the most accurate heads. Out of date
+        """
         probe_accuracies = torch.tensor(einops.rearrange(self.all_head_accs_np, "(n_l n_h) -> n_l n_h", n_l=self.model.cfg.n_layers))
         top_head_indices = torch.topk(einops.rearrange(probe_accuracies, "n_l n_h -> (n_l n_h)"), k=topk).indices # take top k indices
 

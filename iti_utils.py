@@ -129,15 +129,20 @@ def patch_top_activations(model, probe_accuracies, old_activations, topk=20, alp
                     patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=use_MMD, use_probe=False, truth_indices=truth_indices, probe=None, cache_interventions=cache_interventions, device=model_device)
                 model.add_hook(utils.get_act_name("z", layer), patch_activation_with_head)
 
-# Do iti patching given a model and a ModelActs object
-# One of use_MMD, use_probe must be true
 def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, use_probe=False, cache_interventions=None, model_device='cpu'):
+    """
+    Do iti patching (on heads) given a model and a ModelActs object that has already trained probes.
+    One of use_MMD, use_probe must be true
+    """
+
     assert use_MMD ^ use_probe
     model.reset_hooks()
-    probe_accuracies = torch.tensor(einops.rearrange(model_acts.all_head_accs_np, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers)).to(device=model_device)
+    probe_accuracies = torch.tensor(einops.rearrange(model_acts.probe_accs["z"], "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers)).to(device=model_device)
     
-    attn_activations = model_acts.attn_head_acts
-    old_activations =  einops.rearrange(attn_activations, "b (n_l n_h) d_h -> b n_l n_h d_h", n_l=model.cfg.n_layers).to(device=model_device)
+    # attn_activations = model_acts.attn_head_acts
+    # old_activations =  einops.rearrange(attn_activations, "b (n_l n_h) d_h -> b n_l n_h d_h", n_l=model.cfg.n_layers).to(device=model_device)
+    old_activations = model_acts.stored_acts["z"].to(device=model_device)
+
     if use_MMD:
         truth_indices = torch.tensor(model_acts.dataset.all_labels)[model_acts.indices].to(device=model_device)
         probes=None
