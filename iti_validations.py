@@ -90,7 +90,7 @@ boolq_acts.train_probes("z", max_iter=1000)
 #%%
 
 cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
-patch_iti(model, boolq_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=10)
+patch_iti(model, boolq_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=1, topk=1200)
 # patch_iti(model, ez_acts, use_probe=True, cache_interventions=cache_interventions, model_device=device, alpha=10)
 
 # reset ez_mc so that samples will be the same

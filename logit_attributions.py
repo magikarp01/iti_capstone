@@ -53,7 +53,7 @@ device = "cuda"
 # %%
 print("loading model")
 model = HookedTransformer.from_pretrained(
-    "gpt2-xl",
+    "gpt2-small",
     center_unembed=False,
     center_writing_weights=False,
     fold_ln=False,
@@ -71,11 +71,12 @@ random_seed = 5
 
 from utils.dataset_utils import EZ_Dataset, BoolQ_Dataset
 
-ez_data = EZ_Dataset(model.tokenizer, seed=random_seed)
+boolq_data = BoolQ_Dataset(model.tokenizer, seed=random_seed)
 
 model.reset_hooks()
-ez_acts = ModelActs(model, ez_data, act_types=["z", "resid_pre", "result"])
-ez_acts.gen_acts(N=n_acts, id=f"ez_gpt2xl_{n_acts}")
+boolq_acts = ModelActs(model, boolq_data, act_types=["z", "resid_pre", "result"])
+boolq_acts.gen_acts(N=n_acts, id=f"boolq_gpt2small_{n_acts}")
 
 #%%
-ez_acts.stored_acts["result"]
+boolq_acts.stored_acts["result"]
+

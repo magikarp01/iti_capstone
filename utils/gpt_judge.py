@@ -42,7 +42,7 @@ def get_judge_scores(model_responses):
 
 from transformer_lens import HookedTransformer, HookedTransformerConfig, FactoredMatrix, ActivationCache
 import numpy as np
-from dataset_utils import TQA_MC_Dataset
+from utils.dataset_utils import TQA_MC_Dataset
 
 def get_model_generations(model: HookedTransformer, dataset, num_gens, seed=None, max_tokens=20):
     if seed is not None:
@@ -59,13 +59,13 @@ def get_model_generations(model: HookedTransformer, dataset, num_gens, seed=None
     return completions
 
 
-from probing_utils import ModelActs
+from utils.probing_utils import ModelActs
 import torch
-from iti_utils import patch_iti
-from dataset_utils import EZ_Dataset
+from utils.iti_utils import patch_iti
+from utils.dataset_utils import EZ_Dataset
 
-def get_iti_scores(model, dataset, alpha=10, device=default_device, num_gens=50):
-
+def get_iti_scores(model, dataset, alpha=10, topk=50, device=default_device, num_gens=50):
+    model.reset_hooks()
     # ez_data = EZ_Dataset(model.tokenizer, seed=0)
 
     gens = get_model_generations(model, dataset, num_gens)
@@ -78,7 +78,7 @@ def get_iti_scores(model, dataset, alpha=10, device=default_device, num_gens=50)
     acts.train_probes("z",max_iter=1000)
 
     cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
-    patch_iti(model, acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=alpha)
+    patch_iti(model, acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=alpha, topk=topk)
 
     gens_iti = get_model_generations(model, dataset, 50)
     truth_score_iti, info_score_iti = get_judge_scores(gens_iti)
@@ -87,7 +87,7 @@ def get_iti_scores(model, dataset, alpha=10, device=default_device, num_gens=50)
     return truth_score, info_score, truth_score_iti, info_score_iti, gens, gens_iti
 
 
-def check_iti_generalization(model, gen_dataset, iti_dataset, num_gens=50, n_iti_acts=1000, alpha=20, device=default_device, existing_gen_acts=None):
+def check_iti_generalization(model, gen_dataset, iti_dataset, num_gens=50, n_iti_acts=1000, alpha=20, topk=50, device=default_device, existing_gen_acts=None):
     model.reset_hooks()
     gens = get_model_generations(model, gen_dataset, num_gens)
     truth_score, info_score = get_judge_scores(gens)
@@ -101,7 +101,7 @@ def check_iti_generalization(model, gen_dataset, iti_dataset, num_gens=50, n_iti
         acts = existing_gen_acts
 
     cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
-    patch_iti(model, acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=alpha)
+    patch_iti(model, acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=alpha, topk=topk)
 
     gens_iti = get_model_generations(model, gen_dataset, 50)
     truth_score_iti, info_score_iti = get_judge_scores(gens_iti)

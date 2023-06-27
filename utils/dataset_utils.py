@@ -275,7 +275,8 @@ class Capitals_Dataset():
 
 class BoolQ_Dataset:
     """
-    Dataset of True/False questions. For some reason, dataset is all in lowercase, may degrade performance.
+    Dataset of True/False statements. Statements consist of "true or false: {question}. A: {true or false}". 
+    For some reason, dataset is all in lowercase, may degrade performance.
     18854 examples if train=True, 6540 if train=False.
     """
     def __init__(self, tokenizer, seed:int = 0, train=True):
@@ -308,5 +309,37 @@ class BoolQ_Dataset:
             sample_prompts.append(self.all_prompts[i])
             sample_labels.append(self.all_labels[i])
         return indices, sample_prompts, sample_labels
+
+class BoolQ_Question_Dataset:
+    """
+    Dataset of questions, without the " true" or " false" at end of statement given, also untokenized.
+    """
+    def __init__(self, tokenizer, seed:int = 0, train=True):
+        self.dataset = load_dataset("boolq")["train" if train else "validation"]
+        
+        prompts = []
+        labels = []
+        for idx, question in enumerate(self.dataset['question']):
+            prompt = f"true or false: {question}? A:"
+            prompts.append(tokenizer(prompt, return_tensors='pt').input_ids)
+
+            if self.dataset['answer'][idx] == True:
+                labels.append(1)
+            else:
+                labels.append(0)
+        np.random.seed(seed)
+
+        self.all_prompts = prompts
+        self.all_labels = labels
+
+    def sample(self, sample_size: int):
+        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
+        sample_prompts = []
+        sample_labels =[]
+        for i in indices:
+            sample_prompts.append(self.all_prompts[i])
+            sample_labels.append(self.all_labels[i])
+        return indices, sample_prompts, sample_labels
+
 
 #%%
