@@ -16,7 +16,18 @@ from sklearn.linear_model import LogisticRegression
 dataset_names = [("imdb",), ("amazon_polarity",), ("ag_news",), ("dbpedia_14",), ("super_glue", "copa"),
                  ("super_glue", "rte"), ("boolq",), ("glue", "qnli"), ("piqa",), ("chenxwh/gen-storycloze",)]
 dataset_names_singular = ["imdb", "amazon_polarity", "ag_news", "dbpedia_14", "copa", "rte", "boolq", "qnli", "piqa", "story-cloze"]
-
+label_dict = {
+    "imdb": ["negative", "positive"], # This is for normal IMDB
+    "amazon_polarity": ["negative", "positive"],
+    "ag_news": ["politics", "sports", "business", "technology"],
+    "dbpedia_14": ["company", "educational institution", "artist", "athlete", "office holder", "mean of transportation", "building", "natural place", "village", "animal",  "plant",  "album",  "film",  "written work"],
+    "copa": ["choice 1", "choice 2"],
+    "rte": ["yes", "no"],   # whether entail
+    "boolq": ["false", "true"],
+    "qnli": ["yes", "no"],  # represent whether entail
+    "piqa": ["solution 1", "solution 2"],
+    "story-cloze": ["choice 1", "choice 2"],
+}
 datasets = {}
 
 def add_new_column(dataset):
@@ -60,27 +71,7 @@ for i, dataset_tuple in enumerate(dataset_names):
     # all_prompts = DatasetTemplates(dataset_name)
     # print(all_prompts)
 
-
 #%%
-dataset_name = "imdb"
-data = datasets[dataset_name]
-
-#%%
-
-
-label_dict = {
-    "imdb": ["negative", "positive"], # This is for normal IMDB
-    "amazon-polarity": ["negative", "positive"],
-    "ag-news": ["politics", "sports", "business", "technology"],
-    "dbpedia-14": ["company", "educational institution", "artist", "athlete", "office holder", "mean of transportation", "building", "natural place", "village", "animal",  "plant",  "album",  "film",  "written work"],
-    "copa": ["choice 1", "choice 2"],
-    "rte": ["yes", "no"],   # whether entail
-    "boolq": ["false", "true"],
-    "qnli": ["yes", "no"],  # represent whether entail
-    "piqa": ["solution 1", "solution 2"],
-    "story-cloze": ["choice 1", "choice 2"],
-}
-
 def format_prompt(label, text, text1, text2, dataset_name = "imdb"):
     """
     Given an imdb example ("text") and corresponding label (0 for negative, or 1 for positive), 
@@ -90,12 +81,12 @@ def format_prompt(label, text, text1, text2, dataset_name = "imdb"):
     """
     if dataset_name == "imdb":
         return "The following movie review expresses a " + label_dict[dataset_name][label] + " sentiment:\n" + text
-    if dataset_name == "amazon-polarity":
+    if dataset_name == "amazon_polarity":
         return "The following Amazon review expresses a " + label_dict[dataset_name][label] + " sentiment:\n" + text
         # text = title and content
-    if dataset_name == "ag-news":
+    if dataset_name == "ag_news":
         return "The topic of the following news article is about " + label_dict[dataset_name][label] + ":\n" + text
-    if dataset_name == "dbpedia-14":
+    if dataset_name == "dbpedia_14":
         return "The topic of the following article is about " + label_dict[dataset_name][label] + ":\n" + text
         # text = title and content
     if dataset_name == "copa":
@@ -125,13 +116,14 @@ def format_prompt(label, text, text1, text2, dataset_name = "imdb"):
         # text2 = sentence_quiz2
 
 #%%
-# Here are a few different model options you can play around with:
-model_name = "deberta"
+
+from transformers import AutoModelForSeq2SeqLM, AutoModelForMaskedLM, AutoModelForCausalLM, AutoTokenizer
 
 # if you want to cache the model weights somewhere, you can specify that here
 cache_dir = None
+model_names = ["deberta", "gpt-j", "t5", "unifiedqa", "T0pp"]
 
-def load_model(full_model_name):
+def load_model_helper(full_model_name):
     try:
         model = AutoModelForSeq2SeqLM.from_pretrained(full_model_name, cache_dir=cache_dir)
         model_type = "encoder_decoder"
@@ -145,29 +137,34 @@ def load_model(full_model_name):
     tokenizer = AutoTokenizer.from_pretrained(full_model_name, cache_dir=cache_dir)
     return model, model_type, tokenizer
 
-if model_name == "deberta":
-    full_model_name = "microsoft/deberta-v2-xxlarge"
-    model, model_type, tokenizer = load_model(full_model_name)
-    model.cuda()
-elif model_name == "gpt-j":
-    full_model_name = "EleutherAI/gpt-j-6B"
-    model, model_type, tokenizer = load_model(full_model_name)
-    model.cuda()
-elif model_name == "t5":
-    full_model_name = "t5-11b"
-    model, model_type, tokenizer = load_model(full_model_name)
-    model.cuda()
-    # model.parallelize()  # T5 is big enough that we may need to run it on multiple GPUs
-elif model_name == "unifiedqa":
-    full_model_name = "allenai/unifiedqa-t5-11b"
-    model, model_type, tokenizer = load_model(full_model_name)
-    model.cuda()
-elif model_name == "T0pp":
-    full_model_name = "bigscience/T0pp"
-    model, model_type, tokenizer = load_model(full_model_name)
-    model.cuda()
-else:
-    print("Not implemented!")
+def load_model(model_name):
+    if model_name == "deberta":
+        full_model_name = "microsoft/deberta-v2-xxlarge"
+        model, model_type, tokenizer = load_model_helper(full_model_name)
+        model.cuda()
+    elif model_name == "gpt-j":
+        full_model_name = "EleutherAI/gpt-j-6B"
+        model, model_type, tokenizer = load_model_helper(full_model_name)
+        model.cuda()
+    elif model_name == "t5":
+        full_model_name = "t5-11b"
+        model, model_type, tokenizer = load_model_helper(full_model_name)
+        model.cuda()
+        # model.parallelize()  # T5 is big enough that we may need to run it on multiple GPUs
+    elif model_name == "unifiedqa":
+        full_model_name = "allenai/unifiedqa-t5-11b"
+        model, model_type, tokenizer = load_model_helper(full_model_name)
+        model.cuda()
+    elif model_name == "T0pp":
+        full_model_name = "bigscience/T0pp"
+        model, model_type, tokenizer = load_model_helper(full_model_name)
+        model.cuda()
+    else:
+        print(f"Not implemented! {model_name}")        
+
+    return model, model_type, tokenizer
+
+print("Models loaded successfully!")
 
 
 #%% Extract hidden states
@@ -239,7 +236,7 @@ def get_hidden_states(model, tokenizer, input_text, layer=-1, model_type="encode
 
     return fn(model, tokenizer, input_text, layer=layer)
 
-def get_hidden_states_many_examples(model, tokenizer, data, model_type, n=100):
+def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_name, n=100):
     """
     Given an encoder-decoder model, a list of data, computes the contrast hidden states on n random examples.
     Returns numpy arrays of shape (n, hidden_dim) for each candidate label, along with a boolean numpy array of shape (n,)
@@ -269,45 +266,29 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, n=100):
             # the actual formatted input will be longer, so include a bit of a marign
             if len(tokenizer(text)) < 400:  
                 break
-                
-        # get hidden states
-        neg_prompt = format_prompt(0, text, text1, text2, dataset_name = dataset_name)
-        print(neg_prompt)
-        neg_hs = get_hidden_states(model, tokenizer, neg_prompt, model_type=model_type)
 
-        pos_prompt = format_prompt(true_label, text, text1, text2, dataset_name = dataset_name)
-        print(pos_prompt)
-        pos_hs = get_hidden_states(model, tokenizer, pos_prompt, model_type=model_type)
+        for i, label in enumerate(label_dict.get(dataset_name)):
+            if i != true_label:
 
-        # collect
-        all_neg_hs.append(neg_hs)
-        all_pos_hs.append(pos_hs)
-        all_gt_labels.append(true_label)
+                # get hidden states
+                neg_prompt = format_prompt(i, text, text1, text2, dataset_name = dataset_name)
+                print(neg_prompt)
+                neg_hs = get_hidden_states(model, tokenizer, neg_prompt, model_type=model_type)
+
+                pos_prompt = format_prompt(true_label, text, text1, text2, dataset_name = dataset_name)
+                print(pos_prompt)
+                pos_hs = get_hidden_states(model, tokenizer, pos_prompt, model_type=model_type)
+
+                # collect
+                all_neg_hs.append(neg_hs)
+                all_pos_hs.append(pos_hs)
+                all_gt_labels.append(true_label)
 
     all_neg_hs = np.stack(all_neg_hs)
     all_pos_hs = np.stack(all_pos_hs)
     all_gt_labels = np.stack(all_gt_labels)
 
     return all_neg_hs, all_pos_hs, all_gt_labels
-
-#%%
-neg_hs, pos_hs, y = get_hidden_states_many_examples(model, tokenizer, data, model_type)
-
-#%% Run a probe on neg and pos hidden states
-# let's create a simple 50/50 train split (the data is already randomized)
-n = len(y)
-neg_hs_train, neg_hs_test = neg_hs[:n//2], neg_hs[n//2:]
-pos_hs_train, pos_hs_test = pos_hs[:n//2], pos_hs[n//2:]
-y_train, y_test = y[:n//2], y[n//2:]
-
-# for simplicity we can just take the difference between positive and negative hidden states
-# (concatenating also works fine)
-x_train = neg_hs_train - pos_hs_train
-x_test = neg_hs_test - pos_hs_test
-
-lr = LogisticRegression(class_weight="balanced")
-lr.fit(x_train, y_train)
-print("Logistic regression accuracy: {}".format(lr.score(x_test, y_test)))
 
 #%%
 
@@ -459,13 +440,62 @@ class CCS(object):
         return best_loss
 
 #%% 
-# Train CCS without any labels
-ccs = CCS(neg_hs_train, pos_hs_train)
-ccs.repeated_train()
 
-# Evaluate
-ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
-ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
-print("CCS accuracy: {}".format(ccs_acc_test))
-print("CCS accuracy on train: {}".format(ccs_acc_train))
-# %%
+num_epochs = 200
+
+# 3D torch Tensor of results
+# 0th dimension: models
+# 1st dimension: train datasets
+# 2nd dimension: test datasets
+ccs_results = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
+probe_results = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
+
+for i, model_name in enumerate(model_names):
+    model, model_type, tokenizer = load_model(model_name)
+
+    for j, dataset_name_train in enumerate(dataset_names_singular):
+        for k, dataset_name_test in enumerate(dataset_names_singular):
+
+            # dataset_name_train = "imdb"
+            # dataset_name_test = "amazon_polarity"
+            data_train = datasets[dataset_name_train]
+            data_test = datasets[dataset_name_test]
+
+            if j != k:
+                neg_hs_train, pos_hs_train, y_train = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs)
+                neg_hs_test, pos_hs_test, y_test = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs)
+            else:
+                neg_hs, pos_hs, y = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs*2)
+                # If j = k, let's split training / testing results:
+                n = len(y)
+                neg_hs_train, neg_hs_test = neg_hs[:n//2], neg_hs[n//2:]
+                pos_hs_train, pos_hs_test = pos_hs[:n//2], pos_hs[n//2:]
+                y_train, y_test = y[:n//2], y[n//2:]
+
+            # for simplicity we can just take the difference between positive and negative hidden states
+            # (concatenating also works fine)
+            x_train = neg_hs_train - pos_hs_train
+            x_test = neg_hs_test - pos_hs_test
+
+            # Run a probe on neg and pos hidden states
+            lr = LogisticRegression(class_weight="balanced")
+            lr.fit(x_train, y_train)
+            print("Logistic regression accuracy on transfer: {}".format(lr.score(x_test, y_test)))
+            print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
+
+            # Train and run CCS without any labels
+            ccs = CCS(neg_hs_train, pos_hs_train)
+            ccs.repeated_train()
+            ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
+            ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
+            print("CCS accuracy on transfer: {}".format(ccs_acc_test))
+            print("CCS accuracy on own: {}".format(ccs_acc_train))
+            
+            # Store transfer accuracy in a 3D tensor:
+            ccs_results[i, j, k] = ccs_acc_test
+            probe_results[i, j, k] = lr.score(x_test, y_test)
+
+    del model
+    del tokenizer_ctrl
+    torch.cuda.empty_cache()
+#%%
