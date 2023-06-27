@@ -34,12 +34,15 @@ def tokenized_tqa(dataset, tokenizer):
     return all_prompts, all_labels
 
 class TQA_MC_Dataset():
+    """
+    Questions in format "Q: What is underneath the Denver Airport?\nA: The Denver Airport is underneath the city of Denver.
+    """
     def __init__(self, tokenizer, seed:int = 0):
         self.dataset = load_dataset("truthful_qa", "multiple_choice")['validation']
         self.all_prompts, self.all_labels = tokenized_tqa(self.dataset, tokenizer)
         self.seed = seed
         np.random.seed(seed)
-        
+    
     def sample(self, sample_size: int, reset_seed=False):
         if reset_seed: # so that every sample will be the same
             np.random.seed(self.seed)
@@ -259,4 +262,5 @@ class Capitals_Dataset():
         for i in indices:
             sample_prompts.append(question_prompts[i])
         return indices, sample_prompts
-        
+
+# class BoolQ_Dataset():
