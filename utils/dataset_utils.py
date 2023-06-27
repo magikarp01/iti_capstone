@@ -299,9 +299,9 @@ def TF_helper(prompts, labels, tokenizer):
         prompt_false = "True or False: " + prompt + " False"
         all_prompts.append(tokenizer(prompt_false, return_tensors = 'pt').input_ids)
         if label == False:
-            all_labels.append(1)
-        else:
             all_labels.append(0)
+        else:
+            all_labels.append(1)
     
     return all_prompts, all_labels
 
@@ -327,6 +327,11 @@ class ChatGPTGen_Dataset():
             sample_prompts.append(self.all_prompts[i])
             sample_labels.append(self.all_labels[i])
         return indices, sample_prompts, sample_labels
+
+class MS_Dataset(ChatGPTGen_Dataset):
+    def __init__(self, tokenizer, seed:int = 0):
+        self.dataset = load_dataset("notrichardren/es_tf")["train"]
+        super().__init__(tokenizer, seed)
 
 class MS_Dataset(ChatGPTGen_Dataset):
     def __init__(self, tokenizer, seed:int = 0):
