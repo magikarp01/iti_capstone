@@ -75,7 +75,7 @@ random_seed = 8 # was 5 before
 model.reset_hooks()
 from utils.dataset_utils import MS_Dataset, MisCons_Dataset, Kinder_Dataset, HS_Dataset, EZ_Dataset
 
-Dataset_Init = EZ_Dataset
+Dataset_Init = MS_Dataset
 
 ez_data = Dataset_Init(model.tokenizer, seed=random_seed)
 
