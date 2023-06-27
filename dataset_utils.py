@@ -263,4 +263,9 @@ class Capitals_Dataset():
             sample_prompts.append(question_prompts[i])
         return indices, sample_prompts
 
-# class BoolQ_Dataset():
+class BoolQ_Dataset():
+    def __init__(self, tokenizer, seed:int = 0):
+        self.dataset = load_dataset("boolq")
+        # self.all_prompts, self.all_labels = tokenized_boolq(self.dataset, tokenizer)
+        
+        np.random.seed(seed)

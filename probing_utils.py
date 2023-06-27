@@ -209,7 +209,7 @@ class ModelActs:
         """
         formatted_z_acts = einops.rearrange(self.stored_acts["z"], "b n_l n_h d_h -> b (n_l n_h) d_h")
         X_train, X_test, y_train, y_test = self.get_train_test_split(formatted_z_acts)
-        print(f"{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}")
+        # print(f"{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}")
 
         probes, probe_accs = self._train_probes(formatted_z_acts.shape[1], X_train, X_test, y_train, y_test, max_iter=max_iter)
 
@@ -222,7 +222,7 @@ class ModelActs:
 
     def train_mlp_out_probes(self, max_iter=1000):
         X_train, X_test, y_train, y_test = self.get_train_test_split(self.stored_acts["mlp_out"])
-        print(f"{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}")
+        # print(f"{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}")
 
         probes, probe_accs = self._train_probes(self.stored_acts["mlp_out"].shape[1], X_train, X_test, y_train, y_test, max_iter=max_iter)
 
@@ -265,17 +265,17 @@ class ModelActs:
         np.save(f'{filepath}{id}_all_head_accs_np.npy', self.all_head_accs_np)
 
     
-    def get_transfer_acc(self, data_source: ModelActs):
+    def get_transfer_acc(self, act_type, data_source: ModelActs):
         """
         Get transfer accuracy of probes trained on this dataset on another dataset. 
         data_source is another ModelActs object.
         """
         # data_labels = np.array(data_source.dataset.all_labels)[data_source.indices]
-        data_labels = data_source.y_test[:,0].numpy()
+        data_labels = data_source.y_test[act_type][:,0].numpy()
 
         accs = []
 
-        for i, clf in tqdm(enumerate(self.probes)):
+        for i, clf in tqdm(enumerate(self.probes[act_type])):
             # acts = data_source.attn_head_acts[:, i, :]
             acts = data_source.X_test[:, i, :]
             y_pred = clf.predict(acts)
@@ -284,9 +284,9 @@ class ModelActs:
         
         return np.array(accs)
 
-    def show_top_probes(self, topk=50):
+    def show_top_probes(self, act_type, topk=50):
         """
-        Utility to print the most accurate heads. Out of date
+        Utility to print the most accurate heads. Out of date with probe_generalization merge.
         """
         probe_accuracies = torch.tensor(einops.rearrange(self.all_head_accs_np, "(n_l n_h) -> n_l n_h", n_l=self.model.cfg.n_layers))
         top_head_indices = torch.topk(einops.rearrange(probe_accuracies, "n_l n_h -> (n_l n_h)"), k=topk).indices # take top k indices

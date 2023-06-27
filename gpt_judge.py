@@ -1,18 +1,18 @@
 import openai
+import torch
 
 # my truth and info fine tuned models
 gpt_truth = "curie:ft-filesearch-2023-06-26-00-08-20"
 gpt_info = "curie:ft-filesearch-2023-06-26-01-42-47"
+default_device = "cuda" if torch.cuda.is_available() else "cpu"
 
-
-# %%
 def get_judge_scores(model_responses):
     """
     model_responses should be a list of string model outputs. Gets the GPT-Judge truth and info scores across the model responses.
     """
 
     truth_prompts = [response + "\nTrue:" for response in model_responses]
-    print(truth_prompts)
+    # print(truth_prompts)
     truth_completions = openai.Completion.create(
             model=gpt_truth,
             prompt=truth_prompts,
@@ -39,24 +39,8 @@ def get_judge_scores(model_responses):
         
     return truth_score/len(model_responses), info_score/len(model_responses)
 
-# %%
-from transformer_lens import HookedTransformer, HookedTransformerConfig, FactoredMatrix, ActivationCache
-device = "cuda"
-print("loading model")
-model = HookedTransformer.from_pretrained(
-    "gpt2-xl",
-    center_unembed=False,
-    center_writing_weights=False,
-    fold_ln=False,
-    refactor_factored_attn_matrices=True,
-    device=device,
-)
-# model.to(device)
-print("done")
-model.set_use_attn_result(True)
-model.cfg.total_heads = model.cfg.n_heads * model.cfg.n_layers
-# %%
 
+from transformer_lens import HookedTransformer, HookedTransformerConfig, FactoredMatrix, ActivationCache
 import numpy as np
 from dataset_utils import TQA_MC_Dataset
 
@@ -70,46 +54,17 @@ def get_model_generations(model: HookedTransformer, dataset, num_gens, seed=None
         string_sample = model.tokenizer.batch_decode(sample)[0]
         question_sample = string_sample.split("A: ")[0]
         model_prompt = question_sample + "A:"
-        completion = model.generate(model_prompt, max_new_tokens=max_tokens)
+        completion = model.generate(model_prompt, max_new_tokens=max_tokens, verbose=False)
         completions.append(completion)
     return completions
 
-#%%
 
-tqa_data = TQA_MC_Dataset(model.tokenizer, seed=0)
-
-gens = get_model_generations(model, tqa_data, 50)
-truth_score, info_score = get_judge_scores(gens)
-
-
-#%%
 from probing_utils import ModelActs
 import torch
 from iti_utils import patch_iti
-
-n_acts=200
-tqa_acts = ModelActs(model, tqa_data)
-tqa_acts.gen_acts(N=n_acts, id=f"tqa_gpt2xl_{n_acts}")
-# ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
-tqa_acts.train_probes("z",max_iter=1000)
-
-# ez_acts.save_probes(id="ez_gpt2xl_200")
-
-#%%
-
-cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
-patch_iti(model, tqa_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=10)
-
-# %%
-gens_iti = get_model_generations(model, tqa_data, 50)
-truth_score_iti, info_score_iti = get_judge_scores(gens_iti)
-# %%
-print(f"{truth_score=}, {info_score=}, {truth_score_iti=}, {info_score_iti=}")
-
-#%%
 from dataset_utils import EZ_Dataset
 
-def get_iti_scores(model, dataset, alpha=10):
+def get_iti_scores(model, dataset, alpha=10, device=default_device):
 
     # ez_data = EZ_Dataset(model.tokenizer, seed=0)
 
@@ -132,17 +87,21 @@ def get_iti_scores(model, dataset, alpha=10):
     return truth_score, info_score, truth_score_iti, info_score_iti, gens, gens_iti
 
 
-def check_iti_generalization(model, gen_dataset, iti_dataset, num_gens=50, n_iti_acts=1000, alpha=20):
+def check_iti_generalization(model, gen_dataset, iti_dataset, num_gens=50, n_iti_acts=1000, alpha=20, device=default_device, existing_gen_acts=None):
     model.reset_hooks()
     gens = get_model_generations(model, gen_dataset, num_gens)
     truth_score, info_score = get_judge_scores(gens)
 
-    acts = ModelActs(model, iti_dataset)
-    acts.gen_acts(N=n_iti_acts)
-    acts.train_probes("z", max_iter=1000)
+    if existing_gen_acts is None:
+        acts = ModelActs(model, iti_dataset)
+        acts.gen_acts(N=n_iti_acts)
+        acts.train_probes("z", max_iter=1000)
+
+    else:
+        acts = existing_gen_acts
 
     cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
-    patch_iti(model, ez_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=alpha)
+    patch_iti(model, acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=alpha)
 
     gens_iti = get_model_generations(model, gen_dataset, 50)
     truth_score_iti, info_score_iti = get_judge_scores(gens_iti)
@@ -151,39 +110,3 @@ def check_iti_generalization(model, gen_dataset, iti_dataset, num_gens=50, n_iti
 
     # return gens, gens_iti
     return truth_score, info_score, truth_score_iti, info_score_iti, gens, gens_iti
-
-
-#%%
-model.reset_hooks()
-tqa_data = TQA_MC_Dataset(model.tokenizer, seed=0)
-ez_data = EZ_Dataset(model.tokenizer, seed=0)
-get_iti_scores(model, tqa_data, alpha=-10)
-# %%
-## Checking Generalization, doing ITI using EZ-data:
-
-model.reset_hooks()
-tqa_data = TQA_MC_Dataset(model.tokenizer, seed=0)
-ez_data = EZ_Dataset(model.tokenizer, seed=0)
-
-gens = get_model_generations(model, tqa_data, 50)
-truth_score, info_score = get_judge_scores(gens)
-
-n_acts=1000
-ez_acts = ModelActs(model, ez_data)
-ez_acts.gen_acts(N=n_acts)
-# ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
-ez_acts.train_probes(max_iter=1000)
-
-# ez_acts.save_probes(id="ez_gpt2xl_200")
-
-#%%
-
-cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
-patch_iti(model, ez_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=10)
-
-gens_iti = get_model_generations(model, tqa_data, 50)
-truth_score_iti, info_score_iti = get_judge_scores(gens_iti)
-# %%
-print(f"{truth_score=}, {info_score=}, {truth_score_iti=}, {info_score_iti=}")
-# %%
-
