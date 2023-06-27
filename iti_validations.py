@@ -47,7 +47,7 @@ from transformer_lens.hook_points import (
 )  # Hooking utilities
 from transformer_lens import HookedTransformer, HookedTransformerConfig, FactoredMatrix, ActivationCache
 
-from utils.iti_utils import patch_top_activations, patch_iti
+from utils.iti_utils import patch_iti
 
 from utils.analytics_utils import plot_probe_accuracies, plot_norm_diffs, plot_cosine_sims
 
@@ -121,7 +121,7 @@ ez_acts.train_probes("z", max_iter=1000)
 #%%
 
 cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
-patch_iti(model, ez_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=10)
+patch_iti(model, ez_acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=1, topk=1200)
 # patch_iti(model, ez_acts, use_probe=True, cache_interventions=cache_interventions, model_device=device, alpha=10)
 
 # reset ez_mc so that samples will be the same

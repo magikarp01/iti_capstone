@@ -31,7 +31,6 @@ from transformer_lens import HookedTransformer, HookedTransformerConfig, Factore
 import pickle
 from collections import defaultdict
 
-# from iti import patch_top_activations
 from typing import TypeVar
 ModelActs = TypeVar("ModelActs")
 

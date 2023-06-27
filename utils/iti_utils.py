@@ -100,36 +100,27 @@ def patch_activation_hook_fn(activations, hook, head, old_activations, alpha, us
     if cache_interventions is not None:
         cache_interventions[hook.layer(), head] = alpha * term_to_add
 
-# Calculates new_activations for topk and adds temporary hooks
-def patch_top_activations(model, probe_accuracies, old_activations, topk=20, alpha=20, use_MMD=False, use_probe=False, truth_indices=None, probes=None, cache_interventions=None, model_device='cpu'):
+
+def patch_arbitrary_heads(model, head_bools, old_activations, topk=20, alpha=20, use_MMD=False, use_probe=False, truth_indices=None, probes=None, cache_interventions=None, model_device='cpu', permanent=False):
     """
-    probe_accuracies: (n_layers, n_heads)
-    old_activations: (batch, n_layers, n_heads, d_head)
-
-    if use_probe is True, probes should be list in shape (n_layers, n_heads) filled with probes
-
-    Goes into every single activation, and then tells it to add the ITI
+    Function to patch (with ITI) arbitrary heads, given by head_bools. head_bools should be a n_l x n_h tensor of booleans, where a particular element is True if that head should be patched.
     """
-
-    # print(f"old activations shape is {old_activations.shape}")
-
-    top_head_indices = torch.topk(einops.rearrange(probe_accuracies, "n_l n_h -> (n_l n_h)"), k=topk).indices.to(device=model_device) # take top k indices
-    top_head_bools = torch.zeros(size=(probe_accuracies.shape[0] * probe_accuracies.shape[1],)).to(device=model_device) # set all the ones that aren't top to 0
-
-    top_head_bools[top_head_indices] = torch.ones_like(top_head_bools[top_head_indices]).to(device=model_device) # set all the ones that are top to 1
-    top_head_bools = einops.rearrange(top_head_bools, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers) # rearrange back
-    
-    for layer in range(probe_accuracies.shape[0]):
-        for head in range(probe_accuracies.shape[1]):
-            if top_head_bools[layer, head] == 1:
+    for layer in range(head_bools.shape[0]):
+        for head in range(head_bools.shape[1]):
+            if head_bools[layer, head] == 1:
 
                 if use_probe:
                     patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=False, use_probe=use_probe, truth_indices=None, probe=probes[layer * model.cfg.n_heads + head], cache_interventions=cache_interventions, device=model_device)
                 else:
                     patch_activation_with_head = partial(patch_activation_hook_fn, head = head, old_activations = old_activations[:, layer], alpha=alpha, use_MMD=use_MMD, use_probe=False, truth_indices=truth_indices, probe=None, cache_interventions=cache_interventions, device=model_device)
-                model.add_hook(utils.get_act_name("z", layer), patch_activation_with_head)
 
-def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, use_probe=False, cache_interventions=None, model_device='cpu'):
+                if permanent:
+                    model.add_perma_hook(utils.get_act_name("z", layer), patch_activation_with_head)
+                else:
+                    model.add_hook(utils.get_act_name("z", layer), patch_activation_with_head)
+
+
+def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, use_probe=False, cache_interventions=None, model_device='cpu', permanent=False):
     """
     Do iti patching (on heads) given a model and a ModelActs object that has already trained probes.
     One of use_MMD, use_probe must be true
@@ -151,4 +142,10 @@ def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, us
         probes = model_acts.probes
         truth_indices=None
     
-    patch_top_activations(model, probe_accuracies, old_activations, topk=topk, alpha=alpha, use_MMD=use_MMD, use_probe=use_probe, truth_indices=truth_indices, probes=probes, cache_interventions=cache_interventions, model_device=model_device)
+    top_head_indices = torch.topk(einops.rearrange(probe_accuracies, "n_l n_h -> (n_l n_h)"), k=topk).indices.to(device=model_device) # take top k indices
+    top_head_bools = torch.zeros(size=(probe_accuracies.shape[0] * probe_accuracies.shape[1],)).to(device=model_device) # set all the ones that aren't top to 0
+
+    top_head_bools[top_head_indices] = torch.ones_like(top_head_bools[top_head_indices]).to(device=model_device) # set all the ones that are top to 1
+    top_head_bools = einops.rearrange(top_head_bools, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers) # rearrange back
+    
+    patch_arbitrary_heads(model, top_head_bools, old_activations, topk=topk, alpha=alpha, use_MMD=use_MMD, use_probe=use_probe, truth_indices=truth_indices, probes=probes, cache_interventions=cache_interventions, model_device=model_device, permanent=permanent)
