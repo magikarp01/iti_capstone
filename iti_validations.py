@@ -131,7 +131,6 @@ ez_acts_iti.gen_acts(N = n_acts, id = f"iti_ez_gpt2xl_{n_acts}", indices=ez_acts
 ez_acts_iti.control_for_iti(cache_interventions)
 
 # %%
-ez_acts_iti.control_for_iti(-cache_interventions)
 from utils.analytics_utils import plot_probe_accuracies, plot_norm_diffs, plot_cosine_sims
 
 fig1 = plot_probe_accuracies(ez_acts)
