@@ -268,16 +268,16 @@ class ModelActs:
     def get_transfer_acc(self, act_type, data_source: ModelActs):
         """
         Get transfer accuracy of probes trained on this dataset on another dataset. 
-        data_source is another ModelActs object.
+        data_source is another ModelActs object that should already have been trained on probes.
         """
         # data_labels = np.array(data_source.dataset.all_labels)[data_source.indices]
-        data_labels = data_source.y_test[act_type][:,0].numpy()
+        data_labels = data_source.y_tests[act_type][:,0].numpy()
 
         accs = []
 
         for i, clf in tqdm(enumerate(self.probes[act_type])):
             # acts = data_source.attn_head_acts[:, i, :]
-            acts = data_source.X_test[:, i, :]
+            acts = data_source.X_tests[act_type][:, i, :]
             y_pred = clf.predict(acts)
             
             accs.append(accuracy_score(data_labels, y_pred))

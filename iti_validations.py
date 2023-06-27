@@ -80,7 +80,7 @@ boolq_data = BoolQ_Dataset(model.tokenizer, seed=random_seed)
 
 #%%
 model.reset_hooks()
-boolq_acts = ModelActs(model, boolq_data)
+boolq_acts = ModelActs(model, boolq_data, act_types=["z", "resid_pre"])
 boolq_acts.gen_acts(N=n_acts, id=f"boolq_gpt2xl_{n_acts}")
 # ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
 boolq_acts.train_probes("z", max_iter=1000)
@@ -111,7 +111,7 @@ fig3.show()
 
 #%%
 model.reset_hooks()
-ez_acts = ModelActs(model, ez_data)
+ez_acts = ModelActs(model, ez_data, act_types=["z", "resid_pre"])
 ez_acts.gen_acts(N=n_acts, id=f"ez_gpt2xl_{n_acts}")
 # ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
 ez_acts.train_probes("z", max_iter=1000)

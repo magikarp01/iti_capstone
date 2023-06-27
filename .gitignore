@@ -4,4 +4,5 @@ tokenizers.zip
 convert_llama_weights_to_hf.py
 /activations/*
 /.hypothesis
-__pycache__/
+.pytest_cache
+*__pycache__*
