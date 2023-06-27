@@ -197,8 +197,9 @@ easy_questions.to_csv("ms_tf.csv")
 import pandas as pd
 from datasets import Dataset, DatasetDict, DatasetInfo
 
-df = pd.read_csv('ms_tf.csv')
-df['Correct'] = df['Correct'].map({'True': 1, 'False': 0})
+string_to_save = "ms_tf"
+
+df = pd.read_csv(f'datasets/{string_to_save}.csv')
 
 info = DatasetInfo(
     description="Many truthfulness datasets, compiled",
@@ -211,10 +212,8 @@ dataset_dict = DatasetDict({
     'train': dataset
 })
 
-# # %%
-# dataset_dict.save_to_disk("./truthfulness")
-dataset.push_to_hub("notrichardren/ms_tf")
-# # %%
+dataset.push_to_hub(f"notrichardren/{string_to_save}")
+# %%
 
 from datasets import load_from_disk, load_dataset
 
@@ -222,3 +221,6 @@ dataset = load_dataset("notrichardren/hs_tf")
 # #
 
 # %%
+
+
+# Easy generation idea: kindergarten, 1st, 3rd, 5th, 7th, 9th, 11th grade --> obvious, misconceptions, 

@@ -37,7 +37,7 @@ def add_new_column(dataset):
 for i, dataset_tuple in enumerate(dataset_names):
     dataset = load_dataset(*dataset_tuple)["train"]
 
-    if dataset_names_singular[i] == "amazon_polarity" or dataset_names_singular[i] == "dbpedia":
+    if dataset_names_singular[i] == "amazon_polarity" or dataset_names_singular[i] == "dbpedia_14":
         dataset = dataset.map(add_new_column)
     elif dataset_names_singular[i] == "copa":
         dataset = dataset.rename_column('choice1', 'text1')
@@ -48,7 +48,9 @@ for i, dataset_tuple in enumerate(dataset_names):
         dataset = dataset.rename_column('hypothesis', 'text1')
     elif dataset_names_singular[i] == "boolq":
         dataset = dataset.rename_column('question', 'text')
-        dataset = dataset.rename_column('answer', 'text1')
+        dataset = dataset.rename_column('passage', 'text1')
+        dataset = dataset.rename_column('answer', 'label')
+        dataset = dataset.map(lambda example: {"label": 1 if example["label"] == "True" else 0})
     elif dataset_names_singular[i] == "qnli":
         dataset = dataset.rename_column('question', 'text')
         dataset = dataset.rename_column('sentence', 'text1')
@@ -264,7 +266,8 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_
             except:
                 text2 = ""
             # the actual formatted input will be longer, so include a bit of a marign
-            if len(tokenizer(text)) < 400:  
+            if len(tokenizer(text + text1 + text2)) < 400: 
+                print("Skipped an example that was too long: " + text + text1 + text2)
                 break
 
         for i, label in enumerate(label_dict.get(dataset_name)):
@@ -304,12 +307,13 @@ class MLPProbe(nn.Module):
         return torch.sigmoid(o)
 
 class CCS(object):
-    def __init__(self, x0, x1, nepochs=1000, ntries=10, lr=1e-3, batch_size=-1, 
+    def __init__(self, x0, x1, y, nepochs=1000, ntries=10, lr=1e-3, batch_size=-1, 
                  verbose=False, device="cuda", linear=True, weight_decay=0.01, var_normalize=False):
         # data
         self.var_normalize = var_normalize
         self.x0 = self.normalize(x0)
         self.x1 = self.normalize(x1)
+        self.y = y
         self.d = self.x0.shape[-1]
 
         # training
@@ -372,7 +376,7 @@ class CCS(object):
             p0, p1 = self.probe(x0), self.probe(x1)
         avg_confidence = 0.5*(p0 + (1-p1))
         predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
-        acc = (predictions == y_test).mean()
+        acc = (predictions == self.y).mean()
         if acc > 0.5:
             return False # don't turn
         else:
@@ -390,7 +394,7 @@ class CCS(object):
         predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
         acc = (predictions == y_test).mean()
         if self.get_train_dir(): # Apply train_direction
-            acc = max(acc, 1 - acc)
+            acc = 1 - acc
         # acc = max(acc, 1-acc)
         return acc
     
@@ -441,7 +445,7 @@ class CCS(object):
 
 #%% 
 
-num_epochs = 200
+num_epochs = 6
 
 # 3D torch Tensor of results
 # 0th dimension: models
@@ -452,9 +456,12 @@ probe_results = torch.zeros((len(model_names), len(dataset_names_singular), len(
 
 for i, model_name in enumerate(model_names):
     model, model_type, tokenizer = load_model(model_name)
+    print(" **** Loaded model: ", model_name)
 
     for j, dataset_name_train in enumerate(dataset_names_singular):
         for k, dataset_name_test in enumerate(dataset_names_singular):
+
+            print(" *** Training on ", dataset_name_train, " and testing on ", dataset_name_test)
 
             # dataset_name_train = "imdb"
             # dataset_name_test = "amazon_polarity"
@@ -484,7 +491,7 @@ for i, model_name in enumerate(model_names):
             print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
 
             # Train and run CCS without any labels
-            ccs = CCS(neg_hs_train, pos_hs_train)
+            ccs = CCS(neg_hs_train, pos_hs_train, y_train)
             ccs.repeated_train()
             ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
             ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
