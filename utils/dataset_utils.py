@@ -330,10 +330,10 @@ class ChatGPTGen_Dataset():
 
 class MS_Dataset(ChatGPTGen_Dataset):
     def __init__(self, tokenizer, seed:int = 0):
-        self.dataset = load_dataset("notrichardren/es_tf")["train"]
+        self.dataset = load_dataset("notrichardren/elem_tf")["train"]
         super().__init__(tokenizer, seed)
 
-class MS_Dataset(ChatGPTGen_Dataset):
+class Elem_Dataset(ChatGPTGen_Dataset):
     def __init__(self, tokenizer, seed:int = 0):
         self.dataset = load_dataset("notrichardren/ms_tf")["train"]
         super().__init__(tokenizer, seed)
