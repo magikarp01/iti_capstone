@@ -14,6 +14,30 @@ from transformers import LlamaForCausalLM, LlamaTokenizer
 from accelerate import init_empty_weights, load_checkpoint_and_dispatch
 from huggingface_hub import snapshot_download
 
+from datasets import load_dataset
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+import argparse
+import csv
+import gc
+
+
+WORLD_SIZE = 1
+
+device = torch.device('cuda')
+
+#torch.set_grad_enabled(False)
+
+model_name = "stable-vicuna-13b" #"llama-13b-hf"
+
+batch_size = 1
+
+num_hidden_layers = 40
+hidden_size = 5120
+
+activation_buffer = torch.zeros((num_hidden_layers, hidden_size))
+
+
 
 @dataclass
 class HookInfo:
@@ -67,84 +91,66 @@ class HookedModule(nn.Module):
 
     def forward(self, *args, **kwargs):
         return self.model(*args, **kwargs)
+    
 
-def efficient_model_loading(): #can change to cache model weights on disk
-    #checkpoint_location = snapshot_download("decapoda-research/llama-30b-hf")
-    checkpoint_location = f"{os.getcwd()}/vicuna-weights"
-    with init_empty_weights():  # Takes up near zero memory
+def load_llama():
+    #checkpoint_location = snapshot_download(f"decapoda-research/{model_name}")
+    checkpoint_location = f"{os.getcwd()}/{model_name}"
+    with init_empty_weights():
         model = LlamaForCausalLM.from_pretrained(checkpoint_location)
+
     model = load_checkpoint_and_dispatch(
         model,
-        checkpoint_location,
+        checkpoint_location, 
         device_map="auto",
-        dtype=torch.float16,
+        dtype="torch.float16",
         no_split_module_classes=["LlamaDecoderLayer"],
     )
-    tok = LlamaTokenizer.from_pretrained(checkpoint_location)
-    return model, tok #returns by-reference
+
+    tokenizer = LlamaTokenizer.from_pretrained(checkpoint_location)
+    
+    return model, tokenizer
 
 
 
-def save_activations(prompt, prompt_id):
-    #### model loading
-    #model, tok = efficient_model_loading()
-    ####
-    token_ids = tok(prompt, return_tensors="pt").to(model.device)
-    #output = model(**token_ids)
+def cache_z_hook_fnc(module, input, output, name="", layer_num=0):
+    # input of shape bsz, q_len, self.hidden_size (from modeling_llama.py)
+    #torch.save(input[0,-1,:].squeeze().detach(), f"{os.getcwd()}/data/example_{prompt_id}.pt")  #if tight on memory
+    activation_buffer[layer_num, :] = input[0][0,-1,:].detach().clone() #input is a tuple
+
+
+
+
+def main():
+    model, tokenizer = load_llama()
+    model.eval()
 
     hmodel = HookedModule(model)
-    # Print out the names modules you can add hooks to
-    #hmodel.print_model_structure()
 
-    def caching_hook_fnc(module, input, output, name=""):
-        print("Hooking:", name)
-        save_path = f"{os.getcwd()}/data/prompt-{prompt_id}"
-        if not os.path.exists(save_path):
-            os.system(f"mkdir {save_path}")
-        torch.save(output[0].detach(), f"{save_path}/{name}")
+    dataset = load_dataset("notrichardren/truthfulness")
+    dataset = dataset["train"].remove_columns(['explanation', 'common_knowledge_label', 'origin_dataset'])
+
+    loader = DataLoader(dataset, batch_size=1, shuffle=False)
+
+    save_path = f"{os.getcwd()}/data"
+    if not os.path.exists(save_path):
+        os.system(f"mkdir {save_path}")
 
     hook_pairs = []
     for layer in range(model.config.num_hidden_layers):
-        for mat in ["q","k"]:
-            act_name = f"model.layers.{layer}.self_attn.{mat}_proj"
-            hook_pairs.append((act_name, partial(caching_hook_fnc, name=act_name)))
+        act_name = f"model.layers.{layer}.self_attn.o_proj"
+        hook_pairs.append((act_name, partial(cache_z_hook_fnc, name=act_name, layer_num=layer)))
 
-    with hmodel.hooks(fwd=hook_pairs):
-        output = hmodel(**token_ids)
+    for idx, batch in tqdm(enumerate(loader)):
 
-    return output
-    #completion = model.generate(**token_ids, max_new_tokens=30,)
-    #print(tok.batch_decode(completion)[0])
+        text = batch['claim']
+        token_ids = tokenizer(text, return_tensors="pt").to(device)
 
-def talk(prompt, num_tokens=30):
-    model, tok = efficient_model_loading()
-    token_ids = tok(prompt, return_tensors="pt").to(model.device)
-    completion = model.generate(**token_ids, max_new_tokens=num_tokens,)
-    output = tok.batch_decode(completion)[0]
-    return output
+        with hmodel.hooks(fwd=hook_pairs):
+            output = hmodel(**token_ids)
 
-def speak(prompt, num_tokens):
-    token_ids = tok(prompt, return_tensors="pt").to(model.device)
-    completion = model.generate(**token_ids, max_new_tokens=num_tokens,)
-    output = tok.batch_decode(completion)[0]
-    print(output)
+        torch.save(activation_buffer, f"{save_path}/example_{idx}.pt")
 
 
 if __name__ == "__main__":
-    prompt = '''Alex: "Hi, Bob!"
-
-Bob: "Hey, Alex. How's your day going?"
-
-Alex: "Not bad, thanks. Yours?"
-
-Bob:'''
-    num_tokens = 50
-    model, tok = efficient_model_loading()
-    token_ids = tok(prompt, return_tensors="pt").to(model.device)
-    completion = model.generate(**token_ids, max_new_tokens=num_tokens,)
-    output = tok.batch_decode(completion)[0]
-    print(output)
-
-
-    #prompt_id = "1"
-    #output = save_activations(prompt, prompt_id)
+    main()
