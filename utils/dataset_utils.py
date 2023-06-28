@@ -312,15 +312,16 @@ class BoolQ_Dataset:
 
 class BoolQ_Question_Dataset:
     """
-    Dataset of questions, without the " true" or " false" at end of statement given, also untokenized.
+    Dataset of questions, without the " true" or " false" at end of statement given. Tokenized.
     """
     def __init__(self, tokenizer, seed:int = 0, train=True):
         self.dataset = load_dataset("boolq")["train" if train else "validation"]
         
         prompts = []
         labels = []
+        prompt_start = "Is this true or false:"
         for idx, question in enumerate(self.dataset['question']):
-            prompt = f"true or false: {question}? A:"
+            prompt = f"{prompt_start} {question}? A:"
             prompts.append(tokenizer(prompt, return_tensors='pt').input_ids)
 
             if self.dataset['answer'][idx] == True:
