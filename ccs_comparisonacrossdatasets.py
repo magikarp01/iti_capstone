@@ -7,9 +7,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from promptsource.templates import DatasetTemplates
-from datasets import load_dataset
+from datasets import load_dataset, Dataset
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForMaskedLM, AutoModelForCausalLM
 from sklearn.linear_model import LogisticRegression
+
 
 #%% Load datasets
 
@@ -50,7 +51,9 @@ for i, dataset_tuple in enumerate(dataset_names):
         dataset = dataset.rename_column('question', 'text')
         dataset = dataset.rename_column('passage', 'text1')
         dataset = dataset.rename_column('answer', 'label')
-        dataset = dataset.map(lambda example: {"label": 1 if example["label"] == "True" else 0})
+        dataset = dataset.to_pandas()
+        dataset['label'] = dataset['label'].astype(int)
+        dataset = Dataset.from_pandas(dataset)
     elif dataset_names_singular[i] == "qnli":
         dataset = dataset.rename_column('question', 'text')
         dataset = dataset.rename_column('sentence', 'text1')
@@ -270,7 +273,7 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_
                 # print("Skipped an example that was too long: " + text + text1 + text2)
                 break
 
-        print("Number of tokens: " + len(tokenizer(text + text1 + text2)))
+        # print(f"Number of tokens: {len(tokenizer(text + text1 + text2))}")
 
         for i, label in enumerate(label_dict.get(dataset_name)):
             if i != true_label:

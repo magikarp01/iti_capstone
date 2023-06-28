@@ -4,6 +4,8 @@ from datasets import load_dataset
 from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
+from datasets import load_dataset
+from functools import partial
 
 #%%
 
@@ -355,6 +357,52 @@ class HS_Dataset(ChatGPTGen_Dataset):
 
 #%%
 
+def filter_strings(example, strings):
+    return any(s in example['text'] for s in strings)
+
+class TruthfulQA_Tfn(ChatGPTGen_Dataset):
+    def __init__(self, tokenizer, seed:int = 0):
+        string_list = ["TruthfulQA"]
+        partial_filter_strings = partial(filter_strings, strings=string_list)
+        self.dataset = load_dataset("notrichardren/hs_tf")["train"].filter(partial_filter_strings)
+        super().__init__(tokenizer, seed)
+
+class CounterFact_Tfn(ChatGPTGen_Dataset):
+    def __init__(self, tokenizer, seed:int = 0):
+        string_list = ["CounterFact"]
+        partial_filter_strings = partial(filter_strings, strings=string_list)
+        self.dataset = load_dataset("notrichardren/hs_tf")["train"].filter(partial_filter_strings)
+        super().__init__(tokenizer, seed)
+
+class Fever_Tfn(ChatGPTGen_Dataset):
+    def __init__(self, tokenizer, seed:int = 0):
+        string_list = ["fever_v1.0_labelleddev", "fever_v1.0_train","fever_v2.0"]
+        partial_filter_strings = partial(filter_strings, strings=string_list)
+        self.dataset = load_dataset("notrichardren/hs_tf")["train"].filter(partial_filter_strings)
+        super().__init__(tokenizer, seed)
+
+class BoolQ_Tfn(ChatGPTGen_Dataset):
+    def __init__(self, tokenizer, seed:int = 0):
+        string_list = ["boolq_train", "boolq_test"]
+        partial_filter_strings = partial(filter_strings, strings=string_list)
+        self.dataset = load_dataset("notrichardren/hs_tf")["train"].filter(partial_filter_strings)
+        super().__init__(tokenizer, seed)
+
+class Creak_Tfn(ChatGPTGen_Dataset):
+    def __init__(self, tokenizer, seed:int = 0):
+        string_list = ["creak_train", "creak_dev", "creak_contrast_set"]
+        partial_filter_strings = partial(filter_strings, strings=string_list)
+        self.dataset = load_dataset("notrichardren/hs_tf")["train"].filter(partial_filter_strings)
+        super().__init__(tokenizer, seed)
+
+class CommonClaim_Tfn(ChatGPTGen_Dataset):
+    def __init__(self, tokenizer, seed:int = 0):
+        string_list = ["CommonClaim"]
+        partial_filter_strings = partial(filter_strings, strings=string_list)
+        self.dataset = load_dataset("notrichardren/hs_tf")["train"].filter(partial_filter_strings)
+        super().__init__(tokenizer, seed)
+
+#%%
 class BoolQ_Dataset:
     """
     Dataset of True/False questions. For some reason, dataset is all in lowercase, may degrade performance.
