@@ -69,7 +69,8 @@ model.cfg.total_heads = model.cfg.n_heads * model.cfg.n_layers
 n_acts = 1000
 random_seed = 5
 
-from utils.dataset_utils import EZ_Dataset, BoolQ_Dataset, BoolQ_Question_Dataset
+from utils.dataset_utils import EZ_Dataset, BoolQ_Dataset, BoolQ_Question_Dataset, MS_Dataset, Kinder_Dataset
+
 
 boolq_questions = BoolQ_Question_Dataset(model.tokenizer, seed=random_seed)
 
@@ -78,19 +79,38 @@ boolq_acts = ModelActs(model, boolq_questions, act_types=["z", "resid_pre", "res
 # boolq_acts.gen_acts(N=n_acts, id=f"boolq_gpt2small_{n_acts}")
 
 #%%
-boolq_acts.dataset.all_prompts[0]
+model.tokenizer.batch_decode(boolq_acts.dataset.all_prompts[0])
+
+#%%
+kinder_questions = Kinder_Dataset(model.tokenizer, seed=random_seed)
+model.tokenizer.batch_decode(kinder_questions.all_prompts[0])
 
 # %%
 
-act_types = ["resid_pre", "result"]
-total_logit_attrs = {"resid_pre": [], "result": []}
 
 from collections import defaultdict
-def logit_attrs(model: HookedTransformer, dataset, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu"):
+
+def logit_attrs_tokens(cache, stored_acts, positive_tokens=[], negative_tokens=[]):
+    """
+    Helper function to call cache.logit_attrs over a set of possible positive and negative tokens (ints or strings). Also indexes last token. 
+    Ideally, same number of positive and negative tokens (to account for relative logits)
+    """
+    all_attrs = []
+    for token in positive_tokens:
+        all_attrs.append(cache.logit_attrs(stored_acts, tokens=token, has_batch_dim=False)[:,-1])
+    for token in negative_tokens:
+        all_attrs.append(-cache.logit_attrs(stored_acts, tokens=token, has_batch_dim=False)[:,-1])
+
+    return torch.stack(all_attrs).mean(0)
+
+
+def logit_attrs(model: HookedTransformer, dataset, act_types = ["resid_pre", "result"], N = 1000, indices=None):
+    total_logit_attrs = defaultdict(list)
 
     if indices is None:
         indices, all_prompts, all_labels = dataset.sample(N)
 
+    all_logits = []
     # names filter for efficiency, only cache in self.act_types
     # names_filter = lambda name: any([name.endswith(act_type) for act_type in act_types])
 
@@ -99,6 +119,10 @@ def logit_attrs(model: HookedTransformer, dataset, N = 1000, store_acts = True, 
         
         positive_tokens = torch.tensor([2081, 6407, 3763, 3363])
         negative_tokens = torch.tensor([3991, 10352, 645, 1400])
+
+        positive_tokens = ["Yes", "yes", " Yes", " yes", "True", "true", " True", " true"]
+
+        negative_tokens = ["No", "no", " No", " no", "False", "false", " False", " false"]
 
         # correct_tokens = positive_tokens if dataset.all_labels[i] else negative_tokens
         # incorrect_tokens = negative_tokens if dataset.all_labels[i] else positive_tokens
@@ -113,12 +137,63 @@ def logit_attrs(model: HookedTransformer, dataset, N = 1000, store_acts = True, 
             # print(f"{stored_acts.shape=}")
             # print(f"{cache.logit_attrs(stored_acts, tokens=correct_token, incorrect_tokens=incorrect_token)=}")
             
-            total_logit_attrs[act_type].append(cache.logit_attrs(stored_acts, tokens=correct_tokens, incorrect_tokens=incorrect_tokens, pos_slice=-1, has_batch_dim=False)[:,-1]) # last position
-            # print(logit_attrs)
+            # total_logit_attrs[act_type].append(cache.logit_attrs(stored_acts, tokens=correct_tokens, incorrect_tokens=incorrect_tokens, pos_slice=-1, has_batch_dim=False)[:,-1]) # last position
+            total_logit_attrs[act_type].append(logit_attrs_tokens(cache, stored_acts, positive_tokens, negative_tokens))
 
-logit_attrs(model, boolq_questions)
+        all_logits.append(original_logits)
+
+    return all_logits, total_logit_attrs
+
+all_logits, total_logit_attrs = logit_attrs(model, boolq_questions)
 # %%
 mean_logit_attrs = einops.rearrange(torch.stack(total_logit_attrs["result"]).mean(0), "(n_l n_h) -> n_l n_h", n_l = model.cfg.n_layers).to(device="cpu")
 px.imshow(mean_logit_attrs.numpy())
 
 #%%
+all_logit_attrs = einops.rearrange(torch.stack(total_logit_attrs["result"]), "b (n_l n_h) -> b n_l n_h", n_l = model.cfg.n_layers).to(device="cpu")
+
+px.histogram(all_logit_attrs[:, 26, 4])
+
+#%%
+
+def query_logits(logits, return_type = "logits", TOP_N = 10):
+    """
+    Gets TOP_N predictions after last token in a prompt
+    """
+    last_tok_logits = logits[0, -1]
+    
+    #gets probs after last tok in seq
+    
+    if return_type == "probs":
+        scores = F.softmax(last_tok_logits, dim=-1).detach().cpu().numpy() #the [0] is to index out of the batch idx
+    else:
+        scores = last_tok_logits.detach().cpu().numpy()
+
+    #assert probs add to 1
+    # assert np.abs(np.sum(probs) - 1) <= 0.01, str(np.abs(np.sum(probs)-1)) 
+
+    probs_ = []
+    for index, prob in enumerate(scores):
+        probs_.append((index, prob))
+
+    top_k = sorted(probs_, key = lambda x: x[1], reverse = True)[:TOP_N]
+    top_k = [(t[1].item(), model.tokenizer.decode(t[0])) for t in top_k]
+    
+    return top_k
+    
+def is_logits_contain_label(ranked_logits, correct_answer):
+    # Convert correct_answer to lower case and strip white space
+    correct_answer = correct_answer.strip().lower()
+
+    # Loop through the top 10 logits
+    for logit_score, logit_value in ranked_logits:
+        # Convert logit_value to lower case and strip white space
+        logit_value = logit_value.strip().lower()
+
+        # Check if the correct answer contains the logit value
+        if correct_answer.find(logit_value) != -1: 
+            return True
+    return False
+
+
+# %%
