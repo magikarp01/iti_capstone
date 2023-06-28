@@ -26,8 +26,8 @@ from transformer_lens import HookedTransformer, HookedTransformerConfig, Factore
 
 def llama(device = "cuda"):
     # Set up model
-    model = LlamaForCausalLM.from_pretrained('../vicuna-7b-hf')
-    tokenizer = LlamaTokenizer.from_pretrained('../llama-7b-hf')
+    model = LlamaForCausalLM.from_pretrained('vicuna-7b-hf')
+    tokenizer = LlamaTokenizer.from_pretrained('llama-7b-hf')
     model = HookedTransformer.from_pretrained(
         "llama-7b-hf", 
         hf_model=model, 
