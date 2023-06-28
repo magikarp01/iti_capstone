@@ -117,10 +117,11 @@ def patch_arbitrary_heads(model, head_bools, old_activations, topk=20, alpha=20,
                     model.add_hook(utils.get_act_name("z", layer), patch_activation_with_head)
 
 
-def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, use_probe=False, cache_interventions=None, model_device='cpu', permanent=False):
+def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, use_probe=False, cache_interventions=None, model_device='cpu', permanent=False, train_only=True):
     """
     Do iti patching (on heads) given a model and a ModelActs object that has already trained probes.
     One of use_MMD, use_probe must be true
+    If train_only is true, then old_activations is only from the train split (saved in model_acts.indices_trains)
     """
 
     assert use_MMD ^ use_probe
@@ -129,10 +130,20 @@ def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, us
     
     # attn_activations = model_acts.attn_head_acts
     # old_activations =  einops.rearrange(attn_activations, "b (n_l n_h) d_h -> b n_l n_h d_h", n_l=model.cfg.n_layers).to(device=model_device)
-    old_activations = model_acts.stored_acts["z"].to(device=model_device)
+    
+    # need to get the indices of indices_trains in indices (e.g. if indices is [10, 5, 7] and indices_trains is [5, 10], get [1, 0])
+    if train_only:
+        meta_indices = np.array([np.where(model_acts.indices == i)[0][0] for i in model_acts.indices_trains["z"]])
+
+        old_activations = model_acts.stored_acts["z"][meta_indices].to(device=model_device)
+    else:
+        old_activations = model_acts.stored_acts["z"].to(device=model_device)
 
     if use_MMD:
-        truth_indices = torch.tensor(model_acts.dataset.all_labels)[model_acts.indices].to(device=model_device)
+        if train_only:
+            truth_indices = torch.tensor(model_acts.dataset.all_labels)[model_acts.indices_trains["z"]].to(device=model_device)
+        else:
+            truth_indices = torch.tensor(model_acts.dataset.all_labels)[model_acts.indices].to(device=model_device)
         probes=None
         # print(f"{attn_activations.shape=}, {probe_accuracies.shape=}, {truth_indices.shape=}")
     elif use_probe:
