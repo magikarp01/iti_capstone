@@ -2,7 +2,7 @@ from transformers import AutoModelForCausalLM, AutoConfig, AutoTokenizer, LlamaF
 from transformer_lens import HookedTransformer, HookedTransformerConfig, FactoredMatrix, ActivationCache
 
 
-# sudo apt install git-lfs
+# apt install git-lfs
 # git lfs install
 
 # git clone https://huggingface.co/decapoda-research/llama-7b-hf
@@ -19,7 +19,7 @@ from transformer_lens import HookedTransformer, HookedTransformerConfig, Factore
 
 # pip install fschat
 
-# python -m fastchat.model.apply_delta \
+# python3 -m fastchat.model.apply_delta \
 #     --base-model-path llama-7b-hf \
 #     --target-model-path vicuna-7b-hf \
 #     --delta-path vicuna-7b-delta-v1.1

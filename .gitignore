@@ -9,3 +9,4 @@ convert_llama_weights_to_hf.py
 vicuna-7b-hf
 vicuna-7b-delta-v1.1
 llama-7b-hf
+myenv
