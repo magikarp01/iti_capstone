@@ -1,4 +1,3 @@
-# %%
 import os
 import torch
 from transformers import LlamaTokenizer, LlamaForCausalLM
@@ -79,21 +78,21 @@ def main(args, batch_enabled=False):
         output = output.squeeze()
         true_prob = output[true_ids].sum().item()
         false_prob = output[false_ids].sum().item()
-        guess = true_prob / (true_prob + false_prob)
+        #guess = true_prob / (true_prob + false_prob)
 
         #guess = guess.squeeze()
         #for rel_idx in range(start_idx, end_idx):
         #    buffer[start_idx + rel_idx] = guess[rel_idx]
         
-        buffer[idx] = (true_prob, false_prob, guess)
+        buffer[idx] = (true_prob, false_prob)#, guess)
 
         if idx % 1000 == 0:
             with open(f'output-{model_name}.csv', 'a', newline='') as f:
                 writer = csv.writer(f)
                 if f.tell() == 0:
-                    writer.writerow(['index', 'P(true)', 'P(false)', 'guess'])
+                    writer.writerow(['index', 'P(true)', 'P(false)']) #, 'guess'])
                 for index, data_point in buffer.items():
-                    writer.writerow([index, data_point[0], data_point[1], data_point[2]])
+                    writer.writerow([index, data_point[0], data_point[1]]) #, data_point[2]])
             buffer = {}
             gc.collect()
 
@@ -154,7 +153,6 @@ def diagnose(example_number):
     see_topk(output, tokenizer)
 
 
-# %%
 def see_topk(output_probs, tokenizer):
     topk = torch.topk(output_probs, 100)
     top_token_ids = list(topk[1].squeeze())
