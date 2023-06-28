@@ -108,7 +108,8 @@ def patch_arbitrary_heads(model, head_bools, old_activations, topk=20, alpha=20,
 
                 patch_activation_with_head = partial(patch_activation_hook_fn, head = head, term_to_add=term_to_add)
 
-                cache_interventions[layer, head] = term_to_add
+                if cache_interventions is not None:
+                    cache_interventions[layer, head] = term_to_add
 
                 if permanent:
                     model.add_perma_hook(utils.get_act_name("z", layer), patch_activation_with_head)
