@@ -3,19 +3,66 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
 
-"""
-A class for defining our own Dataset classes for probing and ITI. Code written by Kevin Wang and Phillip Guo.
-Datasets have many statements that are either true or false. They need a sample method that returns random
-indices of statements in the dataset, the tokenized statements, and labels.
-Their init method needs to define self.all_prompts (integer tokens) and self.all_labels.
-""" 
+
+
+def get_balanced_indices(indices, labels, sample_size):
+    pairs = list(zip(indices, labels))
+
+    # Split the pairs into two lists depending on the label
+    pairs_0 = [pair[0] for pair in pairs if pair[1] == 0]
+    pairs_1 = [pair[0] for pair in pairs if pair[1] == 1]
+
+    # Get the size of the smaller list
+    min_size = min(len(pairs_0), len(pairs_1))
+
+    assert sample_size//2 <= min_size
+
+    # Randomly select 'min_size' elements from each list
+    sampled_indices_0 = np.random.choice(len(pairs_0), sample_size//2, replace=False)
+    sampled_indices_1 = np.random.choice(len(pairs_1), sample_size//2, replace=False)
+
+    sampled_pairs_0 = [pairs_0[i] for i in sampled_indices_0]
+    sampled_pairs_1 = [pairs_1[i] for i in sampled_indices_1]
+
+    # Merge the lists and extract the indices
+    balanced_indices = np.concatenate((sampled_pairs_0, sampled_pairs_1))
+
+    np.random.shuffle(balanced_indices)
+    return balanced_indices
+
 
 class Abstract_Dataset:
+    """
+    A class for defining our own Dataset classes for probing and ITI. Code written by Kevin Wang and Phillip Guo.
+    Datasets have many statements that are either true or false. They need a sample method that returns random
+    indices of statements in the dataset, the tokenized statements, and labels.
+    Their init method needs to define self.all_prompts (integer tokens) and self.all_labels.
+    """ 
     def __init__(self, tokenizer, seed:int = 0):
         raise NotImplementedError
 
-    def sample(self, sample_size: int):
-        raise NotImplementedError
+    def sample(self, sample_size: int, reset_seed=False, balanced=True):
+        """
+        indices is of type numpy array
+        sample_prompts is of type List of Tensors
+        sample_labels is of type List of Ints
+        """
+        if reset_seed:
+            np.random.seed(self.seed)
+        
+        if balanced:
+            indices = get_balanced_indices(range(len(self.all_prompts)), self.all_labels, sample_size)
+        else:    
+            indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
+        
+        sample_prompts = []
+        sample_labels =[]
+        for i in indices:
+            sample_prompts.append(self.all_prompts[i])
+            sample_labels.append(self.all_labels[i])
+        return indices, sample_prompts, sample_labels
+
+
 
 def format_truthfulqa(question, choice):
     return f"Q: {question} A: {choice}"
@@ -42,7 +89,7 @@ def tokenized_tqa(dataset, tokenizer):
     
     return all_prompts, all_labels
 
-class TQA_MC_Dataset():
+class TQA_MC_Dataset(Abstract_Dataset):
     """
     Questions in format "Q: What is underneath the Denver Airport?\nA: The Denver Airport is underneath the city of Denver.
     """
@@ -336,7 +383,7 @@ class ChatGPTGen_Dataset():
         self.tokenizer = tokenizer
         self.seed = np.random.seed(seed)
 
-    def sample(self, sample_size: int, reset_seed = False):
+    def sample(self, sample_size: int, reset_seed = False, balanced=True):
         """
         indices is of type numpy array
         sample_prompts is of type List of Tensors
@@ -344,7 +391,12 @@ class ChatGPTGen_Dataset():
         """
         if reset_seed:
             np.random.seed(self.seed)
-        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
+        
+        if balanced:
+            indices = get_balanced_indices(range(len(self.all_prompts)), self.all_labels, sample_size)
+        else:    
+            indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
+        
         sample_prompts = []
         sample_labels =[]
         for i in indices:
@@ -364,7 +416,7 @@ class Elem_Dataset(ChatGPTGen_Dataset):
 
 class MisCons_Dataset(ChatGPTGen_Dataset):
     def __init__(self, *args, **kwargs):
-        self.dataset = load_dataset("notrichardren/misconceptions")["train"]
+        self.dataset = load_dataset("notrichardren/misconceptions_tf")["train"]
         super().__init__(*args, **kwargs)
 
 class Kinder_Dataset(ChatGPTGen_Dataset):

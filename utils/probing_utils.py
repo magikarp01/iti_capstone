@@ -90,7 +90,7 @@ class ModelActs:
                     stored_acts = cache.stack_head_results(layer=-1, pos_slice=-1).squeeze().to(device=storage_device)
                 
                 elif act_type == "logits":
-                    stored_acts = original_logits[:,-1] # logits of last token
+                    stored_acts = original_logits[:,-1].to(device=storage_device) # logits of last token
 
                 else:
                     stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
