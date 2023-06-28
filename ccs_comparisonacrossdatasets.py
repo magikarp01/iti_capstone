@@ -266,9 +266,11 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_
             except:
                 text2 = ""
             # the actual formatted input will be longer, so include a bit of a marign
-            if len(tokenizer(text + text1 + text2)) < 400: 
-                print("Skipped an example that was too long: " + text + text1 + text2)
+            if len(tokenizer(text + text1 + text2)) < 300: 
+                # print("Skipped an example that was too long: " + text + text1 + text2)
                 break
+
+        print("Number of tokens: " + len(tokenizer(text + text1 + text2)))
 
         for i, label in enumerate(label_dict.get(dataset_name)):
             if i != true_label:
@@ -445,7 +447,7 @@ class CCS(object):
 
 #%% 
 
-num_epochs = 6
+num_epochs = 20
 
 # 3D torch Tensor of results
 # 0th dimension: models
@@ -486,6 +488,8 @@ for i, model_name in enumerate(model_names):
 
             # Run a probe on neg and pos hidden states
             lr = LogisticRegression(class_weight="balanced")
+            print("Shape of x_train: ", x_train.shape)
+            print("Shape of y_train: ", y_train.shape)
             lr.fit(x_train, y_train)
             print("Logistic regression accuracy on transfer: {}".format(lr.score(x_test, y_test)))
             print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
@@ -503,6 +507,6 @@ for i, model_name in enumerate(model_names):
             probe_results[i, j, k] = lr.score(x_test, y_test)
 
     del model
-    del tokenizer_ctrl
+    del tokenizer
     torch.cuda.empty_cache()
 #%%

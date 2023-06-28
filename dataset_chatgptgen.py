@@ -224,3 +224,45 @@ dataset = load_dataset("notrichardren/hs_tf")
 
 
 # Easy generation idea: kindergarten, 1st, 3rd, 5th, 7th, 9th, 11th grade --> obvious, misconceptions, 
+
+#%%
+
+from datasets import load_dataset, DatasetInfo, DatasetDict
+from datasets import Dataset
+
+import pandas as pd
+import numpy as np
+
+dataset_list = ["kindergarten_tf", "elem_tf", "ms_tf", "hs_tf", "misconceptions_tf"]
+
+info = DatasetInfo(
+    description="Many truthfulness datasets, compiled",
+    citation="Ren 2023",
+    homepage="huggingface.com",
+    license="Apache-2.0",
+)
+
+def remove_nan(example):
+        # Check if the example in 'text' column is NaN
+        # If the example is NaN, return False so it gets removed
+        return not (isinstance(example['text'], float) and np.isnan(example['text']))
+
+for name in dataset_list:
+    dataset = load_dataset(f"notrichardren/{name}")
+    df = dataset["train"].to_pandas()
+    df = df.dropna(subset = ["Correct"])
+
+    info = DatasetInfo(
+    description="Many truthfulness datasets, compiled",
+    citation="Ren & Campbell, 2023",
+    homepage="huggingface.com",
+    license="Apache-2.0",
+    )
+
+    dataset = Dataset.from_pandas(df, info=info)
+    dataset_dict = DatasetDict({
+        'train': dataset
+    })
+
+    dataset.push_to_hub(f"notrichardren/{name}")
+# %%
