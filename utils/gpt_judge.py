@@ -64,18 +64,21 @@ import torch
 from utils.iti_utils import patch_iti
 from utils.dataset_utils import EZ_Dataset
 
-def get_iti_scores(model, dataset, alpha=10, topk=50, device=default_device, num_gens=50):
+def get_iti_scores(model, dataset, alpha=10, topk=50, device=default_device, num_gens=50, existing_acts=None, n_acts=1000):
     model.reset_hooks()
     # ez_data = EZ_Dataset(model.tokenizer, seed=0)
 
     gens = get_model_generations(model, dataset, num_gens)
     truth_score, info_score = get_judge_scores(gens)
 
-    n_acts=1000
-    acts = ModelActs(model, dataset)
-    acts.gen_acts(N=n_acts, id=f"gpt2xl_{n_acts}")
-    # ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
-    acts.train_probes("z",max_iter=1000)
+    if existing_acts is None:
+        acts = ModelActs(model, dataset)
+        acts.gen_acts(N=n_acts, id=f"gpt2xl_{n_acts}")
+        # ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
+        acts.train_probes("z",max_iter=1000)
+
+    else:
+        acts = existing_acts
 
     cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
     patch_iti(model, acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=alpha, topk=topk)
