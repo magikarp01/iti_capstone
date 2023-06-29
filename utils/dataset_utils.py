@@ -391,15 +391,6 @@ class BoolQ_Dataset(Abstract_Dataset):
         self.all_prompts = prompts
         self.all_labels = labels
 
-    def sample(self, sample_size: int):
-        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
-        sample_prompts = []
-        sample_labels =[]
-        for i in indices:
-            sample_prompts.append(self.all_prompts[i])
-            sample_labels.append(self.all_labels[i])
-        return indices, sample_prompts, sample_labels
-
 class BoolQ_Question_Dataset(Abstract_Dataset):
     """
     Dataset of questions, without the " true" or " false" at end of statement given. Tokenized.
@@ -422,14 +413,5 @@ class BoolQ_Question_Dataset(Abstract_Dataset):
 
         self.all_prompts = prompts
         self.all_labels = labels
-
-    def sample(self, sample_size: int):
-        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
-        sample_prompts = []
-        sample_labels =[]
-        for i in indices:
-            sample_prompts.append(self.all_prompts[i])
-            sample_labels.append(self.all_labels[i])
-        return indices, sample_prompts, sample_labels
 
 #%%
