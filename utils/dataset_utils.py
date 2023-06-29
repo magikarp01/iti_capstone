@@ -2,6 +2,7 @@ from datasets import load_dataset
 from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
+from datasets import Dataset
 
 
 
@@ -360,6 +361,75 @@ class Kinder_Dataset(ChatGPTGen_Dataset):
 class HS_Dataset(ChatGPTGen_Dataset):
     def __init__(self, *args, **kwargs):
         self.dataset = load_dataset("notrichardren/hs_tf")["train"]
+        super().__init__(*args, **kwargs)
+
+
+class ChatGPTGen_Dataset_Truthfulness(Abstract_Dataset):
+    def __init__(self, tokenizer, seed:int = 0, questions=False, custom_prompt=None):
+        """
+        If questions = True, then load dataset of prompts in the form "True or False: {str(prompt)}" without True or False at end. Else, load in normal "True or False: {str(prompt)} True/False" format.
+        """
+        # define self.dataset in child class
+        assert self.dataset is not None
+        if questions:
+            self.all_prompts, self.all_labels = TF_questions_helper(self.dataset['claim'], self.dataset['label'], tokenizer, custom_prompt)
+        else:
+            self.all_prompts, self.all_labels = TF_helper(self.dataset['claim'], self.dataset['label'], tokenizer)
+        self.tokenizer = tokenizer
+        self.seed = np.random.seed(seed)
+
+class TruthfulQA_Tfn(ChatGPTGen_Dataset_Truthfulness):
+    def __init__(self, *args, **kwargs):
+        string_list = ["TruthfulQA"]
+        dataset = load_dataset("notrichardren/truthfulness")["train"]
+        df = dataset.to_pandas()
+        df = df[df['origin_dataset'].isin(string_list)]
+        self.dataset = Dataset.from_pandas(df)
+        super().__init__(*args, **kwargs)
+
+class CounterFact_Tfn(ChatGPTGen_Dataset_Truthfulness):
+    def __init__(self, *args, **kwargs):
+        string_list = ["CounterFact"]
+        dataset = load_dataset("notrichardren/truthfulness")["train"]
+        df = dataset.to_pandas()
+        df = df[df['origin_dataset'].isin(string_list)]
+        self.dataset = Dataset.from_pandas(df)
+        super().__init__(*args, **kwargs)
+
+class Fever_Tfn(ChatGPTGen_Dataset_Truthfulness):
+    def __init__(self, *args, **kwargs):
+        string_list = ["fever_v1.0_labelleddev", "fever_v1.0_train","fever_v2.0"]
+        dataset = load_dataset("notrichardren/truthfulness")["train"]
+        df = dataset.to_pandas()
+        df = df[df['origin_dataset'].isin(string_list)]
+        self.dataset = Dataset.from_pandas(df)
+        super().__init__(*args, **kwargs)
+
+class BoolQ_Tfn(ChatGPTGen_Dataset_Truthfulness):
+    def __init__(self, *args, **kwargs):
+        string_list = ["boolq_train", "boolq_test"]
+        dataset = load_dataset("notrichardren/truthfulness")["train"]
+        df = dataset.to_pandas()
+        df = df[df['origin_dataset'].isin(string_list)]
+        self.dataset = Dataset.from_pandas(df)
+        super().__init__(*args, **kwargs)
+
+class Creak_Tfn(ChatGPTGen_Dataset_Truthfulness):
+    def __init__(self, *args, **kwargs):
+        string_list = ["creak_train", "creak_dev", "creak_contrast_set"]
+        dataset = load_dataset("notrichardren/truthfulness")["train"]
+        df = dataset.to_pandas()
+        df = df[df['origin_dataset'].isin(string_list)]
+        self.dataset = Dataset.from_pandas(df)
+        super().__init__(*args, **kwargs)
+
+class CommonClaim_Tfn(ChatGPTGen_Dataset_Truthfulness):
+    def __init__(self, *args, **kwargs):
+        string_list = ["CommonClaim"]
+        dataset = load_dataset("notrichardren/truthfulness")["train"]
+        df = dataset.to_pandas()
+        df = df[df['origin_dataset'].isin(string_list)]
+        self.dataset = Dataset.from_pandas(df)
         super().__init__(*args, **kwargs)
 
 
