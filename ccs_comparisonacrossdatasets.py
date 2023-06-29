@@ -11,7 +11,7 @@ from datasets import load_dataset, Dataset
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForMaskedLM, AutoModelForCausalLM
 from sklearn.linear_model import LogisticRegression
 
-device = "cuda:5"
+device = "cuda"
 
 
 #%% Load datasets
