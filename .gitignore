@@ -5,3 +5,6 @@ convert_llama_weights_to_hf.py
 /activations/*
 /.hypothesis
 __pycache__/
+vicuna-7b-hf
+llama-7b-hf
+vicuna-7b-delta-v1.1

@@ -240,7 +240,7 @@ class ModelActs:
         self.probe_accs["mlp_out"] = probe_accs
     '''
 
-    def train_probes(self, act_type, max_iter=1000):
+    def train_probes(self, act_type, max_iter=1000, test_ratio=0.2):
         """
         Train arbitrary probes on any act type's activations (must've been included in self.act_types).
         self.stored_acts[act_type] should be shape (num_examples, ..., d_probe), will be flattened in the middle
@@ -250,7 +250,7 @@ class ModelActs:
 
         assert len(formatted_acts.shape) == 3
 
-        X_train, X_test, y_train, y_test, indices_train, indices_test = self.get_train_test_split(formatted_acts)
+        X_train, X_test, y_train, y_test, indices_train, indices_test = self.get_train_test_split(formatted_acts, test_ratio=test_ratio)
         print(f"{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}")
 
         probes, probe_accs = self._train_probes(formatted_acts.shape[1], X_train, X_test, y_train, y_test, max_iter=max_iter)
