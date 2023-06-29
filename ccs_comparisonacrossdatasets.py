@@ -450,7 +450,7 @@ class CCS(object):
 
 #%% 
 
-num_epochs = 20
+num_epochs = 300
 
 # 3D torch Tensor of results
 # 0th dimension: models
@@ -513,3 +513,9 @@ for i, model_name in enumerate(model_names):
     del tokenizer
     torch.cuda.empty_cache()
 #%%
+
+# Save ccs_results tensor
+torch.save(ccs_results, 'ccs_results.pt')
+
+# Save probe_results tensor
+torch.save(probe_results, 'probe_results.pt')
