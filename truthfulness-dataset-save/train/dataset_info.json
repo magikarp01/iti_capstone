@@ -1,0 +1,45 @@
+{
+  "citation": "",
+  "dataset_size": 28401683,
+  "description": "",
+  "download_checksums": {
+    "https://huggingface.co/datasets/notrichardren/truthfulness/resolve/788a0ab6a53fba30c91e94e61a6f76eb9ffdeab4/data/train-00000-of-00001-c21e19a97a624467.parquet": {
+      "num_bytes": 12096265,
+      "checksum": null
+    }
+  },
+  "download_size": 12096265,
+  "features": {
+    "claim": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "label": {
+      "dtype": "int64",
+      "_type": "Value"
+    },
+    "explanation": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "common_knowledge_label": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "origin_dataset": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 40497948,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 28401683,
+      "num_examples": 210326,
+      "dataset_name": "parquet"
+    }
+  }
+}

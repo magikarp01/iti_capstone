@@ -11,6 +11,8 @@ from datasets import load_dataset, Dataset
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForMaskedLM, AutoModelForCausalLM
 from sklearn.linear_model import LogisticRegression
 
+device = "cuda:1"
+
 
 #%% Load datasets
 
@@ -146,24 +148,24 @@ def load_model(model_name):
     if model_name == "deberta":
         full_model_name = "microsoft/deberta-v2-xxlarge"
         model, model_type, tokenizer = load_model_helper(full_model_name)
-        model.cuda()
+        model.to(device)
     elif model_name == "gpt-j":
         full_model_name = "EleutherAI/gpt-j-6B"
         model, model_type, tokenizer = load_model_helper(full_model_name)
-        model.cuda()
+        model.to(device)
     elif model_name == "t5":
         full_model_name = "t5-11b"
         model, model_type, tokenizer = load_model_helper(full_model_name)
-        model.cuda()
+        model.to(device)
         # model.parallelize()  # T5 is big enough that we may need to run it on multiple GPUs
     elif model_name == "unifiedqa":
         full_model_name = "allenai/unifiedqa-t5-11b"
         model, model_type, tokenizer = load_model_helper(full_model_name)
-        model.cuda()
+        model.to(device)
     elif model_name == "T0pp":
         full_model_name = "bigscience/T0pp"
         model, model_type, tokenizer = load_model_helper(full_model_name)
-        model.cuda()
+        model.to(device)
     else:
         print(f"Not implemented! {model_name}")        
 
@@ -313,7 +315,7 @@ class MLPProbe(nn.Module):
 
 class CCS(object):
     def __init__(self, x0, x1, y, nepochs=1000, ntries=10, lr=1e-3, batch_size=-1, 
-                 verbose=False, device="cuda", linear=True, weight_decay=0.01, var_normalize=False):
+                 verbose=False, device=device, linear=True, weight_decay=0.01, var_normalize=False):
         # data
         self.var_normalize = var_normalize
         self.x0 = self.normalize(x0)

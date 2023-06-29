@@ -158,13 +158,13 @@ for i in tqdm(range(len(bqtrain))):
     answer = row['answer']
     passage = row['passage']
     
-    if label == "SUPPORTS":
+    if answer == True:
         claims.append(claim)
         labels.append(1)
         explanation.append(passage)
         common_knowledge_label.append(None)
         dataset.append("boolq_train")
-    elif label == "REFUTES":
+    elif answer == False:
         claims.append(claim)
         labels.append(0)
         explanation.append(passage)
@@ -181,13 +181,13 @@ for i in tqdm(range(len(bqtest))):
     answer = row['answer']
     passage = row['passage']
     
-    if label == "SUPPORTS":
+    if answer == True:
         claims.append(claim)
         labels.append(1)
         explanation.append(passage)
         common_knowledge_label.append(None)
         dataset.append("boolq_test")
-    elif label == "REFUTES":
+    elif answer == False:
         claims.append(claim)
         labels.append(0)
         explanation.append(passage)
@@ -199,7 +199,7 @@ for i in tqdm(range(len(bqtest))):
 # Format CREAK
 for file in ['train.json', 'dev.json', 'contrast_set.json']:
     # Open the file
-    with jsonlines.open(f'creak/{file}') as reader:
+    with jsonlines.open(f'other-datasets/creak/{file}') as reader:
         # Go through each row
         for obj in reader:
             # Append the data to the lists
@@ -213,9 +213,9 @@ for file in ['train.json', 'dev.json', 'contrast_set.json']:
             dataset.append("creak_" + file.split('.')[0])
 
 # Format Common Claim
-df = pd.read_csv('common_claim.csv')  # replace 'file.csv' with the path to your CSV file
+df = pd.read_csv('other-datasets/common_claim.csv')  # replace 'file.csv' with the path to your CSV file
 claims.extend(df['examples'].tolist())
-label_cc_list = [1 if label == True else 0 for label in df['label'].tolist()]
+label_cc_list = [1 if label == "True" else 0 for label in df['label'].tolist()]
 labels.extend(label_cc_list)
 explanation.extend([None] * len(df))
 dataset.extend(["CommonClaim"] * len(df))
@@ -242,8 +242,56 @@ dataset_dict = DatasetDict({
 dataset.push_to_hub("notrichardren/truthfulness")
 # # %%
 
+#%% Sanity check
 from datasets import load_from_disk, load_dataset
+dataset = load_dataset("notrichardren/truthfulness")["train"]
+df = dataset.to_pandas()
+string_list = ["TruthfulQA"]
+df = df[df['origin_dataset'].isin(string_list)]
+counts = df['label'].value_counts()
+print(counts)
 
-# dataset = load_from_disk('truthfulness')
-dataset = load_dataset("notrichardren/truthfulness")
-# #
+dataset = load_dataset("notrichardren/truthfulness")["train"]
+df = dataset.to_pandas()
+string_list = ["CounterFact"]
+df = df[df['origin_dataset'].isin(string_list)]
+counts = df['label'].value_counts()
+print(counts)
+
+dataset = load_dataset("notrichardren/truthfulness")["train"]
+df = dataset.to_pandas()
+string_list = ["fever_v1.0_labelleddev", "fever_v1.0_train","fever_v2.0"]
+df = df[df['origin_dataset'].isin(string_list)]
+counts = df['label'].value_counts()
+print(counts)
+
+dataset = load_dataset("notrichardren/truthfulness")["train"]
+df = dataset.to_pandas()
+string_list = ["boolq_train", "boolq_test"]
+df = df[df['origin_dataset'].isin(string_list)]
+counts = df['label'].value_counts()
+print(counts)
+
+dataset = load_dataset("notrichardren/truthfulness")["train"]
+df = dataset.to_pandas()
+string_list = ["creak_train", "creak_dev", "creak_contrast_set"]
+df = df[df['origin_dataset'].isin(string_list)]
+counts = df['label'].value_counts()
+print(counts)
+
+dataset = load_dataset("notrichardren/truthfulness")["train"]
+df = dataset.to_pandas()
+string_list = ["CommonClaim"]
+df = df[df['origin_dataset'].isin(string_list)]
+counts = df['label'].value_counts()
+print(counts)
+
+#%%
+# from datasets import load_from_disk, load_dataset
+
+# # dataset = load_from_disk('truthfulness')
+# dataset = load_dataset("notrichardren/truthfulness")
+# dataset.save_to_disk("./truthfulness")
+# # #
+
+# %%
