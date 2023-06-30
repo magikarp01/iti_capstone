@@ -110,11 +110,12 @@ class ModelActs:
 
         # return self.indices, self.attn_head_acts
 
-    """
-    Loads activations from activations folder. If id is None, then load the most recent activations. 
-    If load_probes is True, load from saved probes.picle and all_heads_acc_np.npy files as well.
-    """
+
     def load_acts(self, id, filepath = "activations/", load_probes=False):
+        """
+        Loads activations from activations folder. If id is None, then load the most recent activations. 
+        If load_probes is True, load from saved probes.picle and all_heads_acc_np.npy files as well.
+        """
         indices = torch.load(f'{filepath}{id}_indices.pt')
 
         self.stored_acts = {}
@@ -298,3 +299,97 @@ class ModelActs:
             for h in range(self.model.cfg.n_heads):
                 if top_probe_heads[l, h] == 1:
                     print(f"{l}.{h}, ", end=" ")
+
+
+
+
+
+
+
+class ModelActsLarge(ModelActs):
+    def __init__(self, model=None, dataset, seed = None, act_types = ["z"]):
+
+        self.model = model
+        # self.model.cfg.total_heads = self.model.cfg.n_heads * self.model.cfg.n_layers
+        self.dataset = dataset
+
+        self.attn_head_acts = None
+        self.indices = None
+
+        self.act_types=act_types
+
+        if seed is not None:
+            np.random.seed(seed)
+            torch.manual_seed(seed)
+
+        self.probes = {}
+        self.probe_accs = {}
+        self.X_tests = {}
+        self.y_tests = {}
+
+
+    def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu"):
+        
+        if indices is None:
+            indices, all_prompts, all_labels = self.dataset.sample(N)
+        
+        cached_acts = defaultdict(list)
+
+        # names filter for efficiency, only cache in self.act_types
+        names_filter = lambda name: any([name.endswith(act_type) for act_type in self.act_types])
+
+        for i in tqdm(indices):
+            original_logits, cache = self.model.run_with_cache(self.dataset.all_prompts[i].to(self.model.cfg.device), names_filter=names_filter) # only cache z
+            
+            # store every act type in self.act_types
+            for act_type in self.act_types:
+
+                if act_type == "result":
+                    # get last seq position
+                    stored_acts = cache.stack_head_results(layer=-1, pos_slice=-1).squeeze().to(device=storage_device)
+                
+                else:
+                    stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
+                cached_acts[act_type].append(stored_acts)
+        
+        # convert lists of tensors into tensors
+        stored_acts = {act_type: torch.stack(cached_acts[act_type]) for act_type in self.act_types} 
+
+        self.stored_acts = stored_acts
+        self.indices = indices
+        
+        if store_acts:
+            if id is None:
+                id = np.random.randint(10000)
+            torch.save(self.indices, f'{filepath}{id}_indices.pt')
+            for act_type in self.act_types:
+                torch.save(self.stored_acts[act_type], f'{filepath}{id}_{act_type}_acts.pt')
+            print(f"Stored at {id}")
+
+
+
+    def load_acts(self, id, filepath = "activations/", load_probes=False):
+        """
+        Loads activations from activations folder. If id is None, then load the most recent activations. 
+        If load_probes is True, load from saved probes.picle and all_heads_acc_np.npy files as well.
+        """
+        indices = torch.load(f'{filepath}{id}_indices.pt')
+
+        self.stored_acts = {}
+        for act_type in self.act_types:
+            self.stored_acts[act_type] = torch.load(f'{filepath}{id}_{act_type}_acts.pt')
+        
+        self.indices = indices
+
+        if load_probes:
+            print("load_probes deprecated for now, please change to False")
+            with open(f'{filepath}{id}_probes.pickle', 'rb') as handle:
+                self.probes = pickle.load(handle)
+            self.all_head_accs_np = np.load(f'{filepath}{id}_all_head_accs_np.npy')
+
+        else:
+            self.probes = {}
+            # self.all_head_accs_np = None
+            self.probe_accs = {}
+
+        # return indices, attn_head_acts
