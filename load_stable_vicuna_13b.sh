@@ -1,4 +1,5 @@
 #!/bin/sh
+sudo apt install git-lfs
 git lfs install
 
 git clone https://huggingface.co/decapoda-research/llama-13b-hf
@@ -18,4 +19,3 @@ python stable-vicuna-13b-delta/apply_delta.py \
     --base llama-13b-hf \
     --target stable-vicuna-13b \
     --delta stable-vicuna-13b-delta
-
