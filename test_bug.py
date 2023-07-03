@@ -16,20 +16,11 @@ models_downloaded = False # set to True if you have already downloaded the model
 
 #%% Load datasets
 
-dataset_names = [("imdb",), ("amazon_polarity",), ("ag_news",), ("dbpedia_14",), ("super_glue", "copa"),
-                 ("super_glue", "rte"), ("boolq",), ("glue", "qnli"), ("piqa",), ("chenxwh/gen-storycloze",)]
-dataset_names_singular = ["imdb", "amazon_polarity", "ag_news", "dbpedia_14", "copa", "rte", "boolq", "qnli", "piqa", "story-cloze"]
+dataset_names = [("amazon_polarity",), ("super_glue", "copa")]
+dataset_names_singular = ["amazon_polarity", "copa"]
 label_dict = {
-    "imdb": ["negative", "positive"], # This is for normal IMDB
     "amazon_polarity": ["negative", "positive"],
-    "ag_news": ["politics", "sports", "business", "technology"],
-    "dbpedia_14": ["company", "educational institution", "artist", "athlete", "office holder", "mean of transportation", "building", "natural place", "village", "animal",  "plant",  "album",  "film",  "written work"],
     "copa": ["choice 1", "choice 2"],
-    "rte": ["yes", "no"],   # whether entail
-    "boolq": ["false", "true"],
-    "qnli": ["yes", "no"],  # represent whether entail
-    "piqa": ["solution 1", "solution 2"],
-    "story-cloze": ["choice 1", "choice 2"],
 }
 datasets = {}
 
@@ -44,27 +35,6 @@ for i, dataset_tuple in enumerate(dataset_names):
         dataset = dataset.rename_column('choice1', 'text1')
         dataset = dataset.rename_column('choice2', 'text2')
         dataset = dataset.rename_column('premise', 'text')
-    elif dataset_names_singular[i] == "rte":
-        dataset = dataset.rename_column('premise', 'text')
-        dataset = dataset.rename_column('hypothesis', 'text1')
-    elif dataset_names_singular[i] == "boolq":
-        dataset = dataset.rename_column('question', 'text1')
-        dataset = dataset.rename_column('passage', 'text')
-        dataset = dataset.rename_column('answer', 'label')
-        dataset = dataset.to_pandas()
-        dataset['label'] = dataset['label'].astype(int)
-        dataset = Dataset.from_pandas(dataset)
-    elif dataset_names_singular[i] == "qnli":
-        dataset = dataset.rename_column('question', 'text')
-        dataset = dataset.rename_column('sentence', 'text1')
-    elif dataset_names_singular[i] == "piqa":
-        dataset = dataset.rename_column('goal', 'text')
-        dataset = dataset.rename_column('sol1', 'text1')
-        dataset = dataset.rename_column('sol2', 'text2')
-    elif dataset_names_singular[i] == "story-cloze":
-        dataset = dataset.rename_column('context', 'text')
-        dataset = dataset.rename_column('sentence_quiz1', 'text1')
-        dataset = dataset.rename_column('sentence_quiz2', 'text2')
 
     # add dataset_names_Singular as key and dataset as value to datasets
     datasets.update({dataset_names_singular[i]: dataset})
@@ -75,8 +45,6 @@ for i, dataset_tuple in enumerate(dataset_names):
 
     # all_prompts = DatasetTemplates(dataset_name)
     # print(all_prompts)
-
-
 
 #%%
 def format_prompt(label, text, text1, text2, dataset_name = "imdb"):
@@ -410,9 +378,10 @@ def train_test_one(dataset_name_train, dataset_name_test, num_epochs=350):
     print("loaded data")
 
     # if dataset_name_train != dataset_name_test:
-    neg_hs_train, pos_hs_train, y_train, _ = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs)
+    neg_hs_train, pos_hs_train, y_train, _ = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, [])
     print("got train hidden state")
-    neg_hs_test, pos_hs_test, y_test, _ = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs)
+    used_idxs = []
+    neg_hs_test, pos_hs_test, y_test, _ = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs, [])
     print("got test hidden state")
     # else:
     #     neg_hs, pos_hs, y = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs*2)
