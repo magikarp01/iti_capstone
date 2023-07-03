@@ -1,0 +1,744 @@
+Loaded dataset: imdb
+Dataset({
+    features: ['text', 'label'],
+    num_rows: 25000
+})
+Loaded dataset: amazon_polarity
+Dataset({
+    features: ['label', 'title', 'content', 'text'],
+    num_rows: 3600000
+})
+Loaded dataset: ag_news
+Dataset({
+    features: ['text', 'label'],
+    num_rows: 120000
+})
+Loaded dataset: dbpedia_14
+Dataset({
+    features: ['label', 'title', 'content', 'text'],
+    num_rows: 560000
+})
+Loaded dataset: super_glue/copa
+Dataset({
+    features: ['text', 'text1', 'text2', 'question', 'idx', 'label'],
+    num_rows: 400
+})
+Loaded dataset: super_glue/rte
+Dataset({
+    features: ['text', 'text1', 'idx', 'label'],
+    num_rows: 2490
+})
+Loaded dataset: boolq
+Dataset({
+    features: ['text1', 'label', 'text'],
+    num_rows: 9427
+})
+Loaded dataset: glue/qnli
+Dataset({
+    features: ['text', 'text1', 'label', 'idx'],
+    num_rows: 104743
+})
+Loaded dataset: piqa
+Dataset({
+    features: ['text', 'text1', 'text2', 'label'],
+    num_rows: 16113
+})
+Loaded dataset: chenxwh/gen-storycloze
+Dataset({
+    features: ['story_id', 'input_sentence_1', 'input_sentence_2', 'input_sentence_3', 'input_sentence_4', 'text', 'text1', 'text2', 'answer_right_ending', 'text_right_ending', 'text_wrong_ending', 'label'],
+    num_rows: 1785
+})
+Models loaded successfully!
+ **** Loaded model:  deberta
+ *** Training on  imdb  and testing on  imdb
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression failed
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.5
+ *** Training on  imdb  and testing on  amazon_polarity
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.5
+CCS accuracy on own: 0.0
+ *** Training on  imdb  and testing on  ag_news
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.16666666666666666
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.16666666666666663
+CCS accuracy on own: 1.0
+ *** Training on  imdb  and testing on  dbpedia_14
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.5
+CCS accuracy on own: 1.0
+ *** Training on  imdb  and testing on  copa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  imdb  and testing on  rte
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  imdb  and testing on  boolq
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  imdb  and testing on  qnli
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  imdb  and testing on  piqa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  imdb  and testing on  story-cloze
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  amazon_polarity  and testing on  imdb
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  amazon_polarity  and testing on  amazon_polarity
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression failed
+CCS accuracy on transfer: 0.5
+CCS accuracy on own: 0.5
+ *** Training on  amazon_polarity  and testing on  ag_news
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.8333333333333334
+CCS accuracy on own: 0.0
+ *** Training on  amazon_polarity  and testing on  dbpedia_14
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.8846153846153846
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.11538461538461539
+CCS accuracy on own: 0.0
+ *** Training on  amazon_polarity  and testing on  copa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  amazon_polarity  and testing on  rte
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  amazon_polarity  and testing on  boolq
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  amazon_polarity  and testing on  qnli
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  amazon_polarity  and testing on  piqa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  amazon_polarity  and testing on  story-cloze
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  ag_news  and testing on  imdb
+Shape of x_train:  (6, 1536)
+Shape of y_train:  (6,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  ag_news  and testing on  amazon_polarity
+Shape of x_train:  (6, 1536)
+Shape of y_train:  (6,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  ag_news  and testing on  ag_news
+Shape of x_train:  (6, 1536)
+Shape of y_train:  (6,)
+Logistic regression failed
+CCS accuracy on transfer: 0.3333333333333333
+CCS accuracy on own: 0.5
+ *** Training on  ag_news  and testing on  dbpedia_14
+Shape of x_train:  (6, 1536)
+Shape of y_train:  (6,)
+Logistic regression accuracy on transfer: 0.15384615384615385
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.15384615384615385
+CCS accuracy on own: 1.0
+ *** Training on  ag_news  and testing on  copa
+Shape of x_train:  (6, 1536)
+Shape of y_train:  (6,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  ag_news  and testing on  rte
+Shape of x_train:  (6, 1536)
+Shape of y_train:  (6,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  ag_news  and testing on  boolq
+Shape of x_train:  (6, 1536)
+Shape of y_train:  (6,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  ag_news  and testing on  qnli
+Shape of x_train:  (6, 1536)
+Shape of y_train:  (6,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  ag_news  and testing on  piqa
+Shape of x_train:  (6, 1536)
+Shape of y_train:  (6,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  ag_news  and testing on  story-cloze
+Shape of x_train:  (6, 1536)
+Shape of y_train:  (6,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  dbpedia_14  and testing on  imdb
+Shape of x_train:  (26, 1536)
+Shape of y_train:  (26,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  dbpedia_14  and testing on  amazon_polarity
+Shape of x_train:  (26, 1536)
+Shape of y_train:  (26,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  dbpedia_14  and testing on  ag_news
+Shape of x_train:  (26, 1536)
+Shape of y_train:  (26,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  dbpedia_14  and testing on  dbpedia_14
+Shape of x_train:  (26, 1536)
+Shape of y_train:  (26,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.7307692307692308
+CCS accuracy on own: 0.0
+ *** Training on  dbpedia_14  and testing on  copa
+Shape of x_train:  (26, 1536)
+Shape of y_train:  (26,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  dbpedia_14  and testing on  rte
+Shape of x_train:  (26, 1536)
+Shape of y_train:  (26,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  dbpedia_14  and testing on  boolq
+Shape of x_train:  (26, 1536)
+Shape of y_train:  (26,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  dbpedia_14  and testing on  qnli
+Shape of x_train:  (26, 1536)
+Shape of y_train:  (26,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  dbpedia_14  and testing on  piqa
+Shape of x_train:  (26, 1536)
+Shape of y_train:  (26,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  dbpedia_14  and testing on  story-cloze
+Shape of x_train:  (26, 1536)
+Shape of y_train:  (26,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  copa  and testing on  imdb
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  copa  and testing on  amazon_polarity
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  copa  and testing on  ag_news
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.8333333333333334
+CCS accuracy on own: 0.0
+ *** Training on  copa  and testing on  dbpedia_14
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.6538461538461539
+CCS accuracy on own: 0.0
+ *** Training on  copa  and testing on  copa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression failed
+CCS accuracy on transfer: 0.5
+CCS accuracy on own: 0.5
+ *** Training on  copa  and testing on  rte
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  copa  and testing on  boolq
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  copa  and testing on  qnli
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  copa  and testing on  piqa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  copa  and testing on  story-cloze
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  rte  and testing on  imdb
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  rte  and testing on  amazon_polarity
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  rte  and testing on  ag_news
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.8333333333333334
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.3333333333333333
+CCS accuracy on own: 0.0
+ *** Training on  rte  and testing on  dbpedia_14
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.8076923076923077
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.8076923076923077
+CCS accuracy on own: 1.0
+ *** Training on  rte  and testing on  copa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  rte  and testing on  rte
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression failed
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.5
+ *** Training on  rte  and testing on  boolq
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  rte  and testing on  qnli
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  rte  and testing on  piqa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  rte  and testing on  story-cloze
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  boolq  and testing on  imdb
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  boolq  and testing on  amazon_polarity
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  boolq  and testing on  ag_news
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  boolq  and testing on  dbpedia_14
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.4230769230769231
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.4230769230769231
+CCS accuracy on own: 1.0
+ *** Training on  boolq  and testing on  copa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  boolq  and testing on  rte
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  boolq  and testing on  boolq
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression failed
+CCS accuracy on transfer: 0.5
+CCS accuracy on own: 0.5
+ *** Training on  boolq  and testing on  qnli
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  boolq  and testing on  piqa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  boolq  and testing on  story-cloze
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  qnli  and testing on  imdb
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  qnli  and testing on  amazon_polarity
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  qnli  and testing on  ag_news
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.3333333333333333
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.33333333333333337
+CCS accuracy on own: 1.0
+ *** Training on  qnli  and testing on  dbpedia_14
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.42307692307692313
+CCS accuracy on own: 1.0
+ *** Training on  qnli  and testing on  copa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  qnli  and testing on  rte
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  qnli  and testing on  boolq
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  qnli  and testing on  qnli
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  qnli  and testing on  piqa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  qnli  and testing on  story-cloze
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  piqa  and testing on  imdb
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  piqa  and testing on  amazon_polarity
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  piqa  and testing on  ag_news
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.33333333333333337
+CCS accuracy on own: 1.0
+ *** Training on  piqa  and testing on  dbpedia_14
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5769230769230769
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.5769230769230769
+CCS accuracy on own: 1.0
+ *** Training on  piqa  and testing on  copa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  piqa  and testing on  rte
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  piqa  and testing on  boolq
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  piqa  and testing on  qnli
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  piqa  and testing on  piqa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression failed
+CCS accuracy on transfer: 0.5
+CCS accuracy on own: 0.5
+ *** Training on  piqa  and testing on  story-cloze
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  story-cloze  and testing on  imdb
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  story-cloze  and testing on  amazon_polarity
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  story-cloze  and testing on  ag_news
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.6666666666666666
+CCS accuracy on own: 0.0
+ *** Training on  story-cloze  and testing on  dbpedia_14
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.5384615384615384
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.11538461538461542
+CCS accuracy on own: 0.0
+ *** Training on  story-cloze  and testing on  copa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 1.0
+ *** Training on  story-cloze  and testing on  rte
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  story-cloze  and testing on  boolq
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 1.0
+ *** Training on  story-cloze  and testing on  qnli
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 0.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.0
+ *** Training on  story-cloze  and testing on  piqa
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.0
+ *** Training on  story-cloze  and testing on  story-cloze
+Shape of x_train:  (2, 1536)
+Shape of y_train:  (2,)
+Logistic regression failed
+CCS accuracy on transfer: 0.5
+CCS accuracy on own: 0.5
