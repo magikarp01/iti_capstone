@@ -1,3 +1,4 @@
+import os
 from einops import repeat
 from sklearn.linear_model import LogisticRegression
 
@@ -30,6 +31,9 @@ from transformer_lens.hook_points import (
 from transformer_lens import HookedTransformer, HookedTransformerConfig, FactoredMatrix, ActivationCache
 import pickle
 from collections import defaultdict
+
+from utils.torch_hooks_utils import HookedModule
+from functools import partial
 
 # from iti import patch_top_activations
 from typing import TypeVar
@@ -66,12 +70,11 @@ class ModelActs:
         self.X_tests = {}
         self.y_tests = {}
 
-    """
-    Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
-    Refactored so that activations are not reshaped by default, and will be reshaped at some other time.
-    """
     def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu"):
-        
+        """
+        Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
+        Refactored so that activations are not reshaped by default, and will be reshaped at some other time.
+        """
         if indices is None:
             indices, all_prompts, all_labels = self.dataset.sample(N)
         
@@ -303,93 +306,78 @@ class ModelActs:
 
 
 
+class AWSUtils:
+    def __init__(self, ):
+        raise NotImplementedError
+    
 
 
 
-class ModelActsLarge(ModelActs):
-    def __init__(self, model=None, dataset, seed = None, act_types = ["z"]):
 
+class ModelActsLarge: #separate class for now, can make into subclass later (need to standardize input and output, and manage memory effectively)
+    def __init__(self, model, dataset, use_aws=True, seed = None, act_types = ["z"], load_model=True):
         self.model = model
-        # self.model.cfg.total_heads = self.model.cfg.n_heads * self.model.cfg.n_layers
         self.dataset = dataset
+        self.use_aws = use_aws #save data to disk first, then send it all to AWS
+        self.world_size = 1
+        self.act_types = act_types #only support z for now
 
-        self.attn_head_acts = None
-        self.indices = None
+        self.activation_buffer = torch.zeros((self.model.num_hidden_layers, self.model.hidden_size))
 
-        self.act_types=act_types
-
-        if seed is not None:
-            np.random.seed(seed)
-            torch.manual_seed(seed)
-
-        self.probes = {}
-        self.probe_accs = {}
-        self.X_tests = {}
-        self.y_tests = {}
-
-
+    def cache_z_hook_fnc(self, module, input, output, name="", layer_num=0):
+        self.activation_buffer[layer_num, :] = input[0][0,-1,:].detach().clone()
+    
     def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu"):
+        self.model.eval()
+        hmodel = HookedModule(self.model)
+        loader = DataLoader(self.dataset, batch_size=1, shuffle=False) #find dataloader optimizations
+        save_path = f"~/iti_capstone/{filepath}"
+        if not os.path.exists(save_path):
+            os.system(f"mkdir {save_path}")
         
-        if indices is None:
-            indices, all_prompts, all_labels = self.dataset.sample(N)
+        hook_pairs = []
+        if "z" in self.act_types:
+            for layer in range(self.model.config.num_hidden_layers):
+                act_name = f"model.layers.{layer}.self_attn.o_proj"
+                hook_pairs.append((act_name, partial(self.cache_z_hook_fnc, name=act_name, layer_num=layer)))
         
-        cached_acts = defaultdict(list)
+        for idx, batch in tqdm(enumerate(loader)):
+            token_ids = batch[0].to(self.model.device)
+            with hmodel.hooks(fwd=hook_pairs):
+                output = hmodel(token_ids)
+            torch.save(self.activation_buffer, f"{save_path}")
 
-        # names filter for efficiency, only cache in self.act_types
-        names_filter = lambda name: any([name.endswith(act_type) for act_type in self.act_types])
 
-        for i in tqdm(indices):
-            original_logits, cache = self.model.run_with_cache(self.dataset.all_prompts[i].to(self.model.cfg.device), names_filter=names_filter) # only cache z
-            
-            # store every act type in self.act_types
-            for act_type in self.act_types:
-
-                if act_type == "result":
-                    # get last seq position
-                    stored_acts = cache.stack_head_results(layer=-1, pos_slice=-1).squeeze().to(device=storage_device)
-                
-                else:
-                    stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
-                cached_acts[act_type].append(stored_acts)
-        
-        # convert lists of tensors into tensors
-        stored_acts = {act_type: torch.stack(cached_acts[act_type]) for act_type in self.act_types} 
-
-        self.stored_acts = stored_acts
-        self.indices = indices
-        
-        if store_acts:
-            if id is None:
-                id = np.random.randint(10000)
-            torch.save(self.indices, f'{filepath}{id}_indices.pt')
-            for act_type in self.act_types:
-                torch.save(self.stored_acts[act_type], f'{filepath}{id}_{act_type}_acts.pt')
-            print(f"Stored at {id}")
 
 
 
     def load_acts(self, id, filepath = "activations/", load_probes=False):
-        """
-        Loads activations from activations folder. If id is None, then load the most recent activations. 
-        If load_probes is True, load from saved probes.picle and all_heads_acc_np.npy files as well.
-        """
-        indices = torch.load(f'{filepath}{id}_indices.pt')
+        raise NotImplementedError
+    
+    def control_for_iti(self, cache_interventions):
+        raise NotImplementedError
+    
+    def get_train_test_split(self, X_acts, test_ratio = 0.2, N = None):
+        raise NotImplementedError
+    
+    def _train_probes(self, num_probes, X_train, X_test, y_train, y_test, max_iter=1000):
+        raise NotImplementedError
+    
+    def train_z_probes(self, max_iter=1000):
+        raise NotImplementedError
+    
+    def train_mlp_out_probes(self, max_iter=1000):
+        raise NotImplementedError
+    
+    def train_probes(self, act_type, max_iter=1000):
+        raise NotImplementedError
+    
+    def save_probes(self, id, filepath = "activations/"):
+        raise NotImplementedError
+    
+    def get_transfer_acc(self, act_type, data_source: ModelActs):
+        raise NotImplementedError
+    
+    def show_top_z_probes(self, topk=50):
+        raise NotImplementedError
 
-        self.stored_acts = {}
-        for act_type in self.act_types:
-            self.stored_acts[act_type] = torch.load(f'{filepath}{id}_{act_type}_acts.pt')
-        
-        self.indices = indices
-
-        if load_probes:
-            print("load_probes deprecated for now, please change to False")
-            with open(f'{filepath}{id}_probes.pickle', 'rb') as handle:
-                self.probes = pickle.load(handle)
-            self.all_head_accs_np = np.load(f'{filepath}{id}_all_head_accs_np.npy')
-
-        else:
-            self.probes = {}
-            # self.all_head_accs_np = None
-            self.probe_accs = {}
-
-        # return indices, attn_head_acts

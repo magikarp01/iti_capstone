@@ -4,17 +4,37 @@ from datasets import load_dataset
 from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
+from torch.utils.data import Dataset
 
 #%%
 
-"""
-A class for defining our own Dataset classes for probing and ITI. Code written by Kevin Wang and Phillip Guo.
-Datasets have many statements that are either true or false. They need a sample method that returns random
-indices of statements in the dataset, the tokenized statements, and labels.
-Their init method needs to define self.all_prompts (integer tokens) and self.all_labels.
-""" 
+
+
+class TorchDataset(Dataset):
+    """
+    Wraps Abstract_Dataset objects with pytorch dataset abstractions. Increases usability for those familiar with PyTorch Dataset classes. Currently only works with tqa, cfact, & ez.
+    """
+    def __init__(self, dataname, tokenizer, seed=5):
+        if dataname=="tqa":
+            self.dataset = TQA_MC_Dataset(tokenizer, seed=seed)
+        elif dataname=="cfact":
+            self.dataset = CounterFact_Dataset(tokenizer, seed=seed)
+        elif dataname=="ez":
+            self.dataset = EZ_Dataset(tokenizer, seed=seed)
+    
+    def __getitem__(self, idx):
+        return self.dataset.all_prompts[idx], self.dataset.all_labels[idx]
+    
+    def __len__(self):
+        return len(self.dataset.all_prompts)
 
 class Abstract_Dataset:
+    """
+    A class for defining our own Dataset classes for probing and ITI. Code written by Kevin Wang and Phillip Guo.
+    Datasets have many statements that are either true or false. They need a sample method that returns random
+    indices of statements in the dataset, the tokenized statements, and labels.
+    Their init method needs to define self.all_prompts (integer tokens) and self.all_labels.
+    """ 
     def __init__(self, tokenizer, seed:int = 0):
         raise NotImplementedError
 
