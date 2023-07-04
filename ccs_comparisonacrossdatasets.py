@@ -541,213 +541,101 @@ class CCS(object):
 
 #%% 
 
-# num_epochs = 350
+num_epochs = 350
 
-# model_names = ["deberta"]
-# # model_names = ["deberta", "gpt-j", "t5", "unifiedqa", "T0pp"]
+model_names = ["deberta", "gpt-j"]
+# model_names = ["deberta", "gpt-j", "t5", "unifiedqa", "T0pp"]
 
-# # 3D torch Tensor of results
-# # 0th dimension: models
-# # 1st dimension: train datasets
-# # 2nd dimension: test datasets
-# ccs_train = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
-# probe_train = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
-# ccs_test = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
-# probe_test = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
+# 3D torch Tensor of results
+# 0th dimension: models
+# 1st dimension: train datasets
+# 2nd dimension: test datasets
+ccs_train = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
+probe_train = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
+ccs_test = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
+probe_test = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
 
-# for i, model_name in enumerate(model_names):
-#     model, model_type, tokenizer = load_model(model_name)
-#     print(" **** Loaded model: ", model_name)
+for i, model_name in enumerate(model_names):
+    model, model_type, tokenizer = load_model(model_name)
+    print(" **** Loaded model: ", model_name)
 
-#     for j, dataset_name_train in enumerate(dataset_names_singular):
-#         for k, dataset_name_test in enumerate(dataset_names_singular):
+    for j, dataset_name_train in enumerate(dataset_names_singular):
+        for k, dataset_name_test in enumerate(dataset_names_singular):
 
-#             print(" *** Training on ", dataset_name_train, " and testing on ", dataset_name_test)
+            print(" *** Training on ", dataset_name_train, " and testing on ", dataset_name_test)
 
-#             # dataset_name_train = "imdb"
-#             # dataset_name_test = "amazon_polarity"
-#             data_train = datasets[dataset_name_train]
-#             data_test = datasets[dataset_name_test]
-#             print("loaded data")
+            # dataset_name_train = "imdb"
+            # dataset_name_test = "amazon_polarity"
+            data_train = datasets[dataset_name_train]
+            data_test = datasets[dataset_name_test]
+            print("loaded data")
 
-#             print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
-#             if j != k:
-#                 neg_hs_train, pos_hs_train, y_train, _ = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs)
-#                 print("got hidden states, train")
-#                 print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
-#                 neg_hs_test, pos_hs_test, y_test, _ = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs)
-#                 print("got hidden states, test")
-#                 print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
-#             else:
-#                 neg_hs_train, pos_hs_train, y_train, used_indx = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs)
-#                 neg_hs_test, pos_hs_test, y_test, used_indx = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, used_indx)
-#                 # If j = k, let's split training / testing results. without repetition, to ensur ethat the balance code in get_hidden_States_many_examples stays that way
+            print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
+            if j != k:
+                neg_hs_train, pos_hs_train, y_train, _ = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, used_idx = [])
+                print("got hidden states, train")
+                print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
+                neg_hs_test, pos_hs_test, y_test, _ = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs, used_idx = [])
+                print("got hidden states, test")
+                print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
+            else:
+                neg_hs_train, pos_hs_train, y_train, used_indx = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, used_idx = [])
+                neg_hs_test, pos_hs_test, y_test, used_indx = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, used_indx)
+                # If j = k, let's split training / testing results. without repetition, to ensur ethat the balance code in get_hidden_States_many_examples stays that way
 
-#             # for simplicity we can just take the difference between positive and negative hidden states
-#             # (concatenating also works fine)
-#             x_train = neg_hs_train - pos_hs_train
-#             x_test = neg_hs_test - pos_hs_test
+            # for simplicity we can just take the difference between positive and negative hidden states
+            # (concatenating also works fine)
+            x_train = neg_hs_train - pos_hs_train
+            x_test = neg_hs_test - pos_hs_test
 
-#             # Run a probe on neg and pos hidden states
-#             try:
-#                 lr = LogisticRegression(class_weight="balanced")
-#                 print("Shape of x_train: ", x_train.shape)
-#                 print("Shape of y_train: ", y_train.shape)
-#                 lr.fit(x_train, y_train)
-#                 print("Logistic regression accuracy on transfer: {}".format(lr.score(x_test, y_test)))
-#                 print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
-#                 probe_train[i, j, k] = lr.score(x_train, y_train)
-#                 probe_test[i, j, k] = lr.score(x_test, y_test)
-#             except:
-#                 print("Logistic regression failed")
+            # Run a probe on neg and pos hidden states
+            try:
+                lr = LogisticRegression(class_weight="balanced")
+                print("Shape of x_train: ", x_train.shape)
+                print("Shape of y_train: ", y_train.shape)
+                lr.fit(x_train, y_train)
+                print("Logistic regression accuracy on transfer: {}".format(lr.score(x_test, y_test)))
+                print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
+                probe_train[i, j, k] = lr.score(x_train, y_train)
+                probe_test[i, j, k] = lr.score(x_test, y_test)
+            except:
+                print("Logistic regression failed")
 
-#             # Train and run CCS without any labels
-#             try:
-#                 ccs = CCS(neg_hs_train, pos_hs_train, y_train)
-#                 ccs.repeated_train()
-#                 ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
-#                 ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
-#                 print("CCS accuracy on transfer: {}".format(ccs_acc_test))
-#                 print("CCS accuracy on own: {}".format(ccs_acc_train))
-#                 ccs_train[i, j, k] = ccs_acc_train
-#                 ccs_test[i, j, k] = ccs_acc_test
-#             except:
-#                 print("CCS failed")
+            # Train and run CCS without any labels
+            try:
+                ccs = CCS(neg_hs_train, pos_hs_train, y_train)
+                ccs.repeated_train()
+                ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
+                ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
+                print("CCS accuracy on transfer: {}".format(ccs_acc_test))
+                print("CCS accuracy on own: {}".format(ccs_acc_train))
+                ccs_train[i, j, k] = ccs_acc_train
+                ccs_test[i, j, k] = ccs_acc_test
+            except:
+                print("CCS failed")
             
 
-#     del model
-#     del tokenizer
-#     torch.cuda.empty_cache()
+    del model
+    del tokenizer
+    torch.cuda.empty_cache()
+#%%
+
+# Save ccs_results tensor
+torch.save(ccs_test, 'ccs_test.pt')
+torch.save(ccs_train, 'ccs_train.pt')
+
+# Save probe_results tensor
+torch.save(probe_test, 'probe_test.pt')
+torch.save(probe_train, 'probe_train.pt')
+
+
+#%%
+
+# model_name = "deberta"
+# model, model_type, tokenizer = load_model(model_name)
+# # del model
+
 # #%%
-
-# # Save ccs_results tensor
-# torch.save(ccs_test, 'ccs_test.pt')
-# torch.save(ccs_train, 'ccs_train.pt')
-
-# # Save probe_results tensor
-# torch.save(probe_test, 'probe_test.pt')
-# torch.save(probe_train, 'probe_train.pt')
-
-
-#%%
-
-model_name = "deberta"
-model, model_type, tokenizer = load_model(model_name)
-# del model
-
-#%%
-
-def train_test_one(dataset_name_train, dataset_name_test, num_epochs=350):
-    print(" *** Training on ", dataset_name_train, " and testing on ", dataset_name_test)
-
-    # dataset_name_train = "imdb"
-    # dataset_name_test = "amazon_polarity"
-    data_train = datasets[dataset_name_train]
-    data_test = datasets[dataset_name_test]
-
-    print("loaded data")
-
-    # if dataset_name_train != dataset_name_test:
-    neg_hs_train, pos_hs_train, y_train, _ = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs)
-    print("got train hidden state")
-    neg_hs_test, pos_hs_test, y_test, _ = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs)
-    print("got test hidden state")
-    # else:
-    #     neg_hs, pos_hs, y = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs*2)
-    #     # If j = k, let's split training / testing results:
-    #     n = len(y)
-    #     neg_hs_train, neg_hs_test = neg_hs[:n//2], neg_hs[n//2:]
-    #     pos_hs_train, pos_hs_test = pos_hs[:n//2], pos_hs[n//2:]
-    #     y_train, y_test = y[:n//2], y[n//2:]
-
-    print("loaded hidden states")
-
-    # for simplicity we can just take the difference between positive and negative hidden states
-    # (concatenating also works fine)
-    x_train = neg_hs_train - pos_hs_train
-    x_test = neg_hs_test - pos_hs_test
-
-    # Run a probe on neg and pos hidden states
-    # try:
-    lr = LogisticRegression(class_weight="balanced")
-    print("Shape of x_train: ", x_train.shape)
-    print("Shape of y_train: ", y_train.shape)
-    print(f"Y_train: {y_train}")
-    lr.fit(x_train, y_train)
-    print("Logistic regression accuracy on transfer: {}".format(lr.score(x_test, y_test)))
-    print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
-    # probe_results[i, j, k] = lr.score(x_test, y_test)
-    # except:
-    #     print("Logistic regression failed")
-
-    # Train and run CCS without any labels
-    ccs = CCS(neg_hs_train, pos_hs_train, y_train)
-    ccs.repeated_train()
-    ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
-    ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
-    print("CCS accuracy on transfer: {}".format(ccs_acc_test))
-    print("CCS accuracy on own: {}".format(ccs_acc_train))
-    # ccs_results[i, j, k] = ccs_acc_test
-
-train_test_one("amazon_polarity", "copa")
-
-#%%
-
-def train_test_one(dataset_name_train, dataset_name_test, num_epochs=350):
-    print(" *** Training on ", dataset_name_train, " and testing on ", dataset_name_test)
-
-    # dataset_name_train = "imdb"
-    # dataset_name_test = "amazon_polarity"
-    data_train = datasets[dataset_name_train]
-    data_test = datasets[dataset_name_test]
-
-    print("loaded data")
-
-    # if dataset_name_train != dataset_name_test:
-    neg_hs_train, pos_hs_train, y_train, _ = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs)
-    print("got train hidden state")
-    neg_hs_test, pos_hs_test, y_test, _ = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs)
-    print("got test hidden state")
-    # else:
-    #     neg_hs, pos_hs, y = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs*2)
-    #     # If j = k, let's split training / testing results:
-    #     n = len(y)
-    #     neg_hs_train, neg_hs_test = neg_hs[:n//2], neg_hs[n//2:]
-    #     pos_hs_train, pos_hs_test = pos_hs[:n//2], pos_hs[n//2:]
-    #     y_train, y_test = y[:n//2], y[n//2:]
-
-    print("loaded hidden states")
-
-    # for simplicity we can just take the difference between positive and negative hidden states
-    # (concatenating also works fine)
-    x_train = neg_hs_train - pos_hs_train
-    x_test = neg_hs_test - pos_hs_test
-
-    # Run a probe on neg and pos hidden states
-    # try:
-    lr = LogisticRegression(class_weight="balanced")
-    print("Shape of x_train: ", x_train.shape)
-    print("Shape of y_train: ", y_train.shape)
-    print(f"Y_train: {y_train}")
-    lr.fit(x_train, y_train)
-    print("Logistic regression accuracy on transfer: {}".format(lr.score(x_test, y_test)))
-    print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
-    # probe_results[i, j, k] = lr.score(x_test, y_test)
-    # except:
-    #     print("Logistic regression failed")
-
-    # Train and run CCS without any labels
-    ccs = CCS(neg_hs_train, pos_hs_train, y_train)
-    ccs.repeated_train()
-    ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
-    ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
-    print("CCS accuracy on transfer: {}".format(ccs_acc_test))
-    print("CCS accuracy on own: {}".format(ccs_acc_train))
-    # ccs_results[i, j, k] = ccs_acc_test
-
-train_test_one("amazon_polarity", "copa")
-
-#%%
 
 # def train_test_one(dataset_name_train, dataset_name_test, num_epochs=350):
 #     print(" *** Training on ", dataset_name_train, " and testing on ", dataset_name_test)
@@ -756,20 +644,23 @@ train_test_one("amazon_polarity", "copa")
 #     # dataset_name_test = "amazon_polarity"
 #     data_train = datasets[dataset_name_train]
 #     data_test = datasets[dataset_name_test]
+
 #     print("loaded data")
 
-#     print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
-#     if dataset_name_train != dataset_name_test:
-#         neg_hs_train, pos_hs_train, y_train, _ = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs)
-#         print("got hidden states, train")
-#         print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
-#         neg_hs_test, pos_hs_test, y_test, _ = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs)
-#         print("got hidden states, test")
-#         print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
-#     else:
-#         neg_hs_train, pos_hs_train, y_train, used_indx = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs)
-#         neg_hs_test, pos_hs_test, y_test, used_indx = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, used_indx)
-#         # If j = k, let's split training / testing results. without repetition, to ensur ethat the balance code in get_hidden_States_many_examples stays that way
+#     # if dataset_name_train != dataset_name_test:
+#     neg_hs_train, pos_hs_train, y_train, _ = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs)
+#     print("got train hidden state")
+#     neg_hs_test, pos_hs_test, y_test, _ = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs)
+#     print("got test hidden state")
+#     # else:
+#     #     neg_hs, pos_hs, y = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs*2)
+#     #     # If j = k, let's split training / testing results:
+#     #     n = len(y)
+#     #     neg_hs_train, neg_hs_test = neg_hs[:n//2], neg_hs[n//2:]
+#     #     pos_hs_train, pos_hs_test = pos_hs[:n//2], pos_hs[n//2:]
+#     #     y_train, y_test = y[:n//2], y[n//2:]
+
+#     print("loaded hidden states")
 
 #     # for simplicity we can just take the difference between positive and negative hidden states
 #     # (concatenating also works fine)
@@ -777,30 +668,140 @@ train_test_one("amazon_polarity", "copa")
 #     x_test = neg_hs_test - pos_hs_test
 
 #     # Run a probe on neg and pos hidden states
-#     try:
-#         lr = LogisticRegression(class_weight="balanced")
-#         print("Shape of x_train: ", x_train.shape)
-#         print("Shape of y_train: ", y_train.shape)
-#         lr.fit(x_train, y_train)
-#         print("Logistic regression accuracy on transfer: {}".format(lr.score(x_test, y_test)))
-#         print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
-#         probe_train[i, j, k] = lr.score(x_train, y_train)
-#         probe_test[i, j, k] = lr.score(x_test, y_test)
-#     except:
-#         print("Logistic regression failed")
+#     # try:
+#     lr = LogisticRegression(class_weight="balanced")
+#     print("Shape of x_train: ", x_train.shape)
+#     print("Shape of y_train: ", y_train.shape)
+#     print(f"Y_train: {y_train}")
+#     lr.fit(x_train, y_train)
+#     print("Logistic regression accuracy on transfer: {}".format(lr.score(x_test, y_test)))
+#     print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
+#     # probe_results[i, j, k] = lr.score(x_test, y_test)
+#     # except:
+#     #     print("Logistic regression failed")
 
 #     # Train and run CCS without any labels
-#     try:
-#         ccs = CCS(neg_hs_train, pos_hs_train, y_train)
-#         ccs.repeated_train()
-#         ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
-#         ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
-#         print("CCS accuracy on transfer: {}".format(ccs_acc_test))
-#         print("CCS accuracy on own: {}".format(ccs_acc_train))
-#         ccs_train[i, j, k] = ccs_acc_train
-#         ccs_test[i, j, k] = ccs_acc_test
-#     except:
-#         print("CCS failed")
+#     ccs = CCS(neg_hs_train, pos_hs_train, y_train)
+#     ccs.repeated_train()
+#     ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
+#     ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
+#     print("CCS accuracy on transfer: {}".format(ccs_acc_test))
+#     print("CCS accuracy on own: {}".format(ccs_acc_train))
+#     # ccs_results[i, j, k] = ccs_acc_test
 
 # train_test_one("amazon_polarity", "copa")
+
 # #%%
+
+# def train_test_one(dataset_name_train, dataset_name_test, num_epochs=350):
+#     print(" *** Training on ", dataset_name_train, " and testing on ", dataset_name_test)
+
+#     # dataset_name_train = "imdb"
+#     # dataset_name_test = "amazon_polarity"
+#     data_train = datasets[dataset_name_train]
+#     data_test = datasets[dataset_name_test]
+
+#     print("loaded data")
+
+#     # if dataset_name_train != dataset_name_test:
+#     neg_hs_train, pos_hs_train, y_train, _ = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs)
+#     print("got train hidden state")
+#     neg_hs_test, pos_hs_test, y_test, _ = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs)
+#     print("got test hidden state")
+#     # else:
+#     #     neg_hs, pos_hs, y = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs*2)
+#     #     # If j = k, let's split training / testing results:
+#     #     n = len(y)
+#     #     neg_hs_train, neg_hs_test = neg_hs[:n//2], neg_hs[n//2:]
+#     #     pos_hs_train, pos_hs_test = pos_hs[:n//2], pos_hs[n//2:]
+#     #     y_train, y_test = y[:n//2], y[n//2:]
+
+#     print("loaded hidden states")
+
+#     # for simplicity we can just take the difference between positive and negative hidden states
+#     # (concatenating also works fine)
+#     x_train = neg_hs_train - pos_hs_train
+#     x_test = neg_hs_test - pos_hs_test
+
+#     # Run a probe on neg and pos hidden states
+#     # try:
+#     lr = LogisticRegression(class_weight="balanced")
+#     print("Shape of x_train: ", x_train.shape)
+#     print("Shape of y_train: ", y_train.shape)
+#     print(f"Y_train: {y_train}")
+#     lr.fit(x_train, y_train)
+#     print("Logistic regression accuracy on transfer: {}".format(lr.score(x_test, y_test)))
+#     print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
+#     # probe_results[i, j, k] = lr.score(x_test, y_test)
+#     # except:
+#     #     print("Logistic regression failed")
+
+#     # Train and run CCS without any labels
+#     ccs = CCS(neg_hs_train, pos_hs_train, y_train)
+#     ccs.repeated_train()
+#     ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
+#     ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
+#     print("CCS accuracy on transfer: {}".format(ccs_acc_test))
+#     print("CCS accuracy on own: {}".format(ccs_acc_train))
+#     # ccs_results[i, j, k] = ccs_acc_test
+
+# train_test_one("amazon_polarity", "copa")
+
+# #%%
+
+# # def train_test_one(dataset_name_train, dataset_name_test, num_epochs=350):
+# #     print(" *** Training on ", dataset_name_train, " and testing on ", dataset_name_test)
+
+# #     # dataset_name_train = "imdb"
+# #     # dataset_name_test = "amazon_polarity"
+# #     data_train = datasets[dataset_name_train]
+# #     data_test = datasets[dataset_name_test]
+# #     print("loaded data")
+
+# #     print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
+# #     if dataset_name_train != dataset_name_test:
+# #         neg_hs_train, pos_hs_train, y_train, _ = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs)
+# #         print("got hidden states, train")
+# #         print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
+# #         neg_hs_test, pos_hs_test, y_test, _ = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs)
+# #         print("got hidden states, test")
+# #         print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
+# #     else:
+# #         neg_hs_train, pos_hs_train, y_train, used_indx = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs)
+# #         neg_hs_test, pos_hs_test, y_test, used_indx = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, used_indx)
+# #         # If j = k, let's split training / testing results. without repetition, to ensur ethat the balance code in get_hidden_States_many_examples stays that way
+
+# #     # for simplicity we can just take the difference between positive and negative hidden states
+# #     # (concatenating also works fine)
+# #     x_train = neg_hs_train - pos_hs_train
+# #     x_test = neg_hs_test - pos_hs_test
+
+# #     # Run a probe on neg and pos hidden states
+# #     try:
+# #         lr = LogisticRegression(class_weight="balanced")
+# #         print("Shape of x_train: ", x_train.shape)
+# #         print("Shape of y_train: ", y_train.shape)
+# #         lr.fit(x_train, y_train)
+# #         print("Logistic regression accuracy on transfer: {}".format(lr.score(x_test, y_test)))
+# #         print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
+# #         probe_train[i, j, k] = lr.score(x_train, y_train)
+# #         probe_test[i, j, k] = lr.score(x_test, y_test)
+# #     except:
+# #         print("Logistic regression failed")
+
+# #     # Train and run CCS without any labels
+# #     try:
+# #         ccs = CCS(neg_hs_train, pos_hs_train, y_train)
+# #         ccs.repeated_train()
+# #         ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
+# #         ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
+# #         print("CCS accuracy on transfer: {}".format(ccs_acc_test))
+# #         print("CCS accuracy on own: {}".format(ccs_acc_train))
+# #         ccs_train[i, j, k] = ccs_acc_train
+# #         ccs_test[i, j, k] = ccs_acc_test
+# #     except:
+# #         print("CCS failed")
+
+# # train_test_one("amazon_polarity", "copa")
+# # #%%
+#%%
