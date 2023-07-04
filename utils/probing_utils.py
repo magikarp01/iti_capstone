@@ -315,10 +315,11 @@ class AWSUtils:
 
 
 class ModelActsLarge: #separate class for now, can make into subclass later (need to standardize input and output, and manage memory effectively)
-    def __init__(self, model, dataset, use_aws=True, seed = None, act_types = ["z"], load_model=True):
+    def __init__(self, model, dataset, use_aws=True, seed = None, act_types = ["z"], aws_callable=AWSUtils.to_aws):
         self.model = model
         self.dataset = dataset
         self.use_aws = use_aws #save data to disk first, then send it all to AWS
+        self.aws_callable = aws_callable
         self.world_size = 1
         self.act_types = act_types #only support z for now
 
@@ -334,7 +335,9 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
         save_path = f"~/iti_capstone/{filepath}"
         if not os.path.exists(save_path):
             os.system(f"mkdir {save_path}")
-        
+        if id is None:
+            id = np.random.randint(10000)
+
         hook_pairs = []
         if "z" in self.act_types:
             for layer in range(self.model.config.num_hidden_layers):
@@ -345,39 +348,48 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
             token_ids = batch[0].to(self.model.device)
             with hmodel.hooks(fwd=hook_pairs):
                 output = hmodel(token_ids)
-            torch.save(self.activation_buffer, f"{save_path}")
+            torch.save(self.activation_buffer, f"{save_path}large_run{id}_{idx}.pt")
 
 
 
 
 
     def load_acts(self, id, filepath = "activations/", load_probes=False):
+        #re-implement this
         raise NotImplementedError
     
     def control_for_iti(self, cache_interventions):
         raise NotImplementedError
     
     def get_train_test_split(self, X_acts, test_ratio = 0.2, N = None):
+        #call super
         raise NotImplementedError
     
     def _train_probes(self, num_probes, X_train, X_test, y_train, y_test, max_iter=1000):
+        #can do parallelized probing (see sheet)
         raise NotImplementedError
     
     def train_z_probes(self, max_iter=1000):
+        #yes
         raise NotImplementedError
     
     def train_mlp_out_probes(self, max_iter=1000):
+        #yes, but re-create tensors on the fly
         raise NotImplementedError
     
     def train_probes(self, act_type, max_iter=1000):
+        #yes
         raise NotImplementedError
     
     def save_probes(self, id, filepath = "activations/"):
+        #super?
         raise NotImplementedError
     
     def get_transfer_acc(self, act_type, data_source: ModelActs):
+        #super?
         raise NotImplementedError
     
     def show_top_z_probes(self, topk=50):
+        #super?
         raise NotImplementedError
 
