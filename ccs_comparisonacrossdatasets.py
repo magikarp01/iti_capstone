@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import pandas as pd
 from promptsource.templates import DatasetTemplates
 from datasets import load_dataset, Dataset
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForMaskedLM, AutoModelForCausalLM
@@ -41,6 +42,9 @@ for i, dataset_tuple in enumerate(dataset_names):
         df["text"] = "[" + df["title"] + "] " + df["content"]
         dataset = Dataset.from_pandas(df)
     elif dataset_names_singular[i] == "copa":
+        dataset2 = load_dataset(*dataset_tuple)["validation"]
+        df_concat = pd.concat([pd.DataFrame(dataset), pd.DataFrame(dataset2)])
+        dataset = Dataset.from_pandas(df_concat)
         dataset = dataset.rename_column('choice1', 'text1')
         dataset = dataset.rename_column('choice2', 'text2')
         dataset = dataset.rename_column('premise', 'text')
@@ -94,13 +98,13 @@ def format_prompt(label, text, text1, text2, dataset_name = "imdb"):
     if dataset_name == "ag_news":
         return "The topic of the following news article is about " + label_dict[dataset_name][label] + ":\n" + text
     if dataset_name == "dbpedia_14":
-        return "The following article relates to " + label_dict[dataset_name][label] + ":\n" + text
+        return "The following article relates to " + label_dict[dataset_name][label] + "s:\n" + text
         # text = title and content
     if dataset_name == "copa":
         return f'Story: {text} \nIn this story, out of "{text1}" and "{text2}", the sentence is most likely to follow is {["the former", "the latter"][label]}.'
         # text = premise. text1 and text2 are choice1 choice2
     if dataset_name == "rte":
-        return f"Passage: {text}\nQuestion: Does this imply that {text1}?\nAnswer here:{['Yes', 'No'][label]}."
+        return f"Passage: {text}\nQuestion: Does this imply that {text1}?\nAnswer here: {['Yes', 'No'][label]}."
         # text = premise
         # text1 = hypothesis
     if dataset_name == "boolq":
@@ -117,7 +121,7 @@ def format_prompt(label, text, text1, text2, dataset_name = "imdb"):
         # text1 = sol1
         # text2 = sol2
     if dataset_name == "story-cloze":
-        return f"Which choice makes the most sense? \nStory: {text}\nContinuation 1: {text1}\nContinuation 2: {text2}? \nAnswer here: {['Continuation 1', 'Continuation 2'][label]}"
+        return f"Which choice makes the most sense? \nStory: {text}\nContinuation 1: {text1}\nContinuation 2: {text2} \nAnswer here: {['Continuation 1', 'Continuation 2'][label]}"
         # text = context
         # text1 = sentence_quiz1
         # text2 = sentence_quiz2
@@ -194,7 +198,7 @@ def load_model_helper(full_model_name):
             model = AutoModelForCausalLM.from_pretrained(full_model_name, cache_dir=cache_dir, torch_dtype = torch.half)
             model_type = "decoder"
     tokenizer = AutoTokenizer.from_pretrained(full_model_name, cache_dir=cache_dir, torch_dtype = torch.half)
-    # model = model.half()
+    model = model.half()
     return model, model_type, tokenizer
 
 def load_model(model_name):
@@ -347,15 +351,16 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_
                 text2 = data[idx]["text2"]
             except:
                 text2 = ""
-            used_idxs.append(idx)
             # the actual formatted input will be longer, so include a bit of a marign
-            print("Example: " + text + text1 + text2)
+            # print("Example: " + text + text1 + text2)
             len_requirement = len(tokenizer(text + text1 + text2)) < 300 
             if not len_requirement:
                 print("Skipped an example that was too long: " + len(tokenizer(text + text1 + text2)))
             if pos_labels < pos_labels_limit and true_label == 1 and len_requirement:
+                used_idxs.append(idx)
                 break
             elif neg_labels < neg_labels_limit and true_label == 0 and len_requirement:
+                used_idxs.append(idx)
                 break
 
         # print(f"Number of tokens: {len(tokenizer(text + text1 + text2))}")
@@ -371,12 +376,18 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_
 
                 # get hidden states
                 neg_prompt = format_prompt(i, text, text1, text2, dataset_name = dataset_name)
+                print("number of tokens in neg_prompt: " + str(len(tokenizer(neg_prompt))))
+                if (str(len(tokenizer(neg_prompt))) > "512"):
+                    print("[ERROR] PROMPT TOO LONG: " + neg_prompt)
                 # print(neg_prompt)
                 neg_hs = get_hidden_states(model, tokenizer, neg_prompt, model_type=model_type)
 
                 pos_prompt = format_prompt(true_label, text, text1, text2, dataset_name = dataset_name)
+                print("number of tokens in pos_prompt: " + str(len(tokenizer(neg_prompt))))
                 # print(pos_prompt)
                 pos_hs = get_hidden_states(model, tokenizer, pos_prompt, model_type=model_type)
+                if (str(len(tokenizer(neg_prompt))) > "512"):
+                    print("[ERROR] PROMPT TOO LONG: " + pos_prompt)
 
                 # collect
                 all_neg_hs.append(neg_hs)
@@ -613,21 +624,17 @@ for i, model_name in enumerate(model_names):
                 ccs_test[i, j, k] = ccs_acc_test
             except:
                 print("CCS failed")
-            
+    # Save ccs_results tensor
+    torch.save(ccs_test, f'ccs_test_{model_name}.pt')
+    torch.save(ccs_train, f'ccs_train_{model_name}.pt')
+
+    # Save probe_results tensor
+    torch.save(probe_test, f'probe_test_{model_name}.pt')
+    torch.save(probe_train, f'probe_train_{model_name}.pt')
 
     del model
     del tokenizer
     torch.cuda.empty_cache()
-#%%
-
-# Save ccs_results tensor
-torch.save(ccs_test, 'ccs_test.pt')
-torch.save(ccs_train, 'ccs_train.pt')
-
-# Save probe_results tensor
-torch.save(probe_test, 'probe_test.pt')
-torch.save(probe_train, 'probe_train.pt')
-
 
 #%%
 
