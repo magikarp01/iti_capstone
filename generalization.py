@@ -99,3 +99,39 @@ for name in datanames:
     # break
     # ez_acts.load_acts(id=f"ez_gpt2xl_{n_acts}", load_probes=False)
     model_acts.train_probes(max_iter=1000)
+
+# %%
+from plotly.subplots import make_subplots
+from utils.gpt_judge import check_iti_generalization
+plots = []
+
+for name in datanames:
+    model_acts: ModelActs = acts[name]
+    for other_name in datanames:
+        print(f"Checking generation on {name}, ITI on {other_name}")
+        results = check_iti_generalization(model, datasets[name], datasets[other_name], 50, 1000, alpha=10)
+        print(f"Truth score before ITI: {results[0]}, Truth score after ITI: {results[2]}")
+        print(f"Info score before ITI: {results[1]}, Info score after ITI: {results[3]}")
+        print()
+
+        # transfer_accs = model_acts.get_transfer_acc(acts[other_name])
+        # plots.append(plot_probe_accuracies(model_acts, sorted=False, title=f"{name} probes on {other_name} data", other_head_accs=transfer_accs).show())
+
+
+# %%
+from plotly.subplots import make_subplots
+from utils.gpt_judge import check_iti_generalization
+plots = []
+
+np.seterr(all="ignore")
+for name in datanames[1:]:
+    model_acts: ModelActs = acts[name]
+    for other_name in datanames:
+        print(f"Checking generation on {name}, ITI on {other_name}")
+        results = check_iti_generalization(model, datasets[name], datasets[other_name], 50, 1000, alpha=10, existing_gen_acts=acts[name])
+        print(f"Truth score before ITI: {results[0]}, Truth score after ITI: {results[2]}")
+        print(f"Info score before ITI: {results[1]}, Info score after ITI: {results[3]}")
+        print()
+
+        # transfer_accs = model_acts.get_transfer_acc(acts[other_name])
+        # plots.append(plot_probe_accuracies(model_acts, sorted=False, title=f"{name} probes on {other_name} data", other_head_accs=transfer_accs).show())

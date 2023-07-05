@@ -6,3 +6,6 @@ convert_llama_weights_to_hf.py
 /.hypothesis
 .pytest_cache
 *__pycache__*
+llama-13b-hf/
+stable-vicuna-13b-delta/
+stable-vicuna-13b/

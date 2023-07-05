@@ -33,6 +33,7 @@ import pickle
 from collections import defaultdict
 
 from utils.torch_hooks_utils import HookedModule
+from utils.dataset_utils import TorchSample
 from functools import partial
 
 # from iti import patch_top_activations
@@ -313,15 +314,39 @@ class AWSUtils:
 
 
 
+#Need support for dataset, for arbitrary act_type, for AWS (separable), for distributed setting
+
+#todo
+#get dataset subsample sorted out
+#re-shape tensors for logistic regression
+#probing code
+
 
 class ModelActsLarge: #separate class for now, can make into subclass later (need to standardize input and output, and manage memory effectively)
-    def __init__(self, model, dataset, use_aws=True, seed = None, act_types = ["z"], aws_callable=AWSUtils.to_aws):
-        self.model = model
+    """
+    A class that re-implements all the functionality of ModelActs, but optimized for large models. This class doesn't use TransformerLens
+    and can thus handle model quantization as well as parallelism. Activation caching is achieved using PyTorch hooks.
+    """
+    def __init__(self, model=None, dataset=None, use_aws=True, seed = None, act_types = ["z"], world_size=1):
+        self.model = model #model only needed for gen_acts, otherwise don't load it so as to preserve memory
         self.dataset = dataset
+
+        self.indices = None
+
+        self.act_types = act_types
+
+        if seed is not None:
+            np.random.seed(seed)
+            torch.manual_seed(seed)
+
+        self.n_layers = None
+        self.d_head = None
+        self.n_heads = None
+
+
         self.use_aws = use_aws #save data to disk first, then send it all to AWS
-        self.aws_callable = aws_callable
-        self.world_size = 1
-        self.act_types = act_types #only support z for now
+        self.world_size = world_size #distributed not supported yet
+        self.id = None
 
         self.activation_buffer = torch.zeros((self.model.num_hidden_layers, self.model.hidden_size))
 
@@ -329,6 +354,16 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
         self.activation_buffer[layer_num, :] = input[0][0,-1,:].detach().clone()
     
     def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu"):
+        """
+        Doesn't save acts in active memory. Acts may be several hundreds of GB.
+        """
+        assert store_acts, "If you're using ModelActsLarge, you probably want to store the activations"
+
+        if indices is None:
+            indices, prompts, labels = self.dataset.sample(N)
+            self.dataset = TorchSample(prompts=prompts, labels=labels, indices=indices)
+        self.indices = indices
+
         self.model.eval()
         hmodel = HookedModule(self.model)
         loader = DataLoader(self.dataset, batch_size=1, shuffle=False) #find dataloader optimizations
@@ -337,25 +372,50 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
             os.system(f"mkdir {save_path}")
         if id is None:
             id = np.random.randint(10000)
+        self.id = id
 
+        #add pytorch hooks
         hook_pairs = []
-        if "z" in self.act_types:
+        if "z" in self.act_types: #only supports hooking for z at the moment
             for layer in range(self.model.config.num_hidden_layers):
                 act_name = f"model.layers.{layer}.self_attn.o_proj"
                 hook_pairs.append((act_name, partial(self.cache_z_hook_fnc, name=act_name, layer_num=layer)))
         
+        if filepath[-1] != "/":
+            filepath = filepath + "/"
+
+        torch.save(self.indices, f"{filepath}large_run{id}_indices.pt")
         for idx, batch in tqdm(enumerate(loader)):
             token_ids = batch[0].to(self.model.device)
             with hmodel.hooks(fwd=hook_pairs):
                 output = hmodel(token_ids)
             torch.save(self.activation_buffer, f"{save_path}large_run{id}_{idx}.pt")
 
+    def reformat_acts_for_probing(self, filepath="activations/"):
+        if filepath[-1] != "/":
+            filepath = filepath + "/"
+
+        probe_dataset = torch.empty((len(self.dataset), self.d_head, 1))
+        for layer in range(self.n_layers):
+            for head in range(self.n_heads):
+                for idx in tqdm(range(len(self.dataset))): #can do smarter things to reduce # of systems calls
+
+                torch.save(probe_dataset, f"")
 
 
+
+    def save_acts_to_aws(self, id, ):
+        raise NotImplementedError
 
 
     def load_acts(self, id, filepath = "activations/", load_probes=False):
         #re-implement this
+        #iteratively load acts
+        """
+        Old:
+        Loads activations from activations folder. If id is None, then load the most recent activations. 
+        If load_probes is True, load from saved probes.picle and all_heads_acc_np.npy files as well.
+        """
         raise NotImplementedError
     
     def control_for_iti(self, cache_interventions):
@@ -365,16 +425,33 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
         #call super
         raise NotImplementedError
     
+    def _train_single_probe(self, filename, train_indices, test_indices, max_iter=1000): #Use regularization!!!
+        data_dir = "~/iti_capstone/activations"
+        X = torch.load(f"{data_dir}/{filename}")
+    
+    #don't need to store model in memory while doing probing (obviously)
     def _train_probes(self, num_probes, X_train, X_test, y_train, y_test, max_iter=1000):
         #can do parallelized probing (see sheet)
+        #for now, loop over probes, we can use embarrasing parallelism later
+        #write sklearn and pytorch implementation
+        """
+        Helper function that all train_x_probes will call to train num_probes probes, after formatting X and y properly.
+        Flatten X so that X_train.shape = (num_examples, num_probes, d_probe)
+        y_train.shape = (num_examples, num_probes)
+        Returns list of probes and np array of probe accuracies
+        """
+
         raise NotImplementedError
     
     def train_z_probes(self, max_iter=1000):
-        #yes
+        #call train test split
+        #call _train_probes
         raise NotImplementedError
     
     def train_mlp_out_probes(self, max_iter=1000):
-        #yes, but re-create tensors on the fly
+        #re-create tensors on the fly
+        #call train test split
+        #call _train_probes
         raise NotImplementedError
     
     def train_probes(self, act_type, max_iter=1000):
