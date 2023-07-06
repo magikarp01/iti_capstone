@@ -17,7 +17,7 @@ cd ..
 
 pip install fschat
 
-python -m fastchat.model.apply_delta \
+python3 -m fastchat.model.apply_delta \
     --base-model-path llama-7b-hf \
     --target-model-path vicuna-7b-hf \
     --delta-path vicuna-7b-delta-v1.1

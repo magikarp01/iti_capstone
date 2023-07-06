@@ -15,7 +15,7 @@ cd stable-vicuna-13b-delta
 git lfs pull
 cd ..
 
-python stable-vicuna-13b-delta/apply_delta.py \
+python3 stable-vicuna-13b-delta/apply_delta.py \
     --base llama-13b-hf \
     --target stable-vicuna-13b \
     --delta stable-vicuna-13b-delta

@@ -1,5 +1,6 @@
 #%%
 from tqdm import tqdm
+import os
 import copy
 import numpy as np
 import torch
@@ -317,9 +318,13 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_
     
     This is deliberately simple so that it's easy to understand, rather than being optimized for efficiency
     """
+
     # setup
     model.eval()
     all_neg_hs, all_pos_hs, all_gt_labels = [], [], []
+
+    # length requirement
+    max_model_length = tokenizer.model_max_length
 
     # BALANCE
     neg_labels = 0
@@ -329,10 +334,11 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_
     pos_labels_limit = n-neg_labels_limit
     print(f"pos_labels_limit: {pos_labels_limit}")
 
-    # NO REPEATS
+    # keep track
     print(f"intial used_idx: {used_idx}")
     used_idxs = used_idx
-    print(f"intial used_idxs: {used_idxs}")
+    visited_idxs = used_idx
+    toolong_idxs = []
 
     # loop
     for _ in tqdm(range(n)):
@@ -340,8 +346,11 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_
         # (most examples should be a reasonable length, so this is just to make sure)
         while True:
             idx = np.random.randint(len(data))
-            if idx in used_idxs:
+            if idx in visited_idxs:
                 continue
+            visited_idxs.append(idx)
+
+            # Find all the variables relevant to this prompt
             text, true_label = data[idx]["text"], data[idx]["label"]
             try:
                 text1 = data[idx]["text1"]
@@ -351,43 +360,27 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_
                 text2 = data[idx]["text2"]
             except:
                 text2 = ""
-            # the actual formatted input will be longer, so include a bit of a marign
-            # print("Example: " + text + text1 + text2)
-            len_requirement = len(tokenizer(text + text1 + text2)) < 300 
-            if not len_requirement:
-                print("Skipped an example that was too long: " + len(tokenizer(text + text1 + text2)))
-            if pos_labels < pos_labels_limit and true_label == 1 and len_requirement:
+            pos_prompt = format_prompt(true_label, text, text1, text2, dataset_name = dataset_name)
+            neg_prompt = format_prompt(i, text, text1, text2, dataset_name = dataset_name)
+
+            # Length requirement (not met)
+            if not (len(tokenizer(neg_prompt)['input_ids']) < max_model_length) and (len(tokenizer(pos_prompt)['input_ids']) < max_model_length):
+                toolong_idxs.append(idx)
+                continue
+            # Balance requirement (met)
+            elif ((pos_labels < pos_labels_limit and true_label == 1) or (neg_labels < neg_labels_limit and true_label == 0)):
                 used_idxs.append(idx)
+                if true_label == 0:
+                    neg_labels += 1
+                else:
+                    pos_labels += 1
                 break
-            elif neg_labels < neg_labels_limit and true_label == 0 and len_requirement:
-                used_idxs.append(idx)
-                break
-
-        # print(f"Number of tokens: {len(tokenizer(text + text1 + text2))}")
-
-        if true_label == 0:
-            neg_labels += 1
-        else:
-            pos_labels += 1
-
+        
         for i, label in enumerate(label_dict.get(dataset_name)):
 
             if i != true_label:
-
-                # get hidden states
-                neg_prompt = format_prompt(i, text, text1, text2, dataset_name = dataset_name)
-                print("number of tokens in neg_prompt: " + str(len(tokenizer(neg_prompt))))
-                if (str(len(tokenizer(neg_prompt))) > "512"):
-                    print("[ERROR] PROMPT TOO LONG: " + neg_prompt)
-                # print(neg_prompt)
                 neg_hs = get_hidden_states(model, tokenizer, neg_prompt, model_type=model_type)
-
-                pos_prompt = format_prompt(true_label, text, text1, text2, dataset_name = dataset_name)
-                print("number of tokens in pos_prompt: " + str(len(tokenizer(neg_prompt))))
-                # print(pos_prompt)
                 pos_hs = get_hidden_states(model, tokenizer, pos_prompt, model_type=model_type)
-                if (str(len(tokenizer(neg_prompt))) > "512"):
-                    print("[ERROR] PROMPT TOO LONG: " + pos_prompt)
 
                 # collect
                 all_neg_hs.append(neg_hs)
@@ -550,92 +543,98 @@ class CCS(object):
 
         return best_loss
 
+#%%
+
 #%% 
 
 num_epochs = 350
+model_names = ["deberta", "gpt-j", "t5", "unifiedqa", "T0pp"]
 
-model_names = ["deberta", "gpt-j"]
-# model_names = ["deberta", "gpt-j", "t5", "unifiedqa", "T0pp"]
-
-# 3D torch Tensor of results
-# 0th dimension: models
-# 1st dimension: train datasets
-# 2nd dimension: test datasets
-ccs_train = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
-probe_train = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
-ccs_test = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
-probe_test = torch.zeros((len(model_names), len(dataset_names_singular), len(dataset_names_singular)))
-
-for i, model_name in enumerate(model_names):
+for model_name in enumerate(model_names):
     model, model_type, tokenizer = load_model(model_name)
     print(" **** Loaded model: ", model_name)
 
+    # Load previous results if they exist; otherwise create zeros
+    # Dimensions: (train, test)
+    if os.path.exists('ccs_results/ccs_test_{model_name}.pt'):
+        ccs_test = torch.load('ccs_results/ccs_test_{model_name}.pt')
+        probe_test = torch.load('ccs_results/probe_test_{model_name}.pt')
+        ccs_train = torch.load('ccs_results/ccs_train_{model_name}.pt')
+        probe_train = torch.load('ccs_results/probe_train_{model_name}.pt')
+    else:
+        size = len(dataset_names_singular)
+        ccs_train, probe_train, ccs_test, probe_test = (
+            torch.zeros(size, size),
+            torch.zeros(size, size),
+            torch.zeros(size, size),
+            torch.zeros(size, size)
+        )
+
     for j, dataset_name_train in enumerate(dataset_names_singular):
         for k, dataset_name_test in enumerate(dataset_names_singular):
+            if (ccs_test[j,k] == 0):
 
-            print(" *** Training on ", dataset_name_train, " and testing on ", dataset_name_test)
+                print(" *** Training on ", dataset_name_train, " and testing on ", dataset_name_test)
 
-            # dataset_name_train = "imdb"
-            # dataset_name_test = "amazon_polarity"
-            data_train = datasets[dataset_name_train]
-            data_test = datasets[dataset_name_test]
-            print("loaded data")
+                data_train = datasets[dataset_name_train]
+                data_test = datasets[dataset_name_test]
+                print("loaded data")
 
-            print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
-            if j != k:
-                neg_hs_train, pos_hs_train, y_train, _ = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, used_idx = [])
-                print("got hidden states, train")
                 print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
-                neg_hs_test, pos_hs_test, y_test, _ = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs, used_idx = [])
-                print("got hidden states, test")
-                print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
-            else:
-                neg_hs_train, pos_hs_train, y_train, used_indx = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, used_idx = [])
-                neg_hs_test, pos_hs_test, y_test, used_indx = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, used_indx)
-                # If j = k, let's split training / testing results. without repetition, to ensur ethat the balance code in get_hidden_States_many_examples stays that way
+                if j != k:
+                    neg_hs_train, pos_hs_train, y_train, _ = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, used_idx = [])
+                    print("got hidden states, train")
+                    print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
+                    neg_hs_test, pos_hs_test, y_test, _ = get_hidden_states_many_examples(model, tokenizer, data_test, model_type, dataset_name_test, num_epochs, used_idx = [])
+                    print("got hidden states, test")
+                    print(f"Memory used, total: {torch.cuda.max_memory_allocated() / 1024**3:.2f} GB")
+                else:
+                    neg_hs_train, pos_hs_train, y_train, used_indx = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, used_idx = [])
+                    neg_hs_test, pos_hs_test, y_test, used_indx = get_hidden_states_many_examples(model, tokenizer, data_train, model_type, dataset_name_train, num_epochs, used_indx)
+                    # If j = k, let's split training / testing results. without repetition, to ensur ethat the balance code in get_hidden_States_many_examples stays that way
 
-            # for simplicity we can just take the difference between positive and negative hidden states
-            # (concatenating also works fine)
-            x_train = neg_hs_train - pos_hs_train
-            x_test = neg_hs_test - pos_hs_test
+                # for simplicity we can just take the difference between positive and negative hidden states
+                # (concatenating also works fine)
+                x_train = neg_hs_train - pos_hs_train
+                x_test = neg_hs_test - pos_hs_test
 
-            # Run a probe on neg and pos hidden states
-            try:
-                lr = LogisticRegression(class_weight="balanced")
-                print("Shape of x_train: ", x_train.shape)
-                print("Shape of y_train: ", y_train.shape)
-                lr.fit(x_train, y_train)
-                print("Logistic regression accuracy on transfer: {}".format(lr.score(x_test, y_test)))
-                print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
-                probe_train[i, j, k] = lr.score(x_train, y_train)
-                probe_test[i, j, k] = lr.score(x_test, y_test)
-            except:
-                print("Logistic regression failed")
+                # Run a probe on neg and pos hidden states
+                try:
+                    lr = LogisticRegression(class_weight="balanced")
+                    print("Shape of x_train: ", x_train.shape)
+                    print("Shape of y_train: ", y_train.shape)
+                    lr.fit(x_train, y_train)
+                    print("Logistic regression accuracy on transfer: {}".format(lr.score(x_test, y_test)))
+                    print("Logistic regression accuracy on own: {}".format(lr.score(x_train, y_train)))
+                    probe_train[j, k] = lr.score(x_train, y_train)
+                    probe_test[j, k] = lr.score(x_test, y_test)
+                except:
+                    print("Logistic regression failed")
 
-            # Train and run CCS without any labels
-            try:
-                ccs = CCS(neg_hs_train, pos_hs_train, y_train)
-                ccs.repeated_train()
-                ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
-                ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
-                print("CCS accuracy on transfer: {}".format(ccs_acc_test))
-                print("CCS accuracy on own: {}".format(ccs_acc_train))
-                ccs_train[i, j, k] = ccs_acc_train
-                ccs_test[i, j, k] = ccs_acc_test
-            except:
-                print("CCS failed")
-    # Save ccs_results tensor
-    torch.save(ccs_test, f'ccs_test_{model_name}.pt')
-    torch.save(ccs_train, f'ccs_train_{model_name}.pt')
+                # Train and run CCS without any labels
+                try:
+                    ccs = CCS(neg_hs_train, pos_hs_train, y_train)
+                    ccs.repeated_train()
+                    ccs_acc_train = ccs.get_acc(neg_hs_train, pos_hs_train, y_train)
+                    ccs_acc_test = ccs.get_acc(neg_hs_test, pos_hs_test, y_test)
+                    print("CCS accuracy on transfer: {}".format(ccs_acc_test))
+                    print("CCS accuracy on own: {}".format(ccs_acc_train))
+                    ccs_train[j, k] = ccs_acc_train
+                    ccs_test[j, k] = ccs_acc_test
+                except:
+                    print("CCS failed")
 
-    # Save probe_results tensor
-    torch.save(probe_test, f'probe_test_{model_name}.pt')
-    torch.save(probe_train, f'probe_train_{model_name}.pt')
+                # Save ccs_results tensor
+                torch.save(ccs_test, f'ccs_results/ccs_test_{model_name}.pt')
+                torch.save(ccs_train, f'ccs_results/ccs_train_{model_name}.pt')
+
+                # Save probe_results tensor
+                torch.save(probe_test, f'ccs_results/probe_test_{model_name}.pt')
+                torch.save(probe_train, f'ccs_results/probe_train_{model_name}.pt')
 
     del model
     del tokenizer
     torch.cuda.empty_cache()
-
 #%%
 
 # model_name = "deberta"
