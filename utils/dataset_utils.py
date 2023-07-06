@@ -1,27 +1,72 @@
-#%%
-
 from datasets import load_dataset
 from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
-from datasets import load_dataset
-from functools import partial
+from datasets import Dataset
 
-#%%
 
-"""
-A class for defining our own Dataset classes for probing and ITI. Code written by Kevin Wang and Phillip Guo.
-Datasets have many statements that are either true or false. They need a sample method that returns random
-indices of statements in the dataset, the tokenized statements, and labels.
-Their init method needs to define self.all_prompts (integer tokens) and self.all_labels.
-""" 
+
+def get_balanced_indices(indices, labels, sample_size):
+    """
+    A sampling method for getting a balanced sample of indices from a list of indices and labels, where the labels are unbalanced (either 0 or 1).
+    """
+    pairs = list(zip(indices, labels))
+
+    # Split the pairs into two lists depending on the label
+    pairs_0 = [pair[0] for pair in pairs if pair[1] == 0]
+    pairs_1 = [pair[0] for pair in pairs if pair[1] == 1]
+
+    # Get the size of the smaller list
+    min_size = min(len(pairs_0), len(pairs_1))
+
+    assert sample_size//2 <= min_size
+
+    # Randomly select 'min_size' elements from each list
+    sampled_indices_0 = np.random.choice(len(pairs_0), sample_size//2, replace=False)
+    sampled_indices_1 = np.random.choice(len(pairs_1), sample_size//2, replace=False)
+
+    sampled_pairs_0 = [pairs_0[i] for i in sampled_indices_0]
+    sampled_pairs_1 = [pairs_1[i] for i in sampled_indices_1]
+
+    # Merge the lists and extract the indices
+    balanced_indices = np.concatenate((sampled_pairs_0, sampled_pairs_1))
+
+    np.random.shuffle(balanced_indices)
+    return balanced_indices
+
 
 class Abstract_Dataset:
+    """
+    A class for defining our own Dataset classes for probing and ITI. Code written by Kevin Wang and Phillip Guo.
+    Datasets have many statements that are either true or false. They need a sample method that returns random
+    indices of statements in the dataset, the tokenized statements, and labels.
+    Their init method needs to define self.all_prompts (integer tokens) and self.all_labels.
+    """ 
     def __init__(self, tokenizer, seed:int = 0):
         raise NotImplementedError
 
-    def sample(self, sample_size: int):
-        raise NotImplementedError
+    def sample(self, sample_size: int, reset_seed=False, balanced=True):
+        """
+        indices is of type numpy array
+        sample_prompts is of type List of Tensors
+        sample_labels is of type List of Ints
+        """
+        if reset_seed:
+            np.random.seed(self.seed)
+        
+        if balanced:
+            indices = get_balanced_indices(range(len(self.all_prompts)), self.all_labels, sample_size)
+        else: 
+            indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
+        
+        sample_prompts = []
+        sample_labels =[]
+        for i in indices:
+            sample_prompts.append(self.all_prompts[i])
+            sample_labels.append(self.all_labels[i])
+        return indices, sample_prompts, sample_labels
+
+
 
 def format_truthfulqa(question, choice):
     return f"Q: {question} A: {choice}"
@@ -48,7 +93,7 @@ def tokenized_tqa(dataset, tokenizer):
     
     return all_prompts, all_labels
 
-class TQA_MC_Dataset():
+class TQA_MC_Dataset(Abstract_Dataset):
     """
     Questions in format "Q: What is underneath the Denver Airport?\nA: The Denver Airport is underneath the city of Denver.
     """
@@ -58,25 +103,6 @@ class TQA_MC_Dataset():
         self.seed = seed
         np.random.seed(seed)
     
-    def sample(self, sample_size: int, reset_seed=False):
-        if reset_seed: # so that every sample will be the same
-            np.random.seed(self.seed)
-
-        # indices = np.random.randint(0, len(self.dataset), size = sample_size)
-        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
-        # print(indices) 
-        # print(self.all_prompts)
-        # print(self.all_labels)
-        sample_prompts = []
-        sample_labels =[]
-        for i in indices:
-            sample_prompts.append(self.all_prompts[i])
-            sample_labels.append(self.all_labels[i])
-        return indices, sample_prompts, sample_labels
-
-        # print(np.array(self.all_prompts)[indices])
-        # print(np.array(self.all_labels)[indices])
-        # return indices, torch.tensor(self.all_prompts, )[indices], torch.tensor(self.all_labels)[indices]
 
 def tokenized_tqa_gen(dataset, tokenizer):
     all_prompts = []
@@ -108,7 +134,7 @@ def tokenized_tqa_gen(dataset, tokenizer):
         
     return all_prompts, all_labels, all_categories
 
-class TQA_GEN_Dataset():
+class TQA_GEN_Dataset(Abstract_Dataset):
     def __init__(self, tokenizer, category: str = "Misconceptions", seed:int = 0):
         full_dataset = load_dataset("truthful_qa", "generation")['validation']
         
@@ -121,11 +147,6 @@ class TQA_GEN_Dataset():
         
         np.random.seed(seed)
         
-    def sample(self, sample_size: int):
-
-        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
-
-        return indices, np.array(self.all_prompts)[indices], np.array(self.all_labels)[indices]
 
 def format_cfact(question, choice):
     return f"Q: {question} A: {choice}"
@@ -150,17 +171,13 @@ def tokenized_cfact(dataset, tokenizer):
         
     return all_prompts, all_labels
 
-class CounterFact_Dataset():
+class CounterFact_Dataset(Abstract_Dataset):
     def __init__(self, tokenizer, seed:int = 0):
         self.dataset = load_dataset("NeelNanda/counterfact-tracing")['train']
         self.all_prompts, self.all_labels = tokenized_cfact(self.dataset, tokenizer)
         
         np.random.seed(seed)
         
-    def sample(self, sample_size: int):
-        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
-        return indices, np.array(self.all_prompts)[indices], np.array(self.all_labels)[indices]
-
 
 # import pandas as pd
 
@@ -187,24 +204,14 @@ def tokenized_ezdataset(dataset, tokenizer):
     
     return all_prompts, all_labels
 
-class EZ_Dataset():
+class EZ_Dataset(Abstract_Dataset):
     def __init__(self, tokenizer, seed:int = 0):
         self.dataset = load_dataset("csv", data_files = "datasets/dumb_facts.csv")
         self.all_prompts, self.all_labels = tokenized_ezdataset(self.dataset, tokenizer)
         np.random.seed(seed)
-        
-    def sample(self, sample_size: int):
-        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
-        sample_prompts = []
-        sample_labels =[]
-        for i in indices:
-            sample_prompts.append(self.all_prompts[i])
-            sample_labels.append(self.all_labels[i])
-        return indices, sample_prompts, sample_labels
 
 
-
-class Capitals_Dataset():
+class Capitals_Dataset(Abstract_Dataset):
     """
     Dataset of prompts in the form "Q: What is the capital of {str(country)}? A: {capital}"
     capital may be correct or incorrect capital of country.
@@ -251,15 +258,6 @@ class Capitals_Dataset():
         self.all_prompts, self.all_labels = self.load_dataset(tokenizer, "datasets/world_capitals.csv", wrong_seed=5)
 
         np.random.seed(seed)
-        
-    def sample(self, sample_size: int):
-        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
-        sample_prompts = []
-        sample_labels =[]
-        for i in indices:
-            sample_prompts.append(self.all_prompts[i])
-            sample_labels.append(self.all_labels[i])
-        return indices, sample_prompts, sample_labels
     
     def sample_questions(self, sample_size: int, seed=None):
         """
@@ -278,7 +276,7 @@ class Capitals_Dataset():
             sample_prompts.append(question_prompts[i])
         return indices, sample_prompts
 
-#%%
+
 
 def TF_helper(prompts, labels, tokenizer):
     """
@@ -307,105 +305,141 @@ def TF_helper(prompts, labels, tokenizer):
     
     return all_prompts, all_labels
 
-class ChatGPTGen_Dataset():
-    def __init__(self, tokenizer, seed:int = 0):
-        # define self.dataset
-        self.all_prompts, self.all_labels = TF_helper(self.dataset['Question'], self.dataset['Correct'], tokenizer)
+
+def TF_questions_helper(prompts, labels, tokenizer, custom_prompt=None):
+    """
+    Helper function for ChatGPTGen_Dataset.
+    Does not include "True" or "False" in the prompt, label is instead whether or not statement is actually true.
+    custom_prompt does not work yet.
+    """
+    all_prompts = []
+    all_labels = []
+    for i in range(len(prompts)):
+
+        prompt = prompts[i]
+        label = labels[i]
+
+        prompt_true = "Is the below statement true or false? " + prompt + " Answer:"
+        all_prompts.append(tokenizer(prompt_true, return_tensors = 'pt').input_ids)
+        all_labels.append(label)
+    
+    return all_prompts, all_labels
+
+
+class ChatGPTGen_Dataset(Abstract_Dataset):
+    def __init__(self, tokenizer, seed:int = 0, questions=False, custom_prompt=None):
+        """
+        If questions = True, then load dataset of prompts in the form "True or False: {str(prompt)}" without True or False at end. Else, load in normal "True or False: {str(prompt)} True/False" format.
+        """
+        # define self.dataset in child class
+        assert self.dataset is not None
+        if questions:
+            self.all_prompts, self.all_labels = TF_questions_helper(self.dataset['Question'], self.dataset['Correct'], tokenizer, custom_prompt)
+        else:
+            self.all_prompts, self.all_labels = TF_helper(self.dataset['Question'], self.dataset['Correct'], tokenizer)
         self.tokenizer = tokenizer
         self.seed = np.random.seed(seed)
 
-    def sample(self, sample_size: int, reset_seed = False):
-        """
-        indices is of type numpy array
-        sample_prompts is of type List of Tensors
-        sample_labels is of type List of Ints
-        """
-        if reset_seed:
-            np.random.seed(self.seed)
-        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
-        sample_prompts = []
-        sample_labels =[]
-        for i in indices:
-            sample_prompts.append(self.all_prompts[i])
-            sample_labels.append(self.all_labels[i])
-        return indices, sample_prompts, sample_labels
 
 class MS_Dataset(ChatGPTGen_Dataset):
-    def __init__(self, tokenizer, seed:int = 0):
+    def __init__(self, *args, **kwargs):
         self.dataset = load_dataset("notrichardren/elem_tf")["train"]
-        super().__init__(tokenizer, seed)
+        super().__init__(*args, **kwargs)
 
 class Elem_Dataset(ChatGPTGen_Dataset):
-    def __init__(self, tokenizer, seed:int = 0):
+    def __init__(self, *args, **kwargs):
         self.dataset = load_dataset("notrichardren/ms_tf")["train"]
-        super().__init__(tokenizer, seed)
+        super().__init__(*args, **kwargs)
 
 class MisCons_Dataset(ChatGPTGen_Dataset):
-    def __init__(self, tokenizer, seed:int = 0):
-        self.dataset = load_dataset("notrichardren/misconceptions")["train"]
-        super().__init__(tokenizer, seed)
+    def __init__(self, *args, **kwargs):
+        self.dataset = load_dataset("notrichardren/misconceptions_tf")["train"]
+        super().__init__(*args, **kwargs)
 
 class Kinder_Dataset(ChatGPTGen_Dataset):
-    def __init__(self, tokenizer, seed:int = 0):
+    def __init__(self, *args, **kwargs):
         self.dataset = load_dataset("notrichardren/kindergarten_tf")["train"]
-        super().__init__(tokenizer, seed)
+        super().__init__(*args, **kwargs)
 
 class HS_Dataset(ChatGPTGen_Dataset):
-    def __init__(self, tokenizer, seed:int = 0):
+    def __init__(self, *args, **kwargs):
         self.dataset = load_dataset("notrichardren/hs_tf")["train"]
-        super().__init__(tokenizer, seed)
+        super().__init__(*args, **kwargs)
 
-#%%
 
-def filter_strings(example, strings):
-    return any(s in example['text'] for s in strings)
+class ChatGPTGen_Dataset_Truthfulness(Abstract_Dataset):
+    def __init__(self, tokenizer, seed:int = 0, questions=False, custom_prompt=None):
+        """
+        If questions = True, then load dataset of prompts in the form "True or False: {str(prompt)}" without True or False at end. Else, load in normal "True or False: {str(prompt)} True/False" format.
+        """
+        # define self.dataset in child class
+        assert self.dataset is not None
+        if questions:
+            self.all_prompts, self.all_labels = TF_questions_helper(self.dataset['claim'], self.dataset['label'], tokenizer, custom_prompt)
+        else:
+            self.all_prompts, self.all_labels = TF_helper(self.dataset['claim'], self.dataset['label'], tokenizer)
+        self.tokenizer = tokenizer
+        self.seed = np.random.seed(seed)
 
-class TruthfulQA_Tfn(ChatGPTGen_Dataset):
-    def __init__(self, tokenizer, seed:int = 0):
+class TruthfulQA_Tfn(ChatGPTGen_Dataset_Truthfulness):
+    def __init__(self, *args, **kwargs):
         string_list = ["TruthfulQA"]
-        partial_filter_strings = partial(filter_strings, strings=string_list)
-        self.dataset = load_dataset("notrichardren/hs_tf")["train"].filter(partial_filter_strings)
-        super().__init__(tokenizer, seed)
+        dataset = load_dataset("notrichardren/truthfulness")["train"]
+        df = dataset.to_pandas()
+        df = df[df['origin_dataset'].isin(string_list)]
+        self.dataset = Dataset.from_pandas(df)
+        super().__init__(*args, **kwargs)
 
-class CounterFact_Tfn(ChatGPTGen_Dataset):
-    def __init__(self, tokenizer, seed:int = 0):
+class CounterFact_Tfn(ChatGPTGen_Dataset_Truthfulness):
+    def __init__(self, *args, **kwargs):
         string_list = ["CounterFact"]
-        partial_filter_strings = partial(filter_strings, strings=string_list)
-        self.dataset = load_dataset("notrichardren/hs_tf")["train"].filter(partial_filter_strings)
-        super().__init__(tokenizer, seed)
+        dataset = load_dataset("notrichardren/truthfulness")["train"]
+        df = dataset.to_pandas()
+        df = df[df['origin_dataset'].isin(string_list)]
+        self.dataset = Dataset.from_pandas(df)
+        super().__init__(*args, **kwargs)
 
-class Fever_Tfn(ChatGPTGen_Dataset):
-    def __init__(self, tokenizer, seed:int = 0):
+class Fever_Tfn(ChatGPTGen_Dataset_Truthfulness):
+    def __init__(self, *args, **kwargs):
         string_list = ["fever_v1.0_labelleddev", "fever_v1.0_train","fever_v2.0"]
-        partial_filter_strings = partial(filter_strings, strings=string_list)
-        self.dataset = load_dataset("notrichardren/hs_tf")["train"].filter(partial_filter_strings)
-        super().__init__(tokenizer, seed)
+        dataset = load_dataset("notrichardren/truthfulness")["train"]
+        df = dataset.to_pandas()
+        df = df[df['origin_dataset'].isin(string_list)]
+        self.dataset = Dataset.from_pandas(df)
+        super().__init__(*args, **kwargs)
 
-class BoolQ_Tfn(ChatGPTGen_Dataset):
-    def __init__(self, tokenizer, seed:int = 0):
+class BoolQ_Tfn(ChatGPTGen_Dataset_Truthfulness):
+    def __init__(self, *args, **kwargs):
         string_list = ["boolq_train", "boolq_test"]
-        partial_filter_strings = partial(filter_strings, strings=string_list)
-        self.dataset = load_dataset("notrichardren/hs_tf")["train"].filter(partial_filter_strings)
-        super().__init__(tokenizer, seed)
+        dataset = load_dataset("notrichardren/truthfulness")["train"]
+        df = dataset.to_pandas()
+        df = df[df['origin_dataset'].isin(string_list)]
+        self.dataset = Dataset.from_pandas(df)
+        super().__init__(*args, **kwargs)
 
-class Creak_Tfn(ChatGPTGen_Dataset):
-    def __init__(self, tokenizer, seed:int = 0):
+class Creak_Tfn(ChatGPTGen_Dataset_Truthfulness):
+    def __init__(self, *args, **kwargs):
         string_list = ["creak_train", "creak_dev", "creak_contrast_set"]
-        partial_filter_strings = partial(filter_strings, strings=string_list)
-        self.dataset = load_dataset("notrichardren/hs_tf")["train"].filter(partial_filter_strings)
-        super().__init__(tokenizer, seed)
+        dataset = load_dataset("notrichardren/truthfulness")["train"]
+        df = dataset.to_pandas()
+        df = df[df['origin_dataset'].isin(string_list)]
+        self.dataset = Dataset.from_pandas(df)
+        super().__init__(*args, **kwargs)
 
-class CommonClaim_Tfn(ChatGPTGen_Dataset):
-    def __init__(self, tokenizer, seed:int = 0):
+class CommonClaim_Tfn(ChatGPTGen_Dataset_Truthfulness):
+    def __init__(self, *args, **kwargs):
         string_list = ["CommonClaim"]
-        partial_filter_strings = partial(filter_strings, strings=string_list)
-        self.dataset = load_dataset("notrichardren/hs_tf")["train"].filter(partial_filter_strings)
-        super().__init__(tokenizer, seed)
+        dataset = load_dataset("notrichardren/truthfulness")["train"]
+        df = dataset.to_pandas()
+        df = df[df['origin_dataset'].isin(string_list)]
+        self.dataset = Dataset.from_pandas(df)
+        super().__init__(*args, **kwargs)
 
-#%%
-class BoolQ_Dataset:
+
+class BoolQ_Dataset(Abstract_Dataset):
     """
-    Dataset of True/False questions. For some reason, dataset is all in lowercase, may degrade performance.
+    Dataset of True/False statements. Statements consist of "true or false: {question}. A: {true or false}". 
+    For some reason, dataset is all in lowercase, may degrade performance.
     18854 examples if train=True, 6540 if train=False.
     """
     def __init__(self, tokenizer, seed:int = 0, train=True):
@@ -430,13 +464,27 @@ class BoolQ_Dataset:
         self.all_prompts = prompts
         self.all_labels = labels
 
-    def sample(self, sample_size: int):
-        indices = np.random.choice(len(self.all_prompts), size = sample_size, replace = False)
-        sample_prompts = []
-        sample_labels =[]
-        for i in indices:
-            sample_prompts.append(self.all_prompts[i])
-            sample_labels.append(self.all_labels[i])
-        return indices, sample_prompts, sample_labels
+class BoolQ_Question_Dataset(Abstract_Dataset):
+    """
+    Dataset of questions, without the " true" or " false" at end of statement given. Tokenized.
+    """
+    def __init__(self, tokenizer, seed:int = 0, train=True):
+        self.dataset = load_dataset("boolq")["train" if train else "validation"]
+        
+        prompts = []
+        labels = []
+        prompt_start = "Is this true or false:"
+        for idx, question in enumerate(self.dataset['question']):
+            prompt = f"{prompt_start} {question}? A:"
+            prompts.append(tokenizer(prompt, return_tensors='pt').input_ids)
+
+            if self.dataset['answer'][idx] == True:
+                labels.append(1)
+            else:
+                labels.append(0)
+        np.random.seed(seed)
+
+        self.all_prompts = prompts
+        self.all_labels = labels
 
 #%%

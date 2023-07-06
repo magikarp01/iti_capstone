@@ -24,7 +24,7 @@ from transformer_lens import HookedTransformer, HookedTransformerConfig, Factore
 #     --target-model-path vicuna-7b-hf \
 #     --delta-path vicuna-7b-delta-v1.1
 
-def llama(device = "cuda"):
+def vicuna(device = "cuda"):
     # Set up model
     model = LlamaForCausalLM.from_pretrained('vicuna-7b-hf')
     tokenizer = LlamaTokenizer.from_pretrained('llama-7b-hf')
@@ -33,7 +33,7 @@ def llama(device = "cuda"):
         hf_model=model, 
         device='cpu', 
         fold_ln=False, 
-        refactor_factored_attn_matrices = True,
+        # refactor_factored_attn_matrices = True,
         center_writing_weights=False, 
         center_unembed=False
     )
@@ -43,3 +43,4 @@ def llama(device = "cuda"):
     model.cfg.total_heads = model.cfg.n_heads * model.cfg.n_layers
     model.tokenizer = tokenizer
     model.reset_hooks()
+    return model

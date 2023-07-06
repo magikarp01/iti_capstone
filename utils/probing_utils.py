@@ -31,7 +31,6 @@ from transformer_lens import HookedTransformer, HookedTransformerConfig, Factore
 import pickle
 from collections import defaultdict
 
-# from iti import patch_top_activations
 from typing import TypeVar
 ModelActs = TypeVar("ModelActs")
 
@@ -65,6 +64,8 @@ class ModelActs:
         self.probe_accs = {}
         self.X_tests = {}
         self.y_tests = {}
+        self.indices_trains = {}
+        self.indices_tests = {}
 
     """
     Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
@@ -90,6 +91,9 @@ class ModelActs:
                     # get last seq position
                     stored_acts = cache.stack_head_results(layer=-1, pos_slice=-1).squeeze().to(device=storage_device)
                 
+                elif act_type == "logits":
+                    stored_acts = original_logits[:,-1].to(device=storage_device) # logits of last token
+
                 else:
                     stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
                 cached_acts[act_type].append(stored_acts)
@@ -162,8 +166,8 @@ class ModelActs:
         # print(len(indices))
         # print(np.array(self.dataset.all_labels)[indices])
         # print(len(np.array(self.dataset.all_labels)[indices]))
-        
-        X_train, X_test, y_train, y_test = train_test_split(X_acts_list, np.array(self.dataset.all_labels)[indices], test_size=test_ratio)
+
+        X_train, X_test, y_train, y_test, indices_train, indices_test = train_test_split(X_acts_list, np.array(self.dataset.all_labels)[indices], indices, test_size=test_ratio)
         
         X_train = torch.stack(X_train, axis = 0)
         X_test = torch.stack(X_test, axis = 0)
@@ -173,7 +177,7 @@ class ModelActs:
         y_train = repeat(y_train, 'b -> b num_probes', num_probes=X_acts.shape[1])
         y_test = repeat(y_test, 'b -> b num_probes', num_probes=X_acts.shape[1])
 
-        return X_train, X_test, y_train, y_test
+        return X_train, X_test, y_train, y_test, indices_train, indices_test
 
 
     def _train_probes(self, num_probes, X_train, X_test, y_train, y_test, max_iter=1000):
@@ -201,37 +205,6 @@ class ModelActs:
         return probes, np.array(all_head_accs)
 
 
-    def train_z_probes(self, max_iter=1000):
-        """
-        Train linear probes on every head's activations. Must be called after either gen_acts or load_acts.
-        Probes are stored in self.probes, and accuracies are stored in self.all_head_accs_np (also returned).
-        Also store last X_test and y_test used for probes
-        """
-        formatted_z_acts = einops.rearrange(self.stored_acts["z"], "b n_l n_h d_h -> b (n_l n_h) d_h")
-        X_train, X_test, y_train, y_test = self.get_train_test_split(formatted_z_acts)
-        # print(f"{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}")
-
-        probes, probe_accs = self._train_probes(formatted_z_acts.shape[1], X_train, X_test, y_train, y_test, max_iter=max_iter)
-
-        self.X_tests["z"] = X_test
-        self.y_tests["z"] = y_test
-        
-        self.probes["z"] = probes
-        self.probe_accs["z"] = probe_accs
-
-
-    def train_mlp_out_probes(self, max_iter=1000):
-        X_train, X_test, y_train, y_test = self.get_train_test_split(self.stored_acts["mlp_out"])
-        # print(f"{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}")
-
-        probes, probe_accs = self._train_probes(self.stored_acts["mlp_out"].shape[1], X_train, X_test, y_train, y_test, max_iter=max_iter)
-
-        self.X_tests["mlp_out"] = X_test
-        self.y_tests["mlp_out"] = y_test
-        
-        self.probes["mlp_out"] = probes
-        self.probe_accs["mlp_out"] = probe_accs
-
     def train_probes(self, act_type, max_iter=1000):
         """
         Train arbitrary probes on any act type's activations (must've been included in self.act_types).
@@ -242,14 +215,16 @@ class ModelActs:
 
         assert len(formatted_acts.shape) == 3
 
-        X_train, X_test, y_train, y_test = self.get_train_test_split(formatted_acts)
+        X_train, X_test, y_train, y_test, indices_train, indices_test = self.get_train_test_split(formatted_acts)
         print(f"{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}")
 
         probes, probe_accs = self._train_probes(formatted_acts.shape[1], X_train, X_test, y_train, y_test, max_iter=max_iter)
 
         self.X_tests[act_type] = X_test
         self.y_tests[act_type] = y_test
-        
+        self.indices_trains[act_type] = indices_train
+        self.indices_tests[act_type] = indices_test
+
         self.probes[act_type] = probes
         self.probe_accs[act_type] = probe_accs
 
