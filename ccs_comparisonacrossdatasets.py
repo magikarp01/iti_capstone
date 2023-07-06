@@ -361,13 +361,12 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_
             except:
                 text2 = ""
             pos_prompt = format_prompt(true_label, text, text1, text2, dataset_name = dataset_name)
-            neg_prompt = format_prompt(i, text, text1, text2, dataset_name = dataset_name)
-
+            
             # Length requirement (not met)
-            if not (len(tokenizer(neg_prompt)['input_ids']) < max_model_length) and (len(tokenizer(pos_prompt)['input_ids']) < max_model_length):
+            if not (len(tokenizer(pos_prompt)['input_ids']) < (max_model_length - 10)):
                 toolong_idxs.append(idx)
                 continue
-            # Balance requirement (met)
+            # Balance requirement (met) + length requirement met
             elif ((pos_labels < pos_labels_limit and true_label == 1) or (neg_labels < neg_labels_limit and true_label == 0)):
                 used_idxs.append(idx)
                 if true_label == 0:
@@ -379,6 +378,7 @@ def get_hidden_states_many_examples(model, tokenizer, data, model_type, dataset_
         for i, label in enumerate(label_dict.get(dataset_name)):
 
             if i != true_label:
+                neg_prompt = format_prompt(i, text, text1, text2, dataset_name = dataset_name)
                 neg_hs = get_hidden_states(model, tokenizer, neg_prompt, model_type=model_type)
                 pos_hs = get_hidden_states(model, tokenizer, pos_prompt, model_type=model_type)
 
@@ -544,13 +544,14 @@ class CCS(object):
         return best_loss
 
 #%%
-
+import torch
+ccs_test = torch.load('ccs_results/ccs_test_deberta.pt')
 #%% 
 
 num_epochs = 350
 model_names = ["deberta", "gpt-j", "t5", "unifiedqa", "T0pp"]
 
-for model_name in enumerate(model_names):
+for model_name in model_names:
     model, model_type, tokenizer = load_model(model_name)
     print(" **** Loaded model: ", model_name)
 
