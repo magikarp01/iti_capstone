@@ -38,6 +38,8 @@ class TorchDataset(Dataset):
     def sample(self, sample_size: int, reset_seed=False):
         return self.dataset.sample(sample_size, reset_seed)
 
+        
+
 
 class TorchSample(Dataset):
     def __init__(self, prompts=None, labels=None, indices=None):
