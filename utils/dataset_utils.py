@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
 from datasets import Dataset
+from tqdm import tqdm
 
 
 
@@ -488,3 +489,83 @@ class BoolQ_Question_Dataset(Abstract_Dataset):
         self.all_labels = labels
 
 #%%
+
+class CCS_dataset:
+    """
+    Trying to create a dataset that creates things in *pairs*
+    """
+    def __init__(self, label_dict, format_prompt, dataset, tokenizer, seed:int = 0):
+        self.tokenizer = tokenizer
+        self.dataset = dataset # HuggingFace dataset
+        self.label_dict = label_dict
+        self.format_prompt = format_prompt
+
+    def sample_pair(self, sample_size: int, reset_seed=False, balanced=True, used_idx=[]): # WILL REFACTOR THIS & CLEAN IT UP LATER
+        """
+        indices is of type numpy array
+        sample_prompts is of type List of Tensors
+        sample_labels is of type List of Ints
+
+        Balanced by default; unbalanced implementation hasn't happened yet lol
+        """
+
+        all_neg_hs, all_pos_hs, all_gt_labels = [], [], []
+
+        # Length requirement
+        max_token_length = self.tokenizer.model_max_length
+
+        # BALANCE
+        neg_labels = 0
+        pos_labels = 0
+        neg_labels_limit = sample_size//2
+        pos_labels_limit = sample_size-neg_labels_limit
+
+        # keep track
+        print(f"intial used_idx: {used_idx}")
+        used_idxs = used_idx
+        visited_idxs = used_idx
+        toolong_idxs = []
+
+        for _ in tqdm(range(sample_size)):
+            while True:
+                idx = np.random.randint(len(self.dataset))
+                if idx in visited_idxs:
+                    continue
+                visited_idxs.append(idx)
+
+                # Find all the variables relevant to this prompt
+                text, true_label = self.dataset[idx]["text"], self.dataset[idx]["label"]
+                try:
+                    text1 = self.dataset[idx]["text1"]
+                except:
+                    text1 = ""
+                try:
+                    text2 = self.dataset[idx]["text2"]
+                except:
+                    text2 = ""
+                pos_prompt = self.format_prompt(true_label, text, text1, text2, dataset_name = "imdb")
+
+                # Length requirement (not met)
+                if not (len(self.tokenizer(pos_prompt)['input_ids']) < (max_token_length - 20)):
+                    toolong_idxs.append(idx)
+                    continue
+                # Balance requirement (met) + length requirement met
+                elif ((pos_labels < pos_labels_limit and true_label == 1) or (neg_labels < neg_labels_limit and true_label == 0)):
+                    if true_label == 0:
+                        neg_labels += 1
+                    else:
+                        pos_labels += 1
+                    break
+            for i, label in enumerate(self.label_dict.get(self.dataset_name)):
+                if i != true_label:
+                    neg_prompt = self.format_prompt(i, text, text1, text2, dataset_name = "imdb")
+                    all_neg_hs.append(neg_prompt)
+                    all_pos_hs.append(pos_prompt)
+                    all_gt_labels.append(true_label)
+
+
+        neg_p = np.stack(all_neg_hs)
+        pos_p = np.stack(all_pos_hs)
+        y = np.stack(all_gt_labels)
+
+        return neg_p, pos_p, y, used_idxs

@@ -114,6 +114,109 @@ class ModelActs:
 
         # return self.indices, self.attn_head_acts
 
+
+    def get_acts_of_prompts(self, prompts, store_acts = True, filepath = "activations/", id = None, storage_device="cpu"):
+        """
+        this gen_acts differs because it does model.run_with_cache but takes in a list of prompts, not on a list of indices.
+        """
+
+        cached_acts = defaultdict(list)
+
+        # names filter for efficiency, only cache in self.act_types
+        names_filter = lambda name: any([name.endswith(act_type) for act_type in self.act_types])
+
+        for prompt in tqdm(prompts):
+            original_logits, cache = self.model.run_with_cache(prompt.to(self.model.cfg.device), names_filter=names_filter)
+
+            # store every act type in self.act_types
+            for act_type in self.act_types:
+
+                if act_type == "result":
+                    # get last seq position
+                    stored_acts = cache.stack_head_results(layer=-1, pos_slice=-1).squeeze().to(device=storage_device)
+                
+                elif act_type == "logits":
+                    stored_acts = original_logits[:,-1].to(device=storage_device) # logits of last token
+
+                else:
+                    stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
+                cached_acts[act_type].append(stored_acts)
+
+        # convert lists of tensors into tensors
+        stored_acts = {act_type: torch.stack(cached_acts[act_type]) for act_type in self.act_types} 
+
+        self.stored_acts = stored_acts
+        
+        if store_acts:
+            if id is None:
+                id = np.random.randint(10000)
+            for act_type in self.act_types:
+                torch.save(self.stored_acts[act_type], f'{filepath}{id}_{act_type}_acts.pt')
+            print(f"Stored at {id}")
+
+        return self.stored_acts
+
+    def CCS_train(self,batch_size, n_epochs):
+        """
+        CCS = consistent contrast search
+        """
+        
+        # Initialize probes with random parameters
+        self.p0 = nn.Sequential(nn.Linear(acts_yes.shape[-1], 1), nn.Sigmoid()).to(self.model.cfg.device)
+        self.p1 = nn.Sequential(nn.Linear(acts_yes.shape[-1], 1), nn.Sigmoid()).to(self.model.cfg.device)
+
+        # Initialize optimizer
+        optimizer = torch.optim.AdamW(self.probe.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+
+        for epoch in range(n_epochs):
+            # Sample_pair based on batch_size
+            prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(batch_size)
+
+            # Get hidden states
+            acts_yes = self.get_acts_of_prompts(prompt_yes)
+            acts_no = self.get_acts_of_prompts(prompt_no)
+            # Normalize hidden states
+            acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
+            acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
+        
+            # probe
+            p0_out, p1_out = self.p0(acts_yes), self.p1(acts_no)
+
+            # get the corresponding loss
+            informative_loss = (torch.min(p0_out, p1_out)**2).mean(0)
+            consistent_loss = ((p0_out - (1-p1_out))**2).mean(0)
+            loss = informative_loss + consistent_loss
+
+            # update the parameters
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+        return loss.detach().cpu().item()
+
+    def CCS_label_clusters(self, acts_yes, acts_no, labels):
+        with torch.no_grad():
+            p0_out, p1_out = self.p0(acts_yes), self.p1(acts_no)
+        avg_confidence = 0.5*(p0_out + (1-p1_out))
+        predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
+        acc = (predictions == labels).mean()
+        if acc > 0.5:
+            return False # don't turn
+        else:
+            return True # do turn
+
+    def CCS_inference(self, acts_yes, acts_no, labels):
+        acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
+        acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
+        with torch.no_grad():
+            p0_out, p1_out = self.p0(acts_yes), self.p1(acts_no)
+        avg_confidence = 0.5*(p0_out + (1-p1_out))
+        predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
+        acc = (predictions == labels).mean()
+        if self.get_train_dir(): # Apply train_direction
+            acc = 1 - acc
+        return acc
+    
     """
     Loads activations from activations folder. If id is None, then load the most recent activations. 
     If load_probes is True, load from saved probes.picle and all_heads_acc_np.npy files as well.
