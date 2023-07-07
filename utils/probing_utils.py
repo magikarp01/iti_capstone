@@ -113,6 +113,63 @@ class ModelActs:
             print(f"Stored at {id}")
 
         # return self.indices, self.attn_head_acts
+    
+    def gen_acts_CCS(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu"):
+        
+        neg_p, pos_p, y, used_idxs = self.dataset.sample(N)
+        
+        cached_acts_neg = defaultdict(list)
+        cached_acts_pos = defaultdict(list)
+
+        # names filter for efficiency, only cache in self.act_types
+        names_filter = lambda name: any([name.endswith(act_type) for act_type in self.act_types])
+
+        for i in tqdm(pos_p):
+            original_logits, cache = self.model.run_with_cache(neg_p[i].to(self.model.cfg.device), names_filter=names_filter) # only cache z
+            
+            # store every act type in self.act_types
+            for act_type in self.act_types:
+
+                if act_type == "result":
+                    # get last seq position
+                    stored_acts = cache.stack_head_results(layer=-1, pos_slice=-1).squeeze().to(device=storage_device)
+                
+                elif act_type == "logits":
+                    stored_acts = original_logits[:,-1].to(device=storage_device) # logits of last token
+
+                else:
+                    stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
+                cached_acts_pos[act_type].append(stored_acts)
+
+        for i in tqdm(neg_p):
+            original_logits, cache = self.model.run_with_cache(neg_p[i].to(self.model.cfg.device), names_filter=names_filter) # only cache z
+            
+            # store every act type in self.act_types
+            for act_type in self.act_types:
+
+                if act_type == "result":
+                    # get last seq position
+                    stored_acts = cache.stack_head_results(layer=-1, pos_slice=-1).squeeze().to(device=storage_device)
+                
+                elif act_type == "logits":
+                    stored_acts = original_logits[:,-1].to(device=storage_device) # logits of last token
+
+                else:
+                    stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
+                cached_acts_neg[act_type].append(stored_acts)
+        
+        # convert lists of tensors into tensors
+        self.stored_acts_pos = {act_type: torch.stack(cached_acts_pos[act_type]) for act_type in self.act_types} 
+        self.stored_acts_neg = {act_type: torch.stack(cached_acts_neg[act_type]) for act_type in self.act_types} 
+        
+        if store_acts:
+            if id is None:
+                id = np.random.randint(10000)
+            for act_type in self.act_types:
+                torch.save(self.stored_acts[act_type], f'{filepath}{id}_{act_type}_CCS_acts.pt')
+            print(f"Stored at {id}")
+
+        return self.stored_acts_pos, self.stored_acts_neg, y, used_idxs
 
     """
     Loads activations from activations folder. If id is None, then load the most recent activations. 

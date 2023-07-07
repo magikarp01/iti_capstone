@@ -1325,3 +1325,885 @@ Memory used, total: 3.15 GB
 neg_labels_limit: 175
 pos_labels_limit: 175
 intial used_idx: []
+Loaded dataset: imdb
+Dataset({
+    features: ['text', 'label'],
+    num_rows: 25000
+})
+Loaded dataset: amazon_polarity
+Dataset({
+    features: ['label', 'title', 'content', 'text'],
+    num_rows: 3600000
+})
+Loaded dataset: ag_news
+Dataset({
+    features: ['text', 'label'],
+    num_rows: 120000
+})
+Loaded dataset: dbpedia_14
+Dataset({
+    features: ['label', 'title', 'content', 'text'],
+    num_rows: 560000
+})
+Loaded dataset: super_glue/copa
+Dataset({
+    features: ['text', 'text1', 'text2', 'question', 'idx', 'label', '__index_level_0__'],
+    num_rows: 500
+})
+Loaded dataset: super_glue/rte
+Dataset({
+    features: ['text', 'text1', 'idx', 'label'],
+    num_rows: 2490
+})
+Loaded dataset: boolq
+Dataset({
+    features: ['text1', 'label', 'text'],
+    num_rows: 9427
+})
+Loaded dataset: glue/qnli
+Dataset({
+    features: ['text', 'text1', 'label', 'idx'],
+    num_rows: 104743
+})
+Loaded dataset: piqa
+Dataset({
+    features: ['text', 'text1', 'text2', 'label'],
+    num_rows: 16113
+})
+Loaded dataset: chenxwh/gen-storycloze
+Dataset({
+    features: ['story_id', 'input_sentence_1', 'input_sentence_2', 'input_sentence_3', 'input_sentence_4', 'text', 'text1', 'text2', 'answer_right_ending', 'text_right_ending', 'text_wrong_ending', 'label'],
+    num_rows: 1785
+})
+[2023-07-07 02:47:40,613] [INFO] [real_accelerator.py:110:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+Models loaded successfully!
+ **** Loaded model:  deberta
+ *** Training on  imdb  and testing on  imdb
+loaded data
+Memory used, total: 2.92 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: [23654, 23654, 15795, 15795, 860, 860, 5390, 5390, 21575, 21575, 11964, 11964, 11284, 11284, 22118, 22118, 6265, 6265, 16850, 16850, 4426, 4426, 21962, 21962, 14423, 11363, 11363, 16023, 16023, 8322, 8322, 1685, 1685, 769, 769, 23333, 23333, 2433, 2433, 5311, 5311, 5051, 5051, 6420, 6420, 17568, 17568, 20939, 20939, 19769, 19769, 6396, 6396, 8666, 8666, 18942, 18942, 24233, 24233, 18431, 18431, 2747, 2747, 189, 189, 19118, 19118, 3005, 3005, 21042, 21042, 1899, 1899, 24118, 24118, 1267, 17912, 17912, 11394, 11394, 3556, 3556, 3890, 3890, 8838, 14502, 14502, 21777, 21777, 10627, 10627, 8792, 10555, 10555, 10253, 10253, 8433, 8433, 10233, 10233, 11016, 11016, 23897, 23897, 2612, 2612, 23425, 23425, 22619, 22619, 21870, 21870, 23483, 23483, 15787, 15787, 17159, 17159, 12206, 12206, 8226, 8226, 14541, 14541, 3152, 3152, 1585, 1585, 3943, 3943, 23939, 23939, 19457, 19457, 1021, 1021, 11653, 11653, 10805, 10805, 13417, 13417, 20227, 20227, 7989, 7989, 9692, 9692, 12990, 12990, 6873, 6873, 5675, 5675, 161, 161, 4297, 4297, 995, 995, 11534, 11534, 7629, 7629, 1016, 1016, 24253, 24253, 22823, 24276, 24276, 23247, 23247, 24300, 24300, 8529, 8529, 17262, 17262, 9268, 9268, 21271, 21271, 12185, 12185, 21243, 21243, 6331, 6331, 8571, 8571, 7208, 7208, 5276, 18446, 18446, 16448, 16448, 16216, 16216, 8006, 2568, 2568, 21847, 21847, 2027, 2027, 2695, 2695, 15422, 15422, 5258, 5258, 22002, 22002, 6736, 6736, 391, 391, 13986, 13986, 12666, 12666, 5892, 5892, 3561, 3561, 6184, 6184, 19483, 19483, 22662, 8392, 13067, 13067, 15265, 15265, 19488, 19488, 23599, 23599, 2454, 2454, 11837, 11837, 14039, 14039, 19115, 19115, 10965, 10965, 24538, 24538, 9762, 9762, 5056, 5056, 14948, 8110, 8110, 13773, 20224, 20224, 17412, 17412, 23769, 502, 502, 6910, 6910, 12685, 12685, 23322, 23322, 20872, 206, 206, 21518, 21518, 22361, 22361, 24105, 24105, 23419, 23419, 17868, 17868, 24242, 24242, 15934, 15934, 17247, 17247, 19174, 23792, 23792, 8755, 8755, 21500, 12383, 12383, 22403, 22403, 18141, 18141, 14820, 14820, 7574, 6374, 6374, 23276, 23276, 1678, 1678, 19626, 21020, 1059, 1059, 23052, 23052, 16198, 16198, 9914, 9914, 19541, 19541, 22299, 10817, 10817, 10921, 9789, 9789, 16312, 16312, 11252, 11252, 2693, 2693, 13931, 3627, 3627, 16157, 10173, 10173, 21834, 21834, 18047, 18047, 10230, 10230, 15707, 15707, 21976, 21976, 11494, 11494, 23776, 1306, 6776, 22248, 22248, 9474, 9474, 7526, 7526, 21959, 5530, 5530, 20797, 20797, 3748, 13545, 13545, 663, 663, 1998, 1998, 7994, 17879, 17879, 3304, 3304, 20147, 20147, 21616, 18237, 18237, 13808, 6585, 6585, 17675, 17675, 19965, 11649, 11649, 23938, 23938, 23664, 1636, 1636, 20080, 20080, 17082, 17082, 4737, 4737, 14555, 14555, 13877, 854, 854, 24548, 24548, 5855, 5855, 7392, 22912, 22912, 13949, 13949, 21633, 21556, 21556, 18091, 18091, 5791, 5791, 21919, 21919, 4931, 4931, 19894, 19894, 202, 202, 11447, 11447, 20602, 20602, 12688, 12688, 4389, 4389, 2327, 2327, 8004, 8004, 19315, 7777, 7777, 197, 23509, 1930, 1930, 11774, 11774, 15087, 15087, 22671, 22671, 9339, 9339, 20666, 11589, 11589, 18895, 18895, 15708, 15708, 17043, 17043, 2811, 2811, 23482, 23482, 14243, 14243, 6546, 6546, 1986, 1986, 8338, 8338, 11411, 11411, 2911, 2911, 1734, 1734, 18227, 8680, 8680, 19360, 18343, 18343, 5759, 5759, 23078, 23078, 2385, 2385, 11111, 11111, 4736, 4736, 1802, 1802, 8155, 8155, 8120, 8120, 6616, 6616, 14257, 14257, 14486, 21918, 21918, 20445, 20445, 16646, 16646, 14075, 14075, 9208, 16371, 16371, 11835, 11835, 13168, 13168, 2049, 2049, 5423, 5423, 14589, 14589, 20932, 20932, 19492, 19492, 7158, 7158, 10248, 10248, 7400, 7400, 19554, 19554, 9874, 9874, 15151, 15151, 18639, 18639, 1154, 1154, 4499, 4499, 6295, 6295, 22581, 22581, 12183, 12183, 12874, 12874, 18032, 5539, 9637, 20583, 24829, 24829, 15586, 15586, 2557, 2557, 5592, 5592, 16482, 16482, 2200, 14172, 2961, 2961, 14207, 14207, 21357, 21357, 20817, 20817, 11969, 11969, 2869, 2869, 17340, 17340, 13992, 13992, 24736, 24736, 5699, 5699, 23328, 23328, 20877, 20877, 21295, 21295, 3987, 3987, 22399, 22399, 13446, 13446, 1218, 1218, 20880, 20880, 4735, 4735, 11296, 11296, 4555, 4555, 9146, 9146, 8050, 12757, 12757, 19830, 19830, 17429, 6893, 6893, 18077, 18077, 14373, 14565, 14565, 3436, 8754, 10677, 10677, 5895, 5895, 19738, 19738, 16609, 16609, 15636, 15636, 21277, 21277, 7022, 7022, 9151, 5600, 5600, 7996, 7996, 9007, 9007, 12946, 12946, 24067, 24067, 4642, 4642, 11312, 11312, 7679, 8208, 8208, 23723, 23723, 18589, 18589, 10716, 10716, 17453, 17453, 3444, 3444, 10757, 10757, 14434, 14434, 1060, 1060, 18711, 3420, 3420, 301, 301, 12468, 12468, 16990, 16990, 699, 699, 21472, 21472, 190, 190, 10492, 10492, 17364, 17364, 2975, 2975, 6102, 6102, 19711, 19711, 19778, 19778, 24703, 1816, 1816, 22238, 22238, 23093, 569, 569, 5442, 5442, 1895, 1895, 19117, 19117, 3863, 12913, 12913, 7455, 4014, 11093, 18070, 18070, 3009, 24190, 24190, 16538, 16538, 10729, 1409, 12249, 784, 8096, 7560, 12533, 12533, 7343, 7206, 21980, 21980, 5801, 19190, 16921, 5986, 18225, 18225, 10647, 8716, 23355, 23355, 22009, 19334, 19334, 24376, 12323, 4780, 2368, 12039, 6655, 8173, 4495, 10893, 22386, 22386, 22998, 22998, 13403, 13403, 13121, 13121, 22303, 22303]
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.9628571428571429
+Logistic regression accuracy on own: 0.9828571428571429
+CCS accuracy on transfer: 0.9942857142857143
+CCS accuracy on own: 0.9857142857142858
+ *** Training on  imdb  and testing on  amazon_polarity
+loaded data
+Memory used, total: 3.14 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.9971428571428571
+Logistic regression accuracy on own: 0.9828571428571429
+CCS accuracy on transfer: 0.9914285714285714
+CCS accuracy on own: 0.9857142857142858
+ *** Training on  imdb  and testing on  ag_news
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.49333333333333335
+Logistic regression accuracy on own: 0.9971428571428571
+CCS accuracy on transfer: 0.5038095238095238
+CCS accuracy on own: 0.02857142857142858
+ *** Training on  imdb  and testing on  dbpedia_14
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.3564835164835165
+Logistic regression accuracy on own: 0.9885714285714285
+CCS accuracy on transfer: 0.46263736263736266
+CCS accuracy on own: 0.9771428571428571
+ *** Training on  imdb  and testing on  copa
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.4257142857142857
+Logistic regression accuracy on own: 0.98
+CCS accuracy on transfer: 0.54
+CCS accuracy on own: 0.9971428571428571
+ *** Training on  imdb  and testing on  rte
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.44571428571428573
+Logistic regression accuracy on own: 0.9914285714285714
+CCS accuracy on transfer: 0.5228571428571429
+CCS accuracy on own: 0.9942857142857143
+ *** Training on  imdb  and testing on  boolq
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.21428571428571427
+Logistic regression accuracy on own: 0.9828571428571429
+CCS accuracy on transfer: 0.9885714285714285
+CCS accuracy on own: 0.98
+ *** Training on  imdb  and testing on  qnli
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.9942857142857143
+Logistic regression accuracy on own: 0.98
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.98
+ *** Training on  imdb  and testing on  piqa
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.15142857142857144
+Logistic regression accuracy on own: 0.9857142857142858
+CCS accuracy on transfer: 0.9771428571428571
+CCS accuracy on own: 0.9885714285714285
+ *** Training on  imdb  and testing on  story-cloze
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.66
+Logistic regression accuracy on own: 0.9914285714285714
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.9914285714285714
+ *** Training on  amazon_polarity  and testing on  imdb
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.92
+Logistic regression accuracy on own: 0.9971428571428571
+CCS accuracy on transfer: 0.9571428571428572
+CCS accuracy on own: 0.9657142857142857
+ *** Training on  amazon_polarity  and testing on  amazon_polarity
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: [944413, 944413, 2116811, 2116811, 686763, 686763, 3390987, 3390987, 1475378, 1475378, 2107512, 2107512, 2905008, 2905008, 2145943, 2145943, 396281, 396281, 1323020, 1323020, 2654810, 2654810, 725191, 725191, 3172937, 3172937, 501503, 501503, 2067911, 2067911, 283071, 283071, 503623, 503623, 1844040, 1844040, 2714694, 2714694, 864845, 864845, 2006811, 2006811, 3134593, 3134593, 2844714, 2844714, 1434636, 1434636, 1907310, 1907310, 3138523, 3138523, 705314, 705314, 3394070, 3394070, 872189, 872189, 3564046, 3564046, 951937, 951937, 2899516, 2899516, 2154955, 2154955, 3578687, 3578687, 1182200, 1182200, 580915, 580915, 1390530, 1390530, 1093956, 1093956, 2257474, 2257474, 1899694, 1899694, 1431041, 1431041, 831460, 831460, 2767807, 2767807, 1948149, 1948149, 3094861, 3094861, 272667, 272667, 3453402, 3453402, 538057, 538057, 2029122, 2029122, 112035, 112035, 1224293, 1224293, 1794679, 1794679, 1503934, 1503934, 2778069, 2778069, 2856239, 2856239, 1390502, 1390502, 340526, 340526, 1216733, 1216733, 2016788, 2016788, 1493149, 1493149, 2994523, 2994523, 1193118, 1193118, 865144, 865144, 1418137, 1418137, 2307306, 2307306, 1710741, 1710741, 3359124, 3359124, 979532, 979532, 1230420, 1230420, 522797, 522797, 991120, 991120, 1674286, 1674286, 3497172, 3497172, 3144158, 3144158, 2365926, 2365926, 910906, 910906, 2458165, 2458165, 1194507, 1194507, 414399, 414399, 2006518, 2006518, 2980869, 2980869, 1690420, 1690420, 1277071, 1277071, 254809, 254809, 3056900, 3056900, 729672, 729672, 1063597, 1063597, 1773799, 1773799, 448781, 448781, 441259, 441259, 2825662, 2825662, 2161513, 2161513, 1967325, 1967325, 2007091, 2007091, 796787, 796787, 1147417, 1147417, 2014772, 2014772, 2801516, 2801516, 1294876, 1294876, 160786, 160786, 541486, 541486, 329095, 329095, 2075414, 2075414, 3016308, 3016308, 3582569, 3582569, 3404194, 3404194, 1527774, 1527774, 1314530, 1314530, 910175, 910175, 3031225, 3031225, 1306884, 1306884, 3245583, 3245583, 734480, 734480, 1861791, 1861791, 121701, 121701, 2589433, 2589433, 3485919, 3485919, 3256499, 3256499, 1054739, 1054739, 980591, 980591, 2945655, 2945655, 1064641, 1064641, 1433043, 1433043, 904401, 904401, 2442752, 2442752, 2594873, 2594873, 248924, 248924, 2800860, 2800860, 2090923, 2090923, 1940711, 1940711, 544517, 544517, 1363307, 1363307, 1823334, 1823334, 3457585, 3457585, 1730933, 1730933, 545389, 545389, 2304087, 2304087, 3218451, 3218451, 3372021, 3372021, 190477, 190477, 1214596, 1214596, 1935272, 1935272, 2019111, 2019111, 300065, 300065, 2567375, 2567375, 2511439, 2511439, 721478, 721478, 179354, 179354, 1664589, 1664589, 2417741, 2417741, 736427, 736427, 1392928, 1392928, 1496608, 1496608, 1417003, 1417003, 2182931, 2182931, 1051636, 1051636, 2747246, 2747246, 3421603, 3421603, 2437126, 2437126, 2642159, 2642159, 2013122, 2013122, 2082214, 2082214, 1563159, 1563159, 2647765, 2647765, 3037253, 3037253, 984943, 984943, 1063127, 1063127, 355431, 355431, 3432150, 3432150, 2581557, 2581557, 15141, 15141, 330057, 330057, 2917199, 2917199, 2815263, 2815263, 289596, 289596, 3561669, 3561669, 574679, 574679, 1693152, 1693152, 1778996, 1778996, 1162111, 1162111, 142770, 142770, 2337099, 2337099, 610999, 610999, 2961434, 2961434, 1944741, 1944741, 3410237, 3410237, 2850065, 2850065, 884094, 884094, 2664812, 2664812, 824255, 824255, 595446, 595446, 1931084, 1931084, 1032564, 1032564, 1810023, 1810023, 1181597, 1181597, 573684, 573684, 1419056, 1419056, 3177640, 3177640, 1105523, 1105523, 513676, 513676, 490913, 490913, 1092963, 1092963, 3078621, 3078621, 2375804, 2375804, 1356312, 1356312, 2730689, 2730689, 2099071, 2099071, 829027, 829027, 140689, 140689, 2130450, 2130450, 1285801, 1285801, 233725, 233725, 2373752, 2373752, 1158175, 1158175, 3229449, 3229449, 824356, 824356, 810672, 810672, 2446677, 2446677, 2368524, 2368524, 2905270, 2905270, 2633360, 2633360, 1580296, 1580296, 1505367, 1505367, 1683371, 1683371, 1441229, 1441229, 1382445, 1382445, 1797511, 1797511, 1737846, 1737846, 646052, 646052, 161298, 161298, 2301374, 2301374, 321243, 321243, 1161133, 1161133, 542301, 542301, 2081530, 2081530, 2988793, 2988793, 2593561, 2593561, 2822887, 2822887, 3077165, 3077165, 1675125, 1675125, 262701, 262701, 2800212, 2800212, 130878, 130878, 2720583, 2720583, 548866, 548866, 2762108, 2762108, 1892508, 1892508, 2693974, 2693974, 2893713, 2893713, 456610, 456610, 2294270, 2294270, 798028, 798028, 2686795, 2686795, 2634414, 2634414, 3343473, 3343473, 1947012, 1947012, 3397094, 3397094, 3534666, 3534666, 2583801, 2583801, 856634, 856634, 2171594, 2171594, 677178, 677178, 2009326, 2009326, 2230878, 2230878, 2655198, 2655198, 1859212, 1859212, 127309, 127309, 690288, 690288, 2610796, 2610796, 2281833, 2281833, 403552, 403552, 1357757, 1357757, 2244430, 2244430, 3189291, 3189291, 1066937, 1066937, 1876343, 1876343, 1123045, 1123045, 1569157, 1569157, 550104, 550104, 1830286, 1830286, 234295, 234295, 616767, 616767, 26819, 26819, 3137953, 3137953, 3530202, 3530202, 8798, 8798, 680503, 680503, 2933279, 2933279, 1474539, 1474539, 1702408, 1702408, 3399528, 3399528, 533703, 533703, 1977165, 1977165, 3553952, 3553952, 3547064, 3547064, 2039436, 2039436, 2731645, 2731645, 1066746, 1066746, 16259, 16259, 2381395, 2381395, 1189297, 1189297, 1177970, 1177970, 1013295, 1013295, 3467130, 3467130, 3317837, 3317837, 1322525, 1322525, 3400327, 3400327, 1091723, 1091723, 74280, 74280, 1225701, 1225701, 368921, 368921, 1670705, 1670705, 1697590, 1697590, 2487655, 2487655, 2173367, 2173367, 1685773, 1685773, 1406085, 1406085, 3418857, 3418857, 3420263, 3420263, 2626301, 2626301, 2029662, 2029662, 2359120, 2359120, 1755864, 1755864, 296508, 296508, 344543, 344543, 1538827, 1821936, 2611212, 2611212, 2321554, 2321554, 567211, 3022575, 3332696, 501854, 501854, 1396538, 1396538, 2787352, 2787352, 1381880, 1381880, 1176741, 3376042, 3376042, 2498544, 2498544, 295673, 3595350, 3595350, 2765453, 525957, 525957, 3120088, 1789718, 1789718, 1952381, 1952381, 2404155, 706443, 2327654, 1830113, 1830113, 2617918, 301951, 301951, 390449, 312499, 495655, 1686279, 1686279, 270855, 270855, 2553447, 1056480, 1056480, 1921486, 2217187, 1793723, 1793723, 1234744, 1234744, 1270242, 1270242, 2362389, 2384214, 2384214, 3087399, 3087399, 2290860, 2811318, 1189042, 1173077, 1173077, 784516, 784516, 616798, 3239436, 3239436]
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.9885714285714285
+Logistic regression accuracy on own: 0.9942857142857143
+CCS accuracy on transfer: 0.9714285714285714
+CCS accuracy on own: 0.9342857142857143
+ *** Training on  amazon_polarity  and testing on  ag_news
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.5057142857142857
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.6123809523809524
+CCS accuracy on own: 0.9914285714285714
+ *** Training on  amazon_polarity  and testing on  dbpedia_14
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.4096703296703297
+Logistic regression accuracy on own: 0.9971428571428571
+CCS accuracy on transfer: 0.5863736263736263
+CCS accuracy on own: 0.9571428571428572
+ *** Training on  amazon_polarity  and testing on  copa
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.5857142857142857
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.5542857142857143
+CCS accuracy on own: 0.9714285714285714
+ *** Training on  amazon_polarity  and testing on  rte
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.6314285714285715
+Logistic regression accuracy on own: 0.9971428571428571
+CCS accuracy on transfer: 0.3285714285714286
+CCS accuracy on own: 0.040000000000000036
+ *** Training on  amazon_polarity  and testing on  boolq
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.19714285714285715
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.9428571428571428
+CCS accuracy on own: 0.02571428571428569
+ *** Training on  amazon_polarity  and testing on  qnli
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.022857142857142857
+ *** Training on  amazon_polarity  and testing on  piqa
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.3028571428571429
+Logistic regression accuracy on own: 0.9914285714285714
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.045714285714285714
+ *** Training on  amazon_polarity  and testing on  story-cloze
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.005714285714285714
+Logistic regression accuracy on own: 0.9971428571428571
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.014285714285714285
+ *** Training on  ag_news  and testing on  imdb
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (1050, 1536)
+Shape of y_train:  (1050,)
+Logistic regression accuracy on transfer: 0.38571428571428573
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.64
+CCS accuracy on own: 0.0019047619047619048
+ *** Training on  ag_news  and testing on  amazon_polarity
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (1050, 1536)
+Shape of y_train:  (1050,)
+Logistic regression accuracy on transfer: 0.5142857142857142
+Logistic regression accuracy on own: 0.9990476190476191
+CCS accuracy on transfer: 0.44571428571428573
+CCS accuracy on own: 0.002857142857142857
+ *** Training on  ag_news  and testing on  ag_news
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: [70480, 70480, 99252, 99252, 114794, 108987, 108987, 14012, 14012, 102996, 102996, 57498, 68776, 61711, 61711, 42530, 42530, 79267, 79267, 119991, 119991, 18018, 18018, 108434, 108434, 17916, 40376, 40376, 93140, 93140, 110713, 116128, 65046, 65046, 58742, 58742, 85566, 77125, 87519, 87519, 12437, 12437, 62146, 62146, 27618, 50767, 9705, 57146, 57146, 88216, 88216, 80912, 51750, 90956, 44379, 44379, 52682, 52682, 64713, 64713, 105894, 117015, 104869, 56919, 56919, 60384, 60384, 51128, 51128, 1835, 1835, 21283, 21283, 49506, 108101, 108101, 53625, 53625, 35963, 35963, 112172, 9179, 94440, 94440, 106649, 99210, 99210, 11955, 114072, 7198, 67156, 44588, 44588, 11766, 96626, 96626, 53570, 53570, 106827, 69874, 69874, 48679, 48679, 115117, 115117, 5301, 5301, 15144, 13784, 13784, 67959, 8272, 1573, 24419, 82339, 98770, 48555, 5176, 36161, 63440, 108061, 58862, 58862, 15164, 77758, 116723, 25379, 91189, 83552, 83552, 18368, 18368, 89041, 32771, 64950, 40245, 40245, 104302, 104302, 98906, 72792, 43327, 46454, 93787, 46741, 31977, 98200, 98200, 6714, 6714, 106680, 106680, 77237, 14891, 101555, 101555, 52299, 65167, 65124, 93052, 93052, 58639, 40912, 114742, 75452, 75452, 68446, 68446, 83790, 83790, 61516, 44250, 44250, 36116, 83521, 83521, 22151, 22151, 71366, 44297, 44297, 40888, 56195, 56195, 84010, 71016, 74979, 74979, 104674, 54334, 98474, 98474, 68345, 68345, 39761, 26930, 59117, 23095, 77482, 77482, 3991, 23519, 26657, 826, 42625, 82049, 82049, 17801, 17801, 29846, 29846, 39566, 39566, 23157, 23157, 28363, 50559, 50559, 5136, 57937, 17421, 78027, 78027, 7546, 71439, 46623, 16406, 16406, 80485, 9825, 9825, 71823, 71823, 110497, 34173, 107974, 55619, 55619, 83114, 83114, 107071, 107071, 7923, 34374, 34374, 61713, 41411, 41411, 64368, 8316, 109950, 10556, 10058, 104554, 104554, 99987, 99987, 25482, 25482, 44494, 25005, 84671, 89424, 32481, 32481, 28401, 40431, 40431, 64459, 64459, 90473, 111387, 117410, 117410, 78682, 78682, 95637, 95637, 76789, 76789, 48504, 48504, 3223, 3223, 70977, 70977, 108126, 108126, 40149, 12863, 103488, 103488, 29564, 82189, 89624, 22499, 22499, 107619, 89218, 32132, 32132, 4533, 4533, 82962, 82962, 80096, 34409, 81461, 81461, 22987, 10633, 101601, 101601, 56207, 50535, 95661, 3996, 14, 80431, 1674, 37867, 37867, 85537, 57251, 55709, 55709, 17864, 17864, 26321, 24082, 24082, 117734, 40131, 40131, 71493, 4210, 114080, 115663, 64586, 83605, 34851, 26865, 26865, 83606, 4158, 57852, 49339, 101086, 101086, 20572, 4100, 4100, 44469, 44469, 81061, 60861, 60861, 18456, 55803, 65633, 65633, 75019, 75019, 36232, 67323, 67323, 106067, 21788, 21788, 98987, 16092, 16092, 1132, 77850, 77850, 104181, 104181, 88118, 88118, 93316, 97772, 118524, 118524, 13068, 13068, 47401, 47401, 48526, 48526, 58958, 115729, 115729, 76593, 76593, 55041, 55041, 99158, 99158, 104042, 104042, 63372, 63372, 67562, 92099, 92099, 64046, 103669, 103669, 68086, 68086, 96458, 7089, 16623, 49641, 12043, 12043, 66572, 64136, 88052, 86700, 86700, 57061, 57061, 117957, 6122, 6122, 47346, 47346, 97322, 97322, 113993, 16150, 16150, 87630, 87630, 77228, 77228, 12054, 1767, 1767, 4708, 4708, 106657, 57999, 52158, 29292, 29292, 28082, 28082, 34024, 34024, 92270, 108447, 108447, 23461, 23461, 5351, 47031, 47031, 99053, 99053, 82628, 104720, 39718, 39718, 110632, 110632, 90577, 90577, 91212, 100017, 100017, 12777, 12777, 89856, 89856, 8308, 43441, 43441, 113682, 113682, 80865, 13882, 114883, 4714, 4714, 91586, 91586, 43432, 43432, 81289, 81289, 95515, 95515, 110625, 110625, 80166, 17658, 17658, 69245, 69245, 98642, 98642, 105065, 118199, 102579, 102579, 77027, 77027, 50808, 39530, 39530, 8834, 14358, 9872, 58694, 87193, 50321, 50321, 90363, 90363, 73709, 16685, 11333, 116254, 11356, 40584, 40584, 110453, 51362, 51362, 11344, 114491, 44619, 44619, 105534, 107107, 81331, 95279, 1943, 90185, 90185, 60217, 112319, 21021, 21021, 8348, 8348, 77286, 77286, 70921, 16639, 16639, 85030, 64566, 64566, 42011, 114577, 103336, 103336, 104565, 104565, 117105, 18640, 35402, 65088, 60240, 1891, 28259, 63021, 63021, 28987, 28987, 52616, 10683, 10683, 61083, 61083, 9967, 77664, 40194, 100274, 93831, 85873, 62661, 62661, 87738, 87738, 72307, 43452, 12857, 31301, 55900, 31460, 86923, 49800, 49800, 9832, 47408, 47408, 12626, 12626, 57872, 57872, 84021, 84021, 78959, 96939, 96939, 96159, 96159, 16802, 16802, 16333, 35120, 35120, 93621, 22159, 22159, 24660, 24660, 56843, 34519, 94333, 84577, 84577, 44935, 22507, 22507, 71060, 71060, 84271, 84271, 57223, 27675, 27675, 113487, 17673, 17673, 109619, 109619, 35470, 41603, 84825, 84825, 31230, 31230, 14542, 14542, 110563, 61407, 61407, 53821, 35690, 6654, 6654, 67557, 112259, 112259, 85544, 85544, 88264, 89698, 27446, 48484, 44078, 44078, 114824, 4225, 4225, 74745, 74745, 110196, 110196, 81259, 45487, 68676, 11721, 11721, 2587, 108878, 108878, 39437, 18989, 18989, 32726, 70540, 79837, 98215, 98215, 93639, 41168, 41168, 64669, 64669, 73040, 73040, 102114, 71616, 7408, 7408, 4153, 4153, 11055, 19760, 17752, 89729, 89729, 3800, 3800, 66573, 30054, 61816, 26866, 26866, 992, 23696, 60282, 60282, 102814, 102814, 98697, 98697, 73541, 52838, 29400, 82277, 118692, 118692, 17565, 39585, 34833, 12094, 31280, 31280, 46647, 46647, 44378, 44378, 19513, 19513, 154, 95798, 28134, 28134, 108050, 8678, 8678, 6294, 6294, 9574, 35183, 35183, 48747, 48747, 66606, 66606, 18638, 18638, 57194, 47553, 47553, 26082, 26082, 16306, 108371, 7807, 88760, 51342, 32143, 32143, 58414, 58414, 90302, 90302, 24715, 24715, 62054, 72934, 72934, 12202, 12202, 27987, 35740, 116202, 116202, 76848, 76848, 85890, 85890, 53871, 13627, 13627, 99649, 99649, 94294, 94294, 51069, 40409, 94022, 94022, 80635, 111689, 111689, 106948, 106948, 61486, 1611, 31657, 18462, 18462, 76309, 116752, 89299, 38547, 107754, 107754, 29063, 29063, 105454, 82273, 110896, 110896, 79397, 52788, 52788, 42523, 42523, 30284, 30284, 87964, 63996, 63996, 66247, 66247, 13706, 13706, 93614, 10924, 111377, 111377, 15921, 25432, 25432, 118960, 17813, 17813, 104748, 108988, 108988, 65250, 68956, 2068, 39927, 39927, 70342, 70342, 105148, 105148, 30539, 11683, 11683, 85151, 85151, 35674, 35674, 52703, 52703, 58810, 86111, 85343, 85343, 85977, 87114, 11117, 3665, 3665, 119423, 44390, 74884, 63887, 63887, 48266, 48266, 55541, 55541, 64802, 94319, 94319, 7882, 70825, 70825, 13910, 13910, 40566, 40566, 63073, 97519, 36176, 83081, 83081, 30289, 30289, 50411, 112263, 112263, 69626, 69626, 109337, 109337, 15362, 87610, 87610, 96371, 13783, 13783, 44162, 35749, 106369, 3554, 58568, 58568, 110883, 18773, 18773, 73694, 73694, 66550, 46295, 46295, 30331, 30331, 45640, 45640, 64877, 64877, 46969, 42986, 42986, 102017, 102017, 116180, 116180, 7585, 4122, 108196, 16838, 16838, 17301, 23107, 57357, 57357, 88161, 102678, 102678, 55211, 55211, 66025, 66025, 66520, 66520, 17344, 17344, 57202, 57202, 100086, 14959, 14959, 112846, 38751, 1869, 44264, 30268, 30268, 84564, 39606, 13550, 119033, 5702, 78563, 110164, 61745, 98279, 24459, 56782, 87822, 6032, 6032, 1825, 77090, 117798, 117798, 48101, 60109, 12470, 3770, 27268, 29, 30083, 8958, 113806, 113806, 8806, 8806, 32162, 74732, 34889, 27702, 27702, 35777, 52971, 7739, 7739, 24599, 36827, 76821, 96683, 95263, 80210, 80210, 83890, 83890, 96212, 91650, 23039, 119455, 44929, 97367, 97367, 43884, 25146, 45819, 83162, 82632, 31308, 13054, 79606, 107789, 52018, 26250, 14413, 14413, 77391, 38921, 38921, 71123, 71123, 74363, 25785, 56865, 56865, 97400, 96847, 6861, 76340, 13979, 13979, 66833, 113049, 357, 114604, 47201, 54254, 82160, 10796, 10796, 23238, 94176, 50978, 40883, 97393, 85478, 69396, 69396, 110747, 110747, 4447, 20523, 64079, 64823, 49289, 118422, 100271, 104883, 104883, 4849, 24718, 105471, 105471, 87862, 87862, 73002, 60977, 60977, 88325, 27135, 110653, 30262, 89971, 34787, 104478, 15689, 15689, 39860, 39860, 117537, 50344, 108809, 67891, 51658, 97464, 65869, 35330, 80312, 80312, 60064, 60064, 27014, 34563, 15270, 15270, 31279, 98557, 3657, 89422, 107919, 68773, 101635, 1027, 14199, 116854, 111587, 44954, 115157, 115157, 79317, 15120, 56812, 89825, 89825, 5983, 66629, 70325, 70325, 2912, 47879, 47879, 21873, 21873, 14332, 16564, 77795, 107716, 20526, 65481, 65481, 52775, 86649, 16006, 21643, 21643]
+Shape of x_train:  (1050, 1536)
+Shape of y_train:  (1050,)
+Logistic regression accuracy on transfer: 0.9952380952380953
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.010476190476190476
+CCS accuracy on own: 0.007619047619047619
+ *** Training on  ag_news  and testing on  dbpedia_14
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (1050, 1536)
+Shape of y_train:  (1050,)
+Logistic regression accuracy on transfer: 0.49274725274725273
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.5542857142857143
+CCS accuracy on own: 0.9961904761904762
+ *** Training on  ag_news  and testing on  copa
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (1050, 1536)
+Shape of y_train:  (1050,)
+Logistic regression accuracy on transfer: 0.03428571428571429
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.9914285714285714
+CCS accuracy on own: 0.0038095238095238095
+ *** Training on  ag_news  and testing on  rte
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (1050, 1536)
+Shape of y_train:  (1050,)
+Logistic regression accuracy on transfer: 0.7828571428571428
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.8742857142857143
+CCS accuracy on own: 0.9952380952380953
+ *** Training on  ag_news  and testing on  boolq
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (1050, 1536)
+Shape of y_train:  (1050,)
+Logistic regression accuracy on transfer: 0.9257142857142857
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.12857142857142856
+CCS accuracy on own: 0.0019047619047618536
+ *** Training on  ag_news  and testing on  qnli
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (1050, 1536)
+Shape of y_train:  (1050,)
+Logistic regression accuracy on transfer: 0.35428571428571426
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.0
+CCS accuracy on own: 0.9971428571428571
+ *** Training on  ag_news  and testing on  piqa
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (1050, 1536)
+Shape of y_train:  (1050,)
+Logistic regression accuracy on transfer: 0.38
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.9914285714285714
+CCS accuracy on own: 0.0009523809523809268
+ *** Training on  ag_news  and testing on  story-cloze
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (1050, 1536)
+Shape of y_train:  (1050,)
+Logistic regression accuracy on transfer: 1.0
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 1.0
+CCS accuracy on own: 0.9980952380952381
+ *** Training on  dbpedia_14  and testing on  imdb
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (4550, 1536)
+Shape of y_train:  (4550,)
+Logistic regression accuracy on transfer: 0.4857142857142857
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.5257142857142857
+CCS accuracy on own: 0.9997802197802198
+ *** Training on  dbpedia_14  and testing on  amazon_polarity
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (4550, 1536)
+Shape of y_train:  (4550,)
+Logistic regression accuracy on transfer: 0.4828571428571429
+Logistic regression accuracy on own: 0.9997802197802198
+CCS accuracy on transfer: 0.3628571428571429
+CCS accuracy on own: 0.9997802197802198
+ *** Training on  dbpedia_14  and testing on  ag_news
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (4550, 1536)
+Shape of y_train:  (4550,)
+Logistic regression accuracy on transfer: 0.40095238095238095
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.4876190476190476
+CCS accuracy on own: 0.9986813186813187
+ *** Training on  dbpedia_14  and testing on  dbpedia_14
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: [400371, 484341, 388230, 432654, 507112, 508719, 362499, 393218, 384258, 432118, 313878, 63261, 63261, 425277, 339147, 322215, 538285, 372029, 392624, 232819, 24686, 24686, 491542, 456107, 337835, 537362, 18091, 18091, 38821, 38821, 544487, 221930, 459266, 396255, 458248, 319812, 122494, 292835, 483284, 285959, 345608, 87771, 418317, 226198, 206549, 514190, 418632, 383119, 5260, 5260, 522045, 152355, 137173, 395976, 405864, 495213, 87298, 542371, 410720, 471817, 213720, 475751, 491890, 257416, 349402, 357112, 54094, 54094, 88251, 285547, 2422, 2422, 391601, 105894, 223730, 519941, 406757, 42478, 42478, 300737, 436135, 20954, 20954, 33341, 33341, 551707, 133294, 225971, 509198, 93901, 25162, 25162, 183874, 117937, 27277, 27277, 366519, 348100, 12167, 12167, 480348, 460262, 227371, 191002, 481039, 276518, 286695, 94188, 232882, 382910, 258295, 223590, 268496, 373710, 456533, 319224, 270738, 532763, 129599, 168496, 458426, 75923, 75923, 238268, 264814, 321407, 35316, 35316, 542998, 248556, 100510, 5179, 5179, 474428, 25063, 25063, 442832, 334645, 33566, 33566, 421090, 445608, 429339, 176389, 323361, 197467, 24939, 24939, 433672, 193547, 142095, 60916, 60916, 522374, 235778, 484243, 440836, 214766, 347429, 548686, 292279, 204950, 494541, 146365, 446185, 144266, 113283, 91182, 454003, 496147, 35507, 35507, 432775, 137939, 489535, 3943, 3943, 457629, 429605, 139990, 177682, 176893, 288329, 283546, 253922, 422792, 285278, 515372, 180311, 525556, 239058, 317341, 404487, 365102, 269656, 461552, 60757, 60757, 107753, 392426, 96381, 488113, 371059, 328823, 422429, 334383, 502877, 141878, 246507, 540446, 454049, 114523, 551497, 275907, 470969, 100408, 447626, 118747, 261769, 65945, 65945, 131717, 83471, 454903, 247487, 112695, 24552, 24552, 324042, 314262, 544032, 284190, 388608, 97219, 425693, 462621, 136272, 526327, 209687, 89374, 99611, 454572, 137706, 64899, 64899, 526012, 185519, 42773, 42773, 489854, 75012, 75012, 417294, 320578, 446811, 76840, 76840, 483548, 339677, 423996, 486584, 419722, 508319, 226772, 313164, 145057, 214525, 384754, 548370, 158834, 90583, 396393, 27502, 27502, 3197, 3197, 35229, 35229, 286310, 505506, 462333, 106298, 491640, 524894, 319425, 130708, 389469, 525107, 76992, 76992, 444214, 531848, 388769, 256928, 207317, 178431, 5318, 5318, 292688, 261305, 282967, 366699, 279122, 437327, 396540, 529321, 367211, 175017, 485691, 508743, 18894, 18894, 528975, 396103, 134115, 411231, 279933, 268259, 553109, 22879, 22879, 379321, 191852, 49157, 49157, 248341, 205257, 92384, 417958, 474427, 498803, 362421, 288664, 87005, 365185, 82159, 494472, 339310, 489775, 101542, 524841, 417734, 502525, 275756, 41154, 41154, 186218, 140689, 146470, 555259, 388777, 198579, 185626, 341134, 348178, 85567, 302821, 98104, 22291, 22291, 290641, 377279, 173156, 490210, 409893, 554533, 8267, 8267, 396991, 194150, 550163, 256679, 512082, 170952, 61807, 61807, 173962, 432816, 172401, 359763, 528027, 295251, 17487, 17487, 533272, 274983, 361018, 392238, 398572, 82036, 291922, 325336, 183255, 128219, 554268, 166891, 14065, 14065, 73969, 73969, 139728, 43210, 43210, 555765, 505276, 498822, 29529, 29529, 280406, 327231, 447004, 51686, 51686, 173937, 429793, 220725, 195399, 36409, 36409, 159152, 543823, 48637, 48637, 172736, 217484, 274329, 523467, 364801, 182386, 7676, 7676, 37312, 37312, 134220, 197435, 526943, 307661, 74227, 74227, 436854, 466277, 210161, 54322, 54322, 382926, 397438, 535004, 60644, 60644, 455441, 210970, 248926, 117323, 365993, 451589, 81117, 159895, 429967, 286265, 61581, 61581, 288267, 392206, 546989, 25387, 25387, 57613, 57613, 308810, 170207, 553842, 224389, 42146, 42146, 100037, 406204, 278600, 497637, 204669, 491166, 62718, 62718, 485993, 217285, 533930, 362988, 196215, 229457, 312627, 499475, 358773, 311652, 107815, 131651, 202871, 147000, 354489, 43591, 43591, 148490, 321710, 471682, 277390, 432001, 103425, 397493, 335144, 110123, 329225, 512224, 378578, 28957, 28957, 476490, 503344, 105634, 21150, 21150, 283235, 308846, 281869, 553010, 213119, 542347, 542449, 201773, 352489, 534975, 344647, 361914, 532982, 127260, 361603, 201764, 186505, 370085, 207459, 56561, 56561, 339152, 397190, 24053, 24053, 433288, 394426, 219171, 521694, 105128, 109573, 234362, 106327, 404462, 150271, 367421, 524457, 406165, 388339, 107127, 161971, 309884, 196562, 68570, 68570, 406544, 119168, 413012, 72666, 72666, 102173, 317395, 274477, 167681, 135997, 403980, 77632, 77632, 301612, 2094, 2094, 307727, 49021, 49021, 202858, 539650, 172647, 480388, 170843, 343822, 464021, 158185, 279032, 423419, 435795, 527194, 67105, 67105, 372356, 463435, 236106, 388402, 535444, 529350, 420961, 559228, 546751, 298332, 71813, 71813, 558305, 251824, 376519, 232129, 408119, 36652, 36652, 375789, 59019, 59019, 372, 372, 233865, 202459, 71564, 71564, 123297, 63615, 63615, 246576, 291589, 415950, 165172, 407954, 62716, 62716, 331205, 29884, 29884, 526084, 406970, 67713, 67713, 113796, 54765, 54765, 549129, 549786, 108567, 112642, 208783, 67229, 67229, 389999, 63914, 63914, 182275, 224874, 373543, 486159, 69703, 69703, 514650, 489921, 38907, 38907, 424374, 470099, 494930, 184248, 557618, 55244, 55244, 208826, 40564, 40564, 215963, 120972, 163433, 551542, 498752, 109623, 17503, 17503, 468856, 519098, 520249, 349065, 524046, 109264, 295008, 160855, 359067, 45596, 45596, 411838, 442297, 418708, 544021, 109082, 12372, 12372, 297400, 73353, 73353, 259923, 259739, 367844, 8064, 8064, 407202, 449821, 426059, 218061, 306150, 32195, 32195, 262347, 307392, 269604, 319374, 185782, 135427, 31935, 31935, 117739, 526951, 172463, 357047, 467141, 523662, 393254, 190934, 534606, 323387, 497706, 110723, 154855, 219286, 199865, 505263, 535686, 407988, 335580, 422227, 50396, 50396, 110583, 66193, 66193, 545128, 186292, 221039, 326044, 292061, 70071, 70071, 507184, 67512, 67512, 364117, 47055, 47055, 263081, 247910, 422716, 188928, 537241, 67052, 67052, 177412, 381324, 157579, 133425, 274143, 204901, 70086, 70086, 45248, 45248, 487170, 258945, 324393, 167956, 531935, 68079, 68079, 201386, 53546, 53546, 246047, 347769, 260993, 460953, 555288, 454741, 400138, 126956, 226371, 200544, 96155, 378683, 363157, 446375, 510525, 67714, 67714, 111992, 386246, 129244, 157691, 501145, 73640, 73640, 328848, 391655, 473939, 318644, 459699, 487887, 142395, 330307, 474984, 540832, 50936, 50936, 219590, 281710, 523322, 539168, 143008, 536486, 8376, 8376, 67432, 67432, 371935, 428388, 215531, 410332, 403029, 106873, 282376, 214300, 471136, 295753, 450715, 301165, 392365, 85305, 529109, 148869, 65580, 65580, 411286, 551033, 137697, 266158, 38548, 38548, 201203, 329240, 25822, 25822, 470746, 34985, 34985, 549564, 436255, 213044, 270474, 457774, 230203, 509152, 553228, 532665, 324452, 204010, 298105, 533892, 48029, 48029, 144849, 162977, 112236, 103949, 135333, 332106, 324576, 341103, 558825, 27337, 27337, 387906, 259850, 325391, 439709, 279720, 559872, 93733, 358124, 218209, 206778, 429961, 422928, 261199, 362331, 540, 540, 8837, 8837, 250845, 103030, 49054, 49054, 181912, 271190, 498154, 491924, 314639, 302723, 59821, 59821, 533300, 531318, 122047, 217522, 511971, 202814, 93399, 280709, 363680, 418216, 443919, 353266, 319684, 418653, 96774, 132730, 121159, 38649, 38649, 194689, 282536, 137115, 541155, 393573, 389018, 26279, 26279, 160539, 303596, 226199, 520242, 338999, 522839, 237619, 325756, 483589, 551866, 526196, 98059, 462398, 450083, 215369, 413936, 394841, 97543, 169258, 484556, 427373, 391886, 375105, 317797, 402324, 469085, 377542, 559272, 325622, 256515, 491273, 463197, 168671, 6984, 6984, 243138, 267738, 193332, 210338, 400387, 253251, 50570, 50570, 379435, 111606, 62653, 62653, 403426, 321524, 101791, 120996, 381565, 80202, 474964, 328535, 74894, 74894, 259972, 305076, 325548, 20071, 20071, 476252, 437544, 260575, 525021, 78345, 78345, 239274, 144758, 69034, 69034, 107620, 266998, 100162, 276502, 415073, 494033, 212192, 26576, 26576, 91909, 493687, 281556, 97760, 91255, 258757, 397447, 557056, 499788, 62985, 62985, 531899, 543300, 501907, 311869, 525836, 145060, 276641, 392481, 221217, 401055, 484948, 534563, 38151, 38151, 558461, 211057, 540248, 28709, 28709, 133211, 428662, 167634, 150175, 286576, 430586, 469170, 495970, 489351, 208168, 472598, 6069, 6069, 205287, 406509, 98582, 308250, 393035, 88164, 370613, 331224, 428189, 542664, 392086, 50184, 50184, 478419, 60854, 60854, 87936, 332599, 186198, 378665, 492511, 77934, 77934, 153802, 18167, 18167, 447552, 279712, 231044, 571, 571, 168140, 544410, 254259, 253300, 153035, 102874, 212348, 290508, 71227, 71227, 89950, 529414, 522534, 265906, 329222, 116363, 340493, 454521, 540582, 68335, 68335, 241248, 494205, 50209, 50209, 6938, 6938, 217493, 104875, 174993, 464774, 531535, 200251, 20146, 20146, 546659, 354387, 107102, 51507, 51507, 551163, 538080, 441939, 345397, 495253, 281878, 47728, 47728, 256040, 505549, 555054, 45240, 45240, 221255, 162360, 377405, 37432, 37432, 201667, 366919, 284641, 290427, 374741, 274607, 350758, 252046, 372984, 27682, 27682, 222183, 105446, 358545, 170148, 430726, 85065, 548815, 101019, 212694, 546065, 62382, 62382, 479218, 298643, 17921, 17921, 295089, 411976, 171578, 527531, 213929, 281555, 346084, 285730, 342312, 502381, 1258, 1258, 105356, 406744, 84673, 77400, 77400, 360867, 107148, 199479, 162504, 78637, 78637, 492387, 389232, 540526, 483501, 259058, 30793, 30793, 8004, 8004, 114462, 217584, 556144, 2488, 2488, 345576, 32791, 32791, 31027, 31027, 143663, 4726, 4726, 325188, 160885, 90105, 229425, 547484, 543721, 54377, 54377, 479025, 458589, 47787, 47787, 347419, 418805, 41113, 41113, 404309, 202869, 478592, 520109, 369256, 523841, 496824, 400026, 146300, 26187, 26187, 397457, 10729, 10729, 300157, 168280, 1998, 1998, 443499, 374316, 377544, 552025, 196822, 38514, 38514, 189019, 449349, 496387, 123549, 50232, 50232, 206225, 272605, 82394, 271467, 205611, 440499, 299184, 139750, 347172, 213259, 353040, 84321, 217901, 158989, 191487, 117004, 147732, 188722, 357925, 377462, 117273, 449029, 256133, 228776, 6968, 6968, 67249, 67249, 140312, 304938, 366663, 321520, 130604, 463110, 211817, 340881, 68677, 68677, 515884, 392084, 92889, 409771, 447221, 95133, 292234, 439551, 523527, 287620, 387638, 75650, 75650, 227880, 361406, 162930, 434519, 324985, 532219, 106951, 270779, 307396, 207715, 331161, 153149, 335356, 334691, 449077, 54565, 54565, 55153, 55153, 489496, 149740, 445155, 253617, 115095, 425114, 310705, 486126, 349617, 385166, 129552, 227850, 271055, 515057, 465712, 73080, 73080, 465054, 555634, 451332, 549932, 552567, 95446, 310782, 113917, 34341, 34341, 118481, 154975, 459292, 297123, 368770, 152999, 331500, 477367, 445086, 162773, 73226, 73226, 230398, 103658, 135298, 369677, 197421, 118525, 500370, 359715, 350745, 5505, 5505, 269693, 451808, 187899, 489511, 387437, 168183, 286731, 364055, 107764, 77994, 77994, 523295, 300657, 530860, 402297, 84872, 480832, 302522, 550372, 515541, 322825, 461785, 546706, 74860, 74860, 197809, 82168, 401219, 157543, 62468, 62468, 68211, 68211, 543547, 171134, 314015, 544575, 512909, 25887, 25887, 390637, 494856, 542090, 73135, 73135, 150915, 433296, 367790, 305671, 42297, 42297, 117769, 393562, 43418, 43418, 9612, 9612, 173886, 85002, 132703, 460751, 319355, 146524, 78105, 78105, 516902, 434386, 198385, 80379, 8057, 8057, 18883, 18883, 152522, 156577, 454673, 445201, 297157, 427169, 74111, 74111, 112839, 46825, 46825, 525809, 462362, 142534, 182177, 316842, 476019, 420319, 119511, 409723, 194173, 441542, 219403, 528694, 90692, 161943, 358586, 364973, 44895, 44895, 305904, 308450, 75179, 75179, 76554, 76554, 403260, 131015, 257997, 152448, 284734, 305547, 26628, 26628, 367907, 520699, 152505, 30617, 30617, 248588, 162754, 272394, 294980, 374463, 329317, 499913, 368905, 6251, 6251, 318390, 515409, 86966, 434001, 229666, 519490, 403497, 121720, 94840, 231306, 105293, 533286, 407733, 368227, 447498, 305010, 22969, 22969, 363124, 31107, 31107, 539077, 275358, 332801, 74536, 74536, 31087, 31087, 511690, 263085, 132393, 214646, 456683, 45972, 45972, 461820, 301505, 328471, 47191, 47191, 534424, 408963, 334204, 210474, 343995, 226519, 295105, 276476, 511801, 343098, 48473, 48473, 504364, 171969, 273826, 414943, 187741, 43775, 43775, 319085, 462655, 466714, 274169, 95439, 320670, 521573, 414079, 530935, 30145, 30145, 433778, 103894, 151839, 301937, 319734, 52470, 52470, 506167, 198689, 325760, 100361, 398551, 105879, 505583, 355853, 333401, 449446, 527016, 345655, 482979, 546455, 388362, 178608, 338570, 76851, 76851, 80962, 382282, 256005, 381776, 26085, 26085, 300230, 26156, 26156, 216425, 202516, 186354, 334107, 438993, 48119, 48119, 460575, 362236, 378784, 146713, 451511, 78451, 78451, 235249, 265732, 478981, 349801, 222331, 257010, 394633, 282437, 297684, 485497, 114383, 544530, 116313, 461501, 97544, 100151, 112457, 515111, 533058, 394352, 535890, 534754, 403629, 177147, 394373, 470802, 288369, 40043, 40043, 407694, 87333, 430356, 518054, 161238, 149779, 189681, 228609, 65567, 65567, 421230, 533239, 235270, 329474, 242456, 28936, 28936, 15574, 15574, 360729, 208703, 414225, 159703, 161772, 162304, 512163, 46782, 46782, 289305, 410110, 505605, 46300, 46300, 352810, 44665, 44665, 451866, 243572, 432572, 312961, 517499, 296777, 310864, 530053, 343016, 555049, 299886, 456451, 277602, 133507, 159808, 29992, 29992, 492970, 319710, 114358, 484765, 27763, 27763, 135937, 433143, 383871, 254694, 226889, 517640, 544022, 264973, 264059, 39980, 39980, 9440, 9440, 73415, 73415, 522853, 106860, 214200, 357511, 331800, 469309, 340529, 217768, 51569, 51569, 123915, 74447, 74447, 522316, 287693, 280374, 491607, 438024, 483821, 115933, 284644, 343554, 140405, 66513, 66513, 157882, 72258, 72258, 212278, 275361, 255354, 434986, 495012, 45272, 45272, 83053, 408434, 37633, 37633, 183224, 433650, 174776, 471569, 335045, 323066, 518139, 479735, 55272, 55272, 516247, 201440, 280213, 95447, 211774, 380323, 62289, 62289, 289321, 239264, 323145, 413576, 460150, 222892, 547102, 527518, 105825, 108998, 119410, 516013, 312560, 474931, 362707, 191061, 87304, 114266, 75111, 75111, 68348, 68348, 285501, 461852, 153320, 379993, 526668, 168175, 525031, 40124, 40124, 472318, 451568, 45653, 45653, 241864, 41302, 41302, 294042, 500409, 103620, 280033, 322283, 529944, 12193, 12193, 398363, 208264, 126474, 102748, 236923, 159836, 63628, 63628, 395618, 529930, 83746, 270062, 380679, 410692, 116408, 229499, 183714, 224778, 382292, 375757, 172336, 318242, 68764, 68764, 355415, 123816, 31711, 31711, 175749, 452691, 167129, 4844, 4844, 413769, 146236, 190360, 266983, 115911, 518633, 358344, 317907, 83059, 152946, 268938, 444623, 197733, 347945, 536024, 443154, 321539, 457424, 65285, 65285, 153886, 135688, 449257, 457219, 148959, 46811, 46811, 235037, 449462, 325531, 395340, 330093, 530377, 414603, 497773, 263846, 427649, 546061, 405641, 252923, 477247, 72519, 72519, 414710, 256788, 264541, 26770, 26770, 212793, 49033, 49033, 201110, 340619, 15950, 15950, 200604, 48787, 48787, 453378, 95551, 495902, 127943, 267130, 216415, 205828, 131307, 139065, 414524, 327731, 75108, 75108, 459808, 412209, 12485, 12485, 69136, 69136, 214957, 465284, 45606, 45606, 298490, 103865, 173334, 301219, 429598, 340819, 529094, 291501, 321021, 53155, 53155, 320195, 124503, 73147, 73147, 127117, 97486, 444812, 347019, 543599, 467620, 470644, 420688, 23802, 23802, 12721, 12721, 463603, 419298, 498370, 91402, 526227, 294133, 73251, 73251, 239351, 233571, 461538, 559811, 292951, 542755, 143359, 143910, 425281, 498090, 317403, 486028, 299016, 249912, 534810, 114108, 40425, 40425, 190427, 267169, 269908, 357206, 290951, 280157, 273455, 80483, 333940, 285450, 351230, 491998, 129428, 477279, 325885, 229789, 280818, 180862, 127401, 146389, 237819, 205468, 315138, 544690, 355201, 539688, 549987, 475705, 226002, 122378, 81798, 462668, 467944, 496065, 233301, 314548, 125210, 552984, 22319, 22319, 299267, 444381, 411527, 22642, 22642, 85639, 337423, 165522, 213376, 217700, 112033, 232412, 469210, 285551, 424312, 196557, 350215, 329410, 456418, 479521, 135195, 461982, 240784, 18898, 18898, 434283, 308090, 379318, 250058, 336648, 139064, 121132, 317317, 534413, 271370, 410436, 393857, 298086, 214800, 266019, 461600, 501434, 494074, 350384, 66998, 66998, 448330, 170651, 297068, 334312, 83400, 534945, 18394, 18394, 548162, 160945, 512103, 23670, 23670, 142023, 195141, 30836, 30836, 7188, 7188, 296801, 131630, 243370, 26195, 26195, 14443, 14443, 547503, 5949, 5949, 302555, 180293, 260482, 378021, 324665, 207916, 284225, 129808, 352326, 395371, 422609, 127277, 177581, 179306, 477051, 489999, 127927, 537529, 251024, 153251, 61242, 61242, 528743, 40459, 40459, 60899, 60899, 17597, 17597, 501852, 271196, 238557, 504291, 559979, 542104, 318677, 108873, 14206, 14206, 441960, 340710, 267078, 208439, 475591, 530141, 298162, 524545, 223293, 377313, 226780, 422887, 535593, 181620, 259450, 120761, 153911, 10818, 10818, 6202, 6202, 244015, 38946, 38946, 279175, 406514, 458527, 452828, 112212, 424058, 226405, 355640, 399296, 209389, 115446, 505491, 294086, 541304, 24232, 24232, 161667, 339925, 377816, 459420, 46094, 46094, 491282, 541113, 415277, 286993, 25602, 25602, 248133, 385471, 544040, 159341, 506615, 152711, 401282, 77045, 77045, 139333, 92689, 397801, 315894, 289776, 116, 116, 277760, 345877, 377735, 196508, 270829, 514109, 358896, 19067, 19067, 102034, 513045, 38211, 38211, 358660, 204696, 302871, 538752, 110875, 513876, 64086, 64086, 4858, 4858, 197445, 524145, 257031, 513060, 254023, 60796, 60796, 327653, 310537, 400450, 458815, 172061, 315948, 318085, 264469, 128192, 283293, 265023, 477281, 82195, 260987, 17650, 17650, 334256, 502655, 375652, 519076, 96003, 377683, 317164, 206864, 171560, 92460, 231183, 44819, 44819, 456457, 383163, 327372, 201112, 237361, 228963, 405847, 416334, 359491, 273436, 159955, 208488, 71, 71, 255088, 209127, 45037, 45037, 135432, 362279, 344109, 352238, 302304, 251831, 83595, 367716, 530669, 154200, 238837, 225167, 183247, 215782, 322658, 29398, 29398, 361460, 183731, 234178, 531818, 337877, 424725, 160481, 251107, 346239, 307742, 175161, 234601, 244162, 425774, 370104, 349208, 533538, 498332, 287691, 321878, 521581, 466576, 136527, 441776, 424333, 7042, 7042, 292645, 352598, 413460, 548530, 109847, 449887, 477996, 244932, 230624, 56235, 56235, 189624, 415362, 255562, 485307, 111873, 55270, 55270, 94516, 276104, 192102, 99456, 413221, 457272, 194735, 320460, 118416, 471977, 535891, 435467, 232236, 163, 163, 257871, 68998, 68998, 509344, 272431, 447681, 191181, 6227, 6227, 50842, 50842, 557289, 172993, 310095, 480245, 312341, 266625, 37227, 37227, 497937, 542079, 393423, 168210, 351214, 141016, 336367, 148357, 551070, 482219, 83669, 451019, 528777, 140180, 139102, 21118, 21118, 329874, 422655, 500105, 306736, 177333, 397754, 413658, 113393, 91978, 41464, 41464, 489493, 113680, 35646, 35646, 238201, 15586, 15586, 248180, 247084, 476144, 255091, 377235, 320183, 44807, 44807, 245474, 6772, 6772, 490473, 39358, 39358, 145719, 518022, 16504, 16504, 137353, 379697, 36499, 36499, 261403, 478727, 178944, 444782, 399851, 142570, 60777, 60777, 481801, 365809, 272571, 49555, 49555, 268714, 58881, 58881, 184473, 432330, 532696, 252385, 439070, 164645, 515265, 521134, 419063, 254385, 129443, 400636, 304291, 528545, 18696, 18696, 559051, 223341, 374611, 33923, 33923, 248964, 434569, 481899, 211495, 351011, 269346, 372282, 194240, 365265, 193907, 477176, 247838, 259245, 232240, 519557, 497769, 253202, 442025, 496632, 275485, 262046, 137411, 59999, 59999, 362833, 178622, 152885, 481528, 232902, 439687, 157952, 287991, 165127, 14802, 14802, 524648, 346038, 125807, 149682, 292751, 218617, 493370, 85825, 331455, 520779, 131889, 395362, 294290, 425827, 548522, 522492, 57036, 57036, 27450, 27450, 457773, 76227, 76227, 211239, 59000, 59000, 392712, 131380, 505291, 159491, 491389, 12756, 12756, 422504, 129415, 511165, 86210, 121789, 524370, 73978, 73978, 103715, 441019, 58825, 58825, 343180, 322699, 389219, 429712, 267438, 44852, 44852, 516828, 65858, 65858, 277980, 493577, 442194, 85620, 140525, 521099, 457758, 452093, 108537, 184449, 265808, 429080, 335245, 114836, 136802, 157431, 317558, 120241, 76003, 475750, 523495, 494533, 202017, 553522, 258523, 524835, 402162, 475870, 315087, 535308, 520872, 55076, 139881, 50012, 383016, 311095, 341258, 89821, 323976, 210709, 27476, 27476, 53017, 409385, 473590, 225429, 442804, 471489, 231948, 381194, 339851, 358485, 110856, 95814, 193552, 365756, 213513, 210470, 2925, 2925, 330970, 305245, 150685, 227178, 63903, 151033, 366057, 68107, 147688, 501334, 129017, 120938, 265683, 426505, 193148, 469778, 535679, 344404, 109240, 44906, 77666, 139322, 180207, 391135, 229603, 137775, 111109, 357520, 332110, 114595, 34936, 34936, 312604, 452685, 198201, 356335, 155339, 39876, 39876, 467190, 377914, 423723, 471872, 360458, 392019, 324612, 325324, 257393, 510196, 508848, 126371, 415848, 542961, 281094, 231135, 283691, 100532, 195163, 434443, 523097, 449387, 141462, 405095, 408151, 446845, 382749, 32574, 32574, 180738, 83663, 421723, 179627, 409798, 26631, 26631, 391046, 348964, 452273, 87633, 448111, 179046, 144929, 433656, 281095, 500641, 545297, 539123, 368318, 98727, 163989, 28039, 28039, 60059, 388017, 357422, 57247, 523668, 301977, 339597, 18254, 18254, 346125, 32611, 32611, 109314, 46827, 538118, 505382, 368629, 233656, 521330, 5696, 5696, 514328, 430165, 57420, 231367, 361464, 467040, 124434, 187165, 47150, 157183, 168365, 493217, 95896, 208285, 354816, 77704, 350288, 210700, 535163, 48996, 398782, 372842, 79139, 438957, 103340, 450871, 526934, 215723, 29339, 29339, 103849, 98718, 109702, 523627, 39967, 39967, 65463, 308995, 549350, 481543, 401437, 15234, 15234, 270089, 404549, 196815, 127066, 110711, 533461, 397518, 103013, 414640, 214401, 276626, 352196, 120963, 4857, 4857, 11166, 11166, 252565, 269642, 156495, 445311, 106371, 303272, 99411, 45940, 56584, 453265, 266486, 96279, 438575, 200082, 315669, 25117, 25117, 376217, 254307, 120331, 337098, 319737, 143462, 284706, 426515, 36881, 36881, 9319, 9319, 438423, 266055, 39927, 39927, 309705, 366944, 394903, 169827, 282999, 28879, 28879, 153137, 278235, 143819, 429459, 441902, 444900, 282745, 514841, 428013, 500855, 365866, 417364, 113962, 473332, 437974, 501459, 136991, 461562, 298327, 185657, 526004, 520795, 63041, 478427, 20141, 20141, 114289, 434053, 479966, 168170, 123185, 234605, 162105, 166835, 536188, 395430, 222393, 147731, 407903, 514057, 530841, 127605, 247313, 509665, 306287, 553575, 211935, 107006, 495333, 30657, 30657, 505036, 539034, 498408, 352211, 494722, 180566, 400961, 394639, 504107, 286865, 256769, 210859, 500627, 488247, 465399, 427895, 456854, 407980, 203054, 520013, 147953, 181014, 241768, 270345, 245360, 248858, 24568, 24568, 295238, 280199, 365450, 149630, 529523, 407763, 221104, 161980, 439785, 359332, 494344, 316403, 187093, 337025, 526358, 295832, 497611, 285000, 148899, 101105, 83695, 466972, 527991, 374645, 106015, 81547, 118429, 488507, 155786, 348516, 245358, 166373, 140623, 331352, 188698, 129567, 132869, 353446, 282936, 324738, 524335, 133, 133, 11238, 11238]
+Shape of x_train:  (4550, 1536)
+Shape of y_train:  (4550,)
+Logistic regression accuracy on transfer: 0.9964835164835165
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.006813186813186767
+CCS accuracy on own: 0.005274725274725278
+ *** Training on  dbpedia_14  and testing on  copa
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (4550, 1536)
+Shape of y_train:  (4550,)
+Logistic regression accuracy on transfer: 0.4057142857142857
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.3828571428571429
+CCS accuracy on own: 1.0
+ *** Training on  dbpedia_14  and testing on  rte
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (4550, 1536)
+Shape of y_train:  (4550,)
+Logistic regression accuracy on transfer: 0.48
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.09142857142857143
+CCS accuracy on own: 0.00021978021978021978
+ *** Training on  dbpedia_14  and testing on  boolq
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (4550, 1536)
+Shape of y_train:  (4550,)
+Logistic regression accuracy on transfer: 0.28285714285714286
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.9942857142857143
+CCS accuracy on own: 0.002417582417582387
+ *** Training on  dbpedia_14  and testing on  qnli
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (4550, 1536)
+Shape of y_train:  (4550,)
+Logistic regression accuracy on transfer: 0.13428571428571429
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.9457142857142857
+CCS accuracy on own: 0.0004395604395603936
+ *** Training on  dbpedia_14  and testing on  piqa
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (4550, 1536)
+Shape of y_train:  (4550,)
+Logistic regression accuracy on transfer: 0.04857142857142857
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.9885714285714285
+CCS accuracy on own: 0.00021978021978021978
+ *** Training on  dbpedia_14  and testing on  story-cloze
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (4550, 1536)
+Shape of y_train:  (4550,)
+Logistic regression accuracy on transfer: 0.4142857142857143
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.9971428571428571
+CCS accuracy on own: 0.9997802197802198
+ *** Training on  copa  and testing on  imdb
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.4
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.6428571428571429
+CCS accuracy on own: 0.0
+ *** Training on  copa  and testing on  amazon_polarity
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.5028571428571429
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.5257142857142857
+CCS accuracy on own: 1.0
+ *** Training on  copa  and testing on  ag_news
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.39714285714285713
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.6038095238095238
+CCS accuracy on own: 0.0
+ *** Training on  copa  and testing on  dbpedia_14
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, train
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+got hidden states, test
+Memory used, total: 3.15 GB
+Shape of x_train:  (350, 1536)
+Shape of y_train:  (350,)
+Logistic regression accuracy on transfer: 0.46835164835164833
+Logistic regression accuracy on own: 1.0
+CCS accuracy on transfer: 0.4567032967032967
+CCS accuracy on own: 0.0
+ *** Training on  copa  and testing on  copa
+loaded data
+Memory used, total: 3.15 GB
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: []
+neg_labels_limit: 175
+pos_labels_limit: 175
+intial used_idx: [431, 431, 239, 239, 24, 24, 216, 216, 368, 368, 279, 279, 11, 11, 198, 198, 417, 417, 386, 386, 133, 133, 314, 314, 410, 410, 82, 82, 327, 327, 35, 35, 316, 316, 230, 230, 99, 99, 465, 465, 192, 192, 388, 388, 169, 169, 141, 141, 247, 247, 320, 320, 210, 210, 385, 385, 269, 269, 322, 322, 114, 114, 354, 354, 460, 460, 496, 496, 300, 300, 136, 136, 393, 393, 391, 391, 156, 156, 60, 60, 437, 437, 422, 422, 288, 288, 406, 406, 382, 382, 167, 167, 357, 357, 22, 22, 58, 58, 433, 433, 355, 355, 447, 447, 311, 311, 170, 170, 83, 83, 313, 313, 495, 495, 383, 383, 395, 395, 419, 419, 456, 456, 480, 480, 287, 287, 187, 187, 499, 499, 151, 151, 7, 7, 268, 268, 62, 62, 186, 186, 87, 87, 124, 124, 474, 474, 242, 242, 25, 25, 195, 195, 277, 277, 134, 134, 440, 440, 317, 317, 377, 377, 117, 117, 401, 401, 265, 265, 286, 286, 182, 182, 238, 238, 108, 108, 89, 89, 381, 381, 280, 280, 119, 119, 179, 179, 17, 17, 107, 107, 142, 142, 263, 263, 42, 42, 482, 482, 23, 23, 493, 493, 249, 249, 487, 487, 372, 372, 101, 101, 468, 468, 329, 329, 153, 153, 321, 321, 423, 423, 416, 416, 128, 128, 93, 93, 36, 36, 273, 273, 157, 157, 154, 154, 432, 432, 112, 112, 29, 29, 428, 428, 244, 244, 20, 20, 399, 399, 464, 464, 161, 161, 404, 404, 459, 459, 158, 158, 9, 9, 360, 360, 3, 3, 14, 14, 52, 52, 54, 54, 445, 445, 425, 425, 232, 232, 155, 155, 390, 390, 138, 138, 412, 412, 371, 371, 115, 115, 349, 349, 218, 218, 439, 439, 39, 39, 470, 470, 375, 375, 92, 92, 190, 190, 374, 374, 10, 10, 191, 191, 245, 245, 131, 131, 483, 483, 414, 414, 309, 309, 335, 335, 55, 55, 43, 43, 208, 208, 260, 260, 194, 194, 79, 79, 498, 498, 67, 67, 340, 340, 457, 457, 116, 116, 94, 94, 15, 15, 486, 486, 110, 110, 497, 497, 325, 325, 221, 221, 270, 270, 362, 362, 435, 435, 484, 484, 299, 299, 163, 163, 411, 411, 367, 367, 295, 295, 318, 318, 254, 254, 272, 272, 488, 488, 37, 37, 415, 415, 181, 181, 332, 332, 427, 427, 123, 123, 290, 290, 476, 476, 462, 462, 334, 334, 174, 174, 430, 430, 231, 231, 144, 144, 344, 344, 223, 223, 121, 121, 222, 222, 229, 229, 16, 16, 284, 284, 1, 1, 266, 266, 434, 434, 336, 336, 250, 250, 276, 276, 5, 5, 301, 301, 236, 236, 184, 184, 444, 444, 38, 38, 485, 485, 30, 30, 472, 472, 341, 341, 164, 164, 453, 453, 126, 126, 74, 74, 308, 308, 75, 75, 471, 471, 274, 274, 234, 234, 28, 28, 303, 303, 148, 148, 312, 312, 479, 479, 343, 343, 104, 104, 264, 264, 73, 73, 96, 96, 240, 240, 27, 27, 118, 118, 71, 71, 26, 26, 149, 149, 159, 159, 491, 491, 202, 202, 70, 70, 172, 172, 88, 88, 384, 384, 220, 220, 407, 407, 310, 310, 97, 97, 41, 41, 68, 68, 361, 361, 205, 205, 147, 147, 494, 494, 328, 328, 379, 379, 387, 387, 421, 421, 4, 4, 405, 405, 81, 81, 66, 66, 227, 227, 152, 152, 78, 78, 248, 248, 47, 47, 212, 212, 258, 258, 235, 235, 196, 196, 356, 356, 32, 32, 454, 454, 197, 197, 2, 2, 48, 48, 13, 13, 380, 380, 403, 403, 193, 193, 259, 259, 424, 424, 246, 246, 257, 257, 175, 175, 306, 306, 275, 275, 85, 85, 323, 323, 319, 319, 481, 481, 56, 56, 166, 166, 409, 409, 397, 397, 302, 302, 19, 19, 6, 6, 209, 209, 490, 490, 237, 237, 450, 450, 113, 113, 448, 448, 492, 492, 398, 398, 69, 69, 347, 347, 139, 139, 111, 111, 137, 137, 400, 400, 129, 129, 80, 80, 200, 200, 326, 326, 396, 396, 125, 125, 105, 333, 333, 146, 146, 373, 373, 0, 451, 451, 183, 86, 86, 339, 109, 109, 359, 171, 171, 176, 98, 98, 452, 452, 224, 292, 292, 252, 50, 135, 135, 253, 253, 366, 366, 282, 282]

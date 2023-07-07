@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
 from datasets import Dataset
+from tqdm import tqdm
 
 
 
@@ -488,3 +489,149 @@ class BoolQ_Question_Dataset(Abstract_Dataset):
         self.all_labels = labels
 
 #%%
+
+# CCS DATASETS
+
+dataset_names = [("imdb",), ("amazon_polarity",), ("ag_news",), ("dbpedia_14",), ("super_glue", "copa"),
+                 ("super_glue", "rte"), ("boolq",), ("glue", "qnli"), ("piqa",), ("chenxwh/gen-storycloze",)]
+dataset_names_singular = ["imdb", "amazon_polarity", "ag_news", "dbpedia_14", "copa", "rte", "boolq", "qnli", "piqa", "story-cloze"]
+label_dict = {
+    "imdb": ["negative", "positive"], # This is for normal IMDB
+    "amazon_polarity": ["negative", "positive"],
+    "ag_news": ["politics", "sports", "business", "technology"],
+    "dbpedia_14": ["company", "educational institution", "artist", "athlete", "office holder", "mean of transportation", "building", "natural place", "village", "animal",  "plant",  "album",  "film",  "written work"],
+    "copa": ["choice 1", "choice 2"],
+    "rte": ["yes", "no"],   # whether entail
+    "boolq": ["false", "true"],
+    "qnli": ["yes", "no"],  # represent whether entail
+    "piqa": ["solution 1", "solution 2"],
+    "story-cloze": ["choice 1", "choice 2"],
+}
+datasets = {}
+
+def format_prompt(label, text, text1, text2, dataset_name = "imdb"):
+    """
+    Given an imdb example ("text") and corresponding label (0 for negative, or 1 for positive), 
+    returns a zero-shot prompt for that example (which includes that label as the answer).
+    
+    (This is just one example of a simple, manually created prompt.)
+    """
+    if dataset_name == "imdb":
+        return "The following movie review expresses a " + label_dict[dataset_name][label] + " sentiment:\n" + text
+    if dataset_name == "amazon_polarity":
+        return "The following Amazon review expresses a " + label_dict[dataset_name][label] + " sentiment:\n" + text
+        # text = title and content
+    if dataset_name == "ag_news":
+        return "The topic of the following news article is about " + label_dict[dataset_name][label] + ":\n" + text
+    if dataset_name == "dbpedia_14":
+        return "The following article relates to " + label_dict[dataset_name][label] + "s:\n" + text
+        # text = title and content
+    if dataset_name == "copa":
+        return f'Story: {text} \nIn this story, out of "{text1}" and "{text2}", the sentence is most likely to follow is {["the former", "the latter"][label]}.'
+        # text = premise. text1 and text2 are choice1 choice2
+    if dataset_name == "rte":
+        return f"Passage: {text}\nQuestion: Does this imply that {text1}?\nAnswer here: {['Yes', 'No'][label]}."
+        # text = premise
+        # text1 = hypothesis
+    if dataset_name == "boolq":
+        return f"{text}\nQuestion: {text1}? {['Yes', 'No'][label]}"
+        # text = passage
+        # text1 = question
+    if dataset_name == "qnli":
+        return f"Question: {text}\nAnswer: {text1}\nDoes the information in the provided answer help completely the question? {['Yes', 'No'][label]}"
+        # text = question
+        # text1 = answer
+    if dataset_name == "piqa":
+        return f"Which choice makes the most sense? \nQuestion: {text}\nChoice 1: {text1}\nChoice 2: {text2}\nAnswer here: {['Choice 1', 'Choice 2'][label]}"
+        # text = question
+        # text1 = sol1
+        # text2 = sol2
+    if dataset_name == "story-cloze":
+        return f"Which choice makes the most sense? \nStory: {text}\nContinuation 1: {text1}\nContinuation 2: {text2} \nAnswer here: {['Continuation 1', 'Continuation 2'][label]}"
+        # text = context
+        # text1 = sentence_quiz1
+        # text2 = sentence_quiz2
+
+class CCS_dataset:
+    """
+    Trying to create a dataset that creates things in *pairs*
+    """
+    def __init__(self, tokenizer, seed:int = 0):
+        # define self.tokenizer
+        # define self.data (type HuggingFace dataset)
+        # define self.dataset_name
+
+        self.tokenizer = tokenizer
+        self.dataset_name = "imdb"
+        self.data = load_dataset(*dataset_names[0])["train"]
+
+    def sample(self, sample_size: int, reset_seed=False, balanced=True, used_idx=[]):
+        """
+        indices is of type numpy array
+        sample_prompts is of type List of Tensors
+        sample_labels is of type List of Ints
+
+        Balanced by default; unbalanced implementation hasn't happened yet lol
+        """
+
+        all_neg_hs, all_pos_hs, all_gt_labels = [], [], []
+
+        # Length requirement
+        max_token_length = self.tokenizer.model_max_length
+
+        # BALANCE
+        neg_labels = 0
+        pos_labels = 0
+        neg_labels_limit = sample_size//2
+        pos_labels_limit = sample_size-neg_labels_limit
+
+        # keep track
+        print(f"intial used_idx: {used_idx}")
+        used_idxs = used_idx
+        visited_idxs = used_idx
+        toolong_idxs = []
+
+        for _ in tqdm(range(sample_size)):
+            while True:
+                idx = np.random.randint(len(self.data))
+                if idx in visited_idxs:
+                    continue
+                visited_idxs.append(idx)
+
+                # Find all the variables relevant to this prompt
+                text, true_label = self.data[idx]["text"], self.data[idx]["label"]
+                try:
+                    text1 = data[idx]["text1"]
+                except:
+                    text1 = ""
+                try:
+                    text2 = data[idx]["text2"]
+                except:
+                    text2 = ""
+                pos_prompt = format_prompt(true_label, text, text1, text2, dataset_name = self.dataset_name)
+
+                # Length requirement (not met)
+                if not (len(self.tokenizer(pos_prompt)['input_ids']) < (max_token_length - 20)):
+                    toolong_idxs.append(idx)
+                    continue
+                # Balance requirement (met) + length requirement met
+                elif ((pos_labels < pos_labels_limit and true_label == 1) or (neg_labels < neg_labels_limit and true_label == 0)):
+                    if true_label == 0:
+                        neg_labels += 1
+                    else:
+                        pos_labels += 1
+                    break
+            for i, label in enumerate(label_dict.get(self.dataset_name)):
+                if i != true_label:
+                    neg_prompt = format_prompt(i, text, text1, text2, dataset_name = self.dataset_name)
+                    all_neg_hs.append(neg_prompt)
+                    all_pos_hs.append(pos_prompt)
+                    all_gt_labels.append(true_label)
+
+        neg_p = np.stack(all_neg_hs)
+        pos_p = np.stack(all_pos_hs)
+        y = np.stack(all_gt_labels)
+
+        return neg_p, pos_p, y, used_idxs
+
+
