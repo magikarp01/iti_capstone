@@ -319,10 +319,13 @@ class AWSUtils:
 #Need support for dataset, for arbitrary act_type, for AWS (separable), for distributed setting
 
 #todo
-#get dataset subsample sorted out
-#re-shape tensors for logistic regression
-#probing code
-
+#add support for other act_types
+#integrate with AWS
+#pipeline parallelism for large model
+#data/probing parallelism
+#test out pipeline, implement CCS
+#polish and improve compatibility with Philip code
+#path handling is atrocious (at the very least abstract it to its own method)
 
 class ModelActsLarge: #separate class for now, can make into subclass later (need to standardize input and output, and manage memory effectively)
     """
@@ -342,7 +345,7 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
     3. get_train_test_split:
         -given a tensor of shape (N, d_head), returns two tensors of shapes (N_train, )
     """
-    def __init__(self, model=None, dataset=None, use_aws=True, seed = None, act_types = ["z"], world_size=1):
+    def __init__(self, model=None, dataset=None, use_aws=True, seed = None, act_types = ["z"], world_size=1, **kwargs):
         self.model = model #model only needed for gen_acts, otherwise don't load it so as to preserve memory
         self.dataset = dataset
 
@@ -354,16 +357,17 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
             np.random.seed(seed)
             torch.manual_seed(seed)
 
-        self.n_layers = None
-        self.d_head = None
-        self.n_heads = None
-
-
         self.use_aws = use_aws #save data to disk first, then send it all to AWS
         self.world_size = world_size #distributed not supported yet
         self.id = None
 
-        self.activation_buffer = torch.zeros((self.model.num_hidden_layers, self.model.hidden_size))
+        if kwargs["n_layers"] is not None:
+            self.n_layers = kwargs["n_layers"] #need to find an adequate way to handle this metadata
+            self.d_head = kwargs["d_head"]
+            self.n_heads = kwargs["n_heads"]    
+            self.d_model = self.d_head * self.n_heads
+
+            self.activation_buffer = torch.zeros((self.n_layers, self.d_model))
 
 
     def cache_z_hook_fnc(self, module, input, output, name="", layer_num=0):
@@ -384,22 +388,27 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
         self.model.eval()
         hmodel = HookedModule(self.model)
         loader = DataLoader(self.dataset, batch_size=1, shuffle=False) #find dataloader optimizations
-        save_path = f"~/iti_capstone/{filepath}"
-        if not os.path.exists(save_path):
-            os.system(f"mkdir {save_path}")
+        #save_path = f"~/iti_capstone/{filepath}"
+        #if not os.path.exists(save_path):
+        #    os.system(f"mkdir {save_path}")
         if id is None:
-            id = np.random.randint(10000)
+            id = np.random.randint(10000) #BUG: THIS IS DETERMINISTIC
         self.id = id
 
         #add pytorch hooks
         hook_pairs = []
         if "z" in self.act_types: #only supports hooking for z at the moment
-            for layer in range(self.model.config.num_hidden_layers):
+            for layer in range(self.n_layers):
                 act_name = f"model.layers.{layer}.self_attn.o_proj"
                 hook_pairs.append((act_name, partial(self.cache_z_hook_fnc, name=act_name, layer_num=layer)))
         
         if filepath[-1] != "/":
             filepath = filepath + "/"
+        if not os.path.exists(filepath):
+            os.system(f"mkdir {filepath}")
+        if not os.path.exists(f"{filepath}unformatted"):
+            os.system(f"mkdir {filepath}unformatted")
+        filepath = filepath + "unformatted/"
 
         if save_labels:
             torch.save(torch.tensor(self.dataset.all_labels), f"{filepath}large_run{id}_labels.pt")
@@ -407,29 +416,43 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
             torch.save(self.indices, f"{filepath}large_run{id}_indices.pt")
 
         for idx, batch in tqdm(enumerate(loader)):
-            token_ids = batch[0].to(self.model.device)
+            token_ids = batch[0].squeeze(dim=0).to(self.model.device)
             with hmodel.hooks(fwd=hook_pairs):
                 output = hmodel(token_ids)
-            torch.save(self.activation_buffer, f"{save_path}large_run{id}_{idx}.pt")
+            torch.save(self.activation_buffer, f"{filepath}large_run{id}_{idx}.pt")
+        #torch.cuda.empty_cache()
+        #consider clearing model so can run pipeline all in one swoop
 
+    #note: please make a new folder for this
+    def reformat_acts_for_probing(self, id, N=0, filepath="activations/"):
+        """
+        need to define n_layers, d_head, n_heads, N
+        """
+        
+        if self.dataset is not None:
+            N = len(self.dataset)
 
-    def reformat_acts_for_probing(self, id, filepath="activations/"):
-        """
-        need to define n_layers, d_head, n_heads
-        """
         if filepath[-1] != "/":
             filepath = filepath + "/"
-        save_path = f"~/iti_capstone/{filepath}"
+        load_path = filepath + "unformatted/"
+        if not os.path.exists(f"{filepath}formatted"):
+            os.system(f"mkdir {filepath}formatted")
+        save_path = filepath + "formatted/"
 
-        probe_dataset = torch.empty((len(self.dataset), self.d_head))
+        probe_dataset = torch.empty((N, self.d_head))
         
         for layer in range(self.n_layers):
             for head in range(self.n_heads):
                 head_start = head*self.d_head
                 head_end = head_start + self.d_head
-                for idx in tqdm(range(len(self.dataset))): #can do smarter things to reduce # of systems calls
-                    acts: Float[Tensor, "d_model n_layers"] = torch.load(f"{save_path}large_run{id}_{idx}.pt") #saved activation buffers
-                    probe_dataset[idx,:] = acts[head_start:head_end, layer].squeeze()
+                print("self.d_head: ", self.d_head)
+                for idx in tqdm(range(N)): #can do smarter things to reduce # of systems calls
+                    # O(layers*heads*N)
+                    acts: Float[Tensor, "n_layers d_model"] = torch.load(f"{load_path}large_run{id}_{idx}.pt") #saved activation buffers
+                    print("acts.shape: ", acts.shape)
+                    print("acts[head_start:head_end, layer]: ", acts[layer, head_start:head_end])
+                    print("probe_dataset[idx,:]: ", probe_dataset[idx,:])
+                    probe_dataset[idx,:] = acts[layer, head_start:head_end].squeeze()
                 torch.save(probe_dataset, f"{save_path}large_run{id}_probe_l{layer}_h{head}.pt")
 
 
@@ -443,16 +466,14 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
     #    raise NotImplementedError
     
 
-    def get_train_test_split(self, X_acts: Float[Tensor, "N d_head"], labels: Float[Tensor, "N,"], test_ratio = 0.2):
-        #need to handle labels
-        #assert X_acts.shape[0] == N
+    def get_train_test_split(self, X_acts: Float[Tensor, "N d_head"], labels: Float[Tensor, "N"], test_ratio = 0.2):
 
-        probe_dataset = TensorDataset(X_acts, labels_tensor)
+        probe_dataset = TensorDataset(X_acts, labels)
         generator1 = torch.Generator().manual_seed(42)
         train_data, test_data = random_split(probe_dataset, [1-test_ratio, test_ratio], generator=generator1) #not the same split for every probe
 
-        train_data = train_data.dataset[train_data.indices]
-        test_data = test_data.dataset[test_data.indicies]
+        X_train, y_train = train_data.dataset[train_data.indices]
+        X_test, y_test = test_data.dataset[test_data.indicies]
 
         return X_train, y_train, X_test, y_test
     
@@ -460,41 +481,52 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
     def _train_single_probe(self, id, layer, head, filepath="activations/", max_iter=1000): #Use regularization!!!
         if filepath[-1] != "/":
             filepath = filepath + "/"
-        load_path = f"~/iti_capstone/{filepath}"
+        # load_path = f"~/iti_capstone/{filepath}"
         
-        X_acts: Float[Tensor, "N d_head"] = torch.load(f"{load_path}large_run{id}_probe_l{layer}_h{head}.pt")
+        X_acts: Float[Tensor, "N d_head"] = torch.load(f"{filepath}large_run{id}_probe_l{layer}_h{head}.pt")
+
         if self.dataset is not None: #must be same object that called gen_acts!
-            labels: Float[Tensor, "N,"] = torch.tensor(self.dataset.all_labels)
+            labels: Float[Tensor, "N"] = torch.tensor(self.dataset.all_labels)
         else:
-            labels: Float[Tensor, "N,"] = torch.load(f"{filepath}large_run{id}_labels.pt")
+            labels: Float[Tensor, "N"] = torch.load(f"{filepath}large_run{id}_labels.pt")
 
         X_train, y_train, X_test, y_test = self.get_train_test_split(X_acts, labels) # (train_size, d_head), (test_size, d_head)
 
         clf = LogisticRegression(max_iter=max_iter).fit(X_train.numpy(), y_train.numpy()) #check shapes
         #also implement plug-and-play pytorch logistic regression and compare performance
+        y_pred = clf.predict(X_train.numpy())
 
-        y_pred = clf.predict()
+        y_val_pred = clf.predict(X_test.numpy())
+
+        acc = accuracy_score(y_test.numpy(), y_val_pred)
+
+        return clf, acc
 
 
     
     #don't need to store model in memory while doing probing (obviously)
-    def _train_probes(self, num_probes, X_train, X_test, y_train, y_test, max_iter=1000):
+    def _train_probes(self, num_probes, max_iter=1000):
         #can do parallelized probing (see sheet)
         #for now, loop over probes, we can use embarrasing parallelism later
         #write sklearn and pytorch implementation
-        """
-        Helper function that all train_x_probes will call to train num_probes probes, after formatting X and y properly.
-        Flatten X so that X_train.shape = (num_examples, num_probes, d_probe)
-        y_train.shape = (num_examples, num_probes)
-        Returns list of probes and np array of probe accuracies
-        """
-
+        #for 
+        #probe, acc = self._train_single_probe(id, layer, head, max_iter=max_iter)
         raise NotImplementedError
     
-    def train_z_probes(self, max_iter=1000):
-        #call train test split
-        #call _train_probes
-        raise NotImplementedError
+    def train_z_probes(self, id, max_iter=1000):
+        probes = {}
+        accs = {}
+        for layer in tqdm(range(self.n_layers)):
+            for head in tqdm(range(self.n_heads)):
+                probe, acc = self._train_single_probe(id, layer, head, max_iter=max_iter)
+                tag = f"l{layer}h{head}"
+                probes[tag] = probe
+                accs[tag] = acc
+        with open(f"large_run{id}_probes.pkl", "wb") as file:
+            pickle.dump(probes, file)
+        with open(f"large_run{id}_accs.pkl", "wb") as file:
+            pickle.dump(accs, file)
+        
     
     def train_mlp_out_probes(self, max_iter=1000):
         #re-create tensors on the fly

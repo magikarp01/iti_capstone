@@ -1,34 +1,33 @@
 # %%
-from utils.probing_utils import ModelActsLarge
+import os
 from utils.model_loading_utils import load_llama
+from utils.probing_utils import ModelActsLarge
 from utils.dataset_utils import TorchDataset
+import time
 
 
-# %%
-model_name = "stable-vicuna-13b"
-model = load_llama(model_name)
+class TCM:
+    """context manager for timing code segments"""
+    def __init__(self):
+        self.start_time = 0
 
-dataset = TorchDataset("tqa", model.tokenizer)
-
-acts = ModelActsLarge(model, dataset, use_aws=False,)
-
-# %%
-import torch
-from utils.dataset_utils import TorchDataset
-from transformers import LlamaTokenizer
-from torch.utils.data import TensorDataset
-
-N = 10
-
-X_acts = torch.randint(0,3,(N, 128))
+    def __enter__(self):
+        self.start_time = time.time()
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print("Time: ", time.time() - self.start_time)
 
 
-labels_tensor = torch.tensor(dataset.all_labels)
-print(labels_tensor.shape)
-
-probe_dataset = TensorDataset(X_acts, labels_tensor)
-generator1 = torch.Generator().manual_seed(42)
-train_data, test_data = random_split(probe_dataset, [1-test_ratio, test_ratio], generator=generator1) #not the same split for every probe
-
-train_data = train_data.dataset[train_data.indices]
-test_data = test_data.dataset[test_data.indicies]
+with TCM():
+    model = load_llama("stable-vicuna-13b", os.getcwd())
+    dataset = TorchDataset(model.tokenizer,"tqa")
+    kwargs = {"n_layers" : 40,
+                "d_head" : 128,
+                "n_heads" : 40,
+                "d_model" : 5120
+                }
+    acts = ModelActsLarge(model, dataset, **kwargs)
+    acts.gen_acts(N=50)
+    acts.reformat_acts_for_probing(5986, N=50)
+    acts.train_z_probes(acts.id)
