@@ -374,7 +374,7 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
         self.activation_buffer[layer_num, :] = input[0][0,-1,:].detach().clone()
 
 
-    def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu", save_labels=True):
+    def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu", save_labels=True, distributed=False):
         """
         Doesn't save acts in active memory. Acts may be several hundreds of GB.
         """
