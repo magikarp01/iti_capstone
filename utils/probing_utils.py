@@ -441,17 +441,13 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
 
         probe_dataset = torch.empty((N, self.d_head))
         
-        for layer in range(self.n_layers):
-            for head in range(self.n_heads):
+        for layer in tqdm(range(self.n_layers), desc='layer', ):
+            for head in tqdm(range(self.n_heads), desc='head', leave=False):
                 head_start = head*self.d_head
                 head_end = head_start + self.d_head
-                print("self.d_head: ", self.d_head)
-                for idx in tqdm(range(N)): #can do smarter things to reduce # of systems calls
+                for idx in range(N): #can do smarter things to reduce # of systems calls
                     # O(layers*heads*N)
                     acts: Float[Tensor, "n_layers d_model"] = torch.load(f"{load_path}large_run{id}_{idx}.pt") #saved activation buffers
-                    print("acts.shape: ", acts.shape)
-                    print("acts[head_start:head_end, layer]: ", acts[layer, head_start:head_end])
-                    print("probe_dataset[idx,:]: ", probe_dataset[idx,:])
                     probe_dataset[idx,:] = acts[layer, head_start:head_end].squeeze()
                 torch.save(probe_dataset, f"{save_path}large_run{id}_probe_l{layer}_h{head}.pt")
 
