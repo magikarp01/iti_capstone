@@ -386,7 +386,9 @@ class TruthfulQA_Tfn(ChatGPTGen_Dataset_Truthfulness):
         string_list = ["TruthfulQA"]
         dataset = load_dataset("notrichardren/truthfulness")["train"]
         df = dataset.to_pandas()
-        df = df[df['origin_dataset'].isin(string_list)] + '.' # add period to end of each sentence
+        df = df[df['origin_dataset'].isin(string_list)] 
+        
+        df['claim'] += '.' # add period to end of each sentence
         self.dataset = Dataset.from_pandas(df)
         super().__init__(*args, **kwargs)
 
@@ -395,7 +397,8 @@ class CounterFact_Tfn(ChatGPTGen_Dataset_Truthfulness):
         string_list = ["CounterFact"]
         dataset = load_dataset("notrichardren/truthfulness")["train"]
         df = dataset.to_pandas()
-        df = df[df['origin_dataset'].isin(string_list)] + '.' # add period to end of each sentence
+        df = df[df['origin_dataset'].isin(string_list)] 
+        df['claim'] += '.' # add period to end of each sentence
         self.dataset = Dataset.from_pandas(df)
         super().__init__(*args, **kwargs)
 
