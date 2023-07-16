@@ -71,7 +71,7 @@ def test_model_output(model: HookedTransformer, input_str=None, dataset: Abstrac
     if input_str is not None:
         input_ids = model.tokenizer(input_str, return_tensors="pt").input_ids
         input_ids = input_ids.to(model.cfg.device)
-        output = model.generate(input_ids, do_sample=True, max_new_tokens=max_length, temperature=temperature)
+        output = model.generate(input_ids, do_sample=True, max_new_tokens=max_length, temperature=temperature, verbose=False)
         if print_output:
             print(output)
         return model.tokenizer.decode(output[0], skip_special_tokens=True)
@@ -83,7 +83,7 @@ def test_model_output(model: HookedTransformer, input_str=None, dataset: Abstrac
 
         for i in dataset_indices:
             input_ids = dataset.all_prompts[i].to(model.cfg.device)
-            output = model.generate(input_ids, do_sample=True, max_new_tokens=max_length, temperature=temperature)
+            output = model.generate(input_ids, do_sample=True, max_new_tokens=max_length, temperature=temperature, verbose=False)
             if print_output:
                 print(output)
             responses.append(model.tokenizer.decode(output[0], skip_special_tokens=True))
