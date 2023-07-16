@@ -14,8 +14,8 @@ def tot_logit_diff(tokenizer, model_acts, use_probs=False, eps=1e-8, test_only=T
     positive_str_tokens = ["Yes", "yes", " Yes", " yes", "True", "true", " True", " true"]
     negative_str_tokens = ["No", "no", " No", " no", "False", "false", " False", " false"]
 
-    positive_tokens = [tokenizer(token).input_ids[0] for token in positive_str_tokens]
-    negative_tokens = [tokenizer(token).input_ids[0] for token in negative_str_tokens]
+    positive_tokens = [tokenizer(token).input_ids[-1] for token in positive_str_tokens]
+    negative_tokens = [tokenizer(token).input_ids[-1] for token in negative_str_tokens]
 
 
     if test_only:

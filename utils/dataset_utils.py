@@ -47,9 +47,9 @@ class Abstract_Dataset:
 
     def sample(self, sample_size: int, reset_seed=False, balanced=True):
         """
-        indices is of type numpy array
-        sample_prompts is of type List of Tensors
-        sample_labels is of type List of Ints
+        indices is of type numpy array.
+        sample_prompts is of type List of Tensors.
+        sample_labels is of type List of Ints.
         """
         if reset_seed:
             np.random.seed(self.seed)

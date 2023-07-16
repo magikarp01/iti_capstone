@@ -34,3 +34,9 @@ For reference, fine-tuning gpt_judge and gpt_info according to the TruthfulQA in
 Once your GPT models are available, get_iti_scores will automatically evaluate your model's outputs on the dataset by truthfulness and informativeness, before and after ITI (method also applies ITI). For more customizability, users can use the get_model_generations and get_judge_scores methods on their own to generate and evaluate model outputs.
 
 To determine the generalization of ITI between two datasets, use the check_iti_generalization method.
+
+# Multiple Models
+For now, only native transformers that can be loaded out of 
+
+# Mechanistic Interpretability
+This codebase uses TransformerLens to store intermediate activations (functionality for storing )
