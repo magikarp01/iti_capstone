@@ -78,3 +78,27 @@ probing_utils.CCS_train(6, 2)
 
 # %%
 
+# TL probably sets disable_grad = True
+
+#%%
+
+# find that pytorch module is bugged
+
+import torch
+import torch.nn as nn
+torch.set_grad_enabled(True)
+
+# Create a simple model
+model = nn.Sequential(nn.Linear(10, 1), nn.Sigmoid()).to('cuda' if torch.cuda.is_available() else 'cpu')
+
+# Create a simple input tensor
+input_tensor = torch.randn(5, 10).to('cuda' if torch.cuda.is_available() else 'cpu')
+input_tensor.requires_grad = True
+
+# Pass the tensor through the model
+output_tensor = model(input_tensor)
+
+# Check if output tensor has requires_grad=True
+print(output_tensor.requires_grad)
+
+# %%

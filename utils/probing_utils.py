@@ -175,8 +175,8 @@ class ModelActs:
         # Initialize probe, optimizer
         print(f"Initial acts shape: {acts_yes.shape}")
         p0 = nn.Sequential(nn.Linear(acts_yes.shape[-1], 1), nn.Sigmoid()).to(self.model.cfg.device)
-        for param in p0.parameters():
-            param.requires_grad = True
+        # for param in p0.parameters():
+        #     param.requires_grad = True
         optimizer = torch.optim.AdamW(p0.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
         for epoch in range(n_epochs):
@@ -190,15 +190,18 @@ class ModelActs:
             print(f"acts_yes shape: {acts_yes.shape}")
             acts_no = self.get_acts_of_prompts(prompt_no)[act_type]
             # Normalize hidden states
-            print(f"acts_no shape: {acts_yes.shape}")
+            print(f"acts_no shape: {acts_no.shape}")
             acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
             acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
+
+            torch.set_grad_enabled(True)
 
             # Add requires grad (no idea why i have to do this)
             acts_yes = acts_yes.to(self.model.cfg.device)
             acts_no = acts_no.to(self.model.cfg.device)
-            acts_yes.requires_grad = True
-            acts_no.requires_grad = True
+            print(acts_yes.requires_grad)
+            # acts_yes.requires_grad = True
+            # acts_no.requires_grad = True
         
             # probe
             p0_out, p1_out = p0(acts_yes), p0(acts_no)
@@ -216,6 +219,8 @@ class ModelActs:
             print(f"Loss: {loss}")
             loss.backward()
             optimizer.step()
+
+            torch.set_grad_enabled(False)
 
             if epoch == range(n_epochs):
                 self.p0 = p0
@@ -394,7 +399,7 @@ class ModelActs:
         return np.array(accs)
 
     def show_top_z_probes(self, topk=50):
-        """
+        """ 
         Utility to print the most accurate heads. Out of date with probe_generalization merge.
         """
         probe_accuracies = torch.tensor(einops.rearrange(self.probe_accs["z"], "(n_l n_h) -> n_l n_h", n_l=self.model.cfg.n_layers))
