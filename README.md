@@ -15,7 +15,7 @@ Both activation caching and probing is done in the ModelActs class, defined in t
 
 To use ModelActs, first initialize a ModelActs object with a model and a dataset from utils.dataset_utils. You can optionally include an act_types parameter of a list of activation types to cache (you can cache any activations from the provided HookedTransformer's hook_dict). (Example in iti_validations.py)
 
-Then, generate activations (also stored in the ModelActs class) using the gen_acts method, which handles sampling from prompts/labels and caching. You can optionally store and load activations in a file. Activations are stored in the self.stored_acts dictionary (keys are act_types).
+Then, generate activations (also stored in the ModelActs class) using the gen_acts method, which handles sampling from prompts/labels and caching. You can optionally store and load activations in a file. Activations are stored in the self.stored_acts dictionary (keys are act_types). In order to generate and store activations, you need to create a folder called "activations".
 
 Once activations have been generated, use the train_probes() method to automatically train probes on the already sampled activations and labels. The train_probes method takes an activation type, so you can specify any activation type (e.g. "z" for ITI) in act_types to train probes on.
 

@@ -66,6 +66,7 @@ class ModelActs:
         self.y_tests = {}
         self.indices_trains = {}
         self.indices_tests = {}
+        self.device = self.model.cfg.device # still need to replace all instances of this
 
     """
     Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
@@ -157,44 +158,68 @@ class ModelActs:
 
         return self.stored_acts
 
-    def CCS_train(self,batch_size, n_epochs):
+    def CCS_train(self,batch_size, n_epochs, act_type = "z"):
         """
         CCS = consistent contrast search
         """
 
+        self.lr = 5e-3
+        self.weight_decay = 1e-4
+
         # Get a single activation to get probe correct shape
         prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(1)
         acts_yes = self.get_acts_of_prompts(prompt_yes)
+        acts_yes = acts_yes[act_type]
         acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
         
         # Initialize probe, optimizer
-        self.p0 = nn.Sequential(nn.Linear(acts_yes.shape[-1], 1), nn.Sigmoid()).to(self.model.cfg.device)
-        optimizer = torch.optim.AdamW(self.probe.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+        print(f"Initial acts shape: {acts_yes.shape}")
+        p0 = nn.Sequential(nn.Linear(acts_yes.shape[-1], 1), nn.Sigmoid()).to(self.model.cfg.device)
+        for param in p0.parameters():
+            param.requires_grad = True
+        optimizer = torch.optim.AdamW(p0.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
         for epoch in range(n_epochs):
+            optimizer.zero_grad()
+
             # Sample_pair based on batch_size
             prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(batch_size)
 
             # Get hidden states
-            acts_yes = self.get_acts_of_prompts(prompt_yes)
-            acts_no = self.get_acts_of_prompts(prompt_no)
+            acts_yes = self.get_acts_of_prompts(prompt_yes)[act_type]
+            print(f"acts_yes shape: {acts_yes.shape}")
+            acts_no = self.get_acts_of_prompts(prompt_no)[act_type]
             # Normalize hidden states
+            print(f"acts_no shape: {acts_yes.shape}")
             acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
             acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
+
+            # Add requires grad (no idea why i have to do this)
+            acts_yes = acts_yes.to(self.model.cfg.device)
+            acts_no = acts_no.to(self.model.cfg.device)
+            acts_yes.requires_grad = True
+            acts_no.requires_grad = True
         
             # probe
-            p0_out, p1_out = self.p0(acts_yes), self.p0(acts_no)
+            p0_out, p1_out = p0(acts_yes), p0(acts_no)
+
+            # p0_out and p1_out do not have requires_grad = True
 
             # get the corresponding loss
             informative_loss = (torch.min(p0_out, p1_out)**2).mean(0)
             consistent_loss = ((p0_out - (1-p1_out))**2).mean(0)
             loss = informative_loss + consistent_loss
 
+            print(loss.shape)
+
             # update the parameters
-            optimizer.zero_grad()
             print(f"Loss: {loss}")
             loss.backward()
             optimizer.step()
+
+            if epoch == range(n_epochs):
+                self.p0 = p0
+                self.CCS_label_clusters(acts_yes, acts_no, y)
 
         return loss.detach().cpu().item()
 
@@ -205,9 +230,9 @@ class ModelActs:
         predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
         acc = (predictions == labels).mean()
         if acc > 0.5:
-            return False # don't turn
+            self.CCS_label_clusters = False # don't turn
         else:
-            return True # do turn
+            self.CCS_label_clusters = True # do turn
 
     def CCS_inference(self, acts_yes, acts_no, labels):
         acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
@@ -217,7 +242,7 @@ class ModelActs:
         avg_confidence = 0.5*(p0_out + (1-p1_out))
         predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
         acc = (predictions == labels).mean()
-        if self.CCS_label_clusters(): # Apply train_direction
+        if self.CCS_label_clusters: # Apply train_direction
             acc = 1 - acc
         return acc
     
