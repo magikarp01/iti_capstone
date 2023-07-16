@@ -490,15 +490,16 @@ class BoolQ_Question_Dataset(Abstract_Dataset):
 
 #%%
 
-class CCS_dataset:
+class CCS_Dataset:
     """
     Trying to create a dataset that creates things in *pairs*
     """
-    def __init__(self, label_dict, format_prompt, dataset, tokenizer, seed:int = 0):
+    def __init__(self, label_dict, format_prompt, dataset, tokenizer, dataset_name = "imdb", seed:int = 0):
         self.tokenizer = tokenizer
         self.dataset = dataset # HuggingFace dataset
         self.label_dict = label_dict
         self.format_prompt = format_prompt
+        self.dataset_name = dataset_name
 
     def sample_pair(self, sample_size: int, reset_seed=False, balanced=True, used_idx=[]): # WILL REFACTOR THIS & CLEAN IT UP LATER
         """
@@ -543,7 +544,7 @@ class CCS_dataset:
                     text2 = self.dataset[idx]["text2"]
                 except:
                     text2 = ""
-                pos_prompt = self.format_prompt(true_label, text, text1, text2, dataset_name = "imdb")
+                pos_prompt = self.format_prompt(true_label, text, text1, text2, self.dataset_name)
 
                 # Length requirement (not met)
                 if not (len(self.tokenizer(pos_prompt)['input_ids']) < (max_token_length - 20)):
@@ -564,8 +565,8 @@ class CCS_dataset:
                     all_gt_labels.append(true_label)
 
 
-        neg_p = np.stack(all_neg_hs)
-        pos_p = np.stack(all_pos_hs)
-        y = np.stack(all_gt_labels)
+        # neg_p = np.stack(all_neg_hs)
+        # pos_p = np.stack(all_pos_hs)
+        # y = np.stack(all_gt_labels)
 
-        return neg_p, pos_p, y, used_idxs
+        return all_neg_hs, all_pos_hs, all_gt_labels, used_idxs

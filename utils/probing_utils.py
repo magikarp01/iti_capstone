@@ -114,6 +114,7 @@ class ModelActs:
 
         # return self.indices, self.attn_head_acts
 
+#%%
 
     def get_acts_of_prompts(self, prompts, store_acts = True, filepath = "activations/", id = None, storage_device="cpu"):
         """
@@ -126,7 +127,7 @@ class ModelActs:
         names_filter = lambda name: any([name.endswith(act_type) for act_type in self.act_types])
 
         for prompt in tqdm(prompts):
-            original_logits, cache = self.model.run_with_cache(prompt.to(self.model.cfg.device), names_filter=names_filter)
+            original_logits, cache = self.model.run_with_cache(prompt, names_filter=names_filter)
 
             # store every act type in self.act_types
             for act_type in self.act_types:
@@ -160,12 +161,14 @@ class ModelActs:
         """
         CCS = consistent contrast search
         """
-        
-        # Initialize probes with random parameters
-        self.p0 = nn.Sequential(nn.Linear(acts_yes.shape[-1], 1), nn.Sigmoid()).to(self.model.cfg.device)
-        self.p1 = nn.Sequential(nn.Linear(acts_yes.shape[-1], 1), nn.Sigmoid()).to(self.model.cfg.device)
 
-        # Initialize optimizer
+        # Get a single activation to get probe correct shape
+        prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(1)
+        acts_yes = self.get_acts_of_prompts(prompt_yes)
+        acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
+        
+        # Initialize probe, optimizer
+        self.p0 = nn.Sequential(nn.Linear(acts_yes.shape[-1], 1), nn.Sigmoid()).to(self.model.cfg.device)
         optimizer = torch.optim.AdamW(self.probe.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
         for epoch in range(n_epochs):
@@ -180,7 +183,7 @@ class ModelActs:
             acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
         
             # probe
-            p0_out, p1_out = self.p0(acts_yes), self.p1(acts_no)
+            p0_out, p1_out = self.p0(acts_yes), self.p0(acts_no)
 
             # get the corresponding loss
             informative_loss = (torch.min(p0_out, p1_out)**2).mean(0)
@@ -189,6 +192,7 @@ class ModelActs:
 
             # update the parameters
             optimizer.zero_grad()
+            print(f"Loss: {loss}")
             loss.backward()
             optimizer.step()
 
@@ -196,7 +200,7 @@ class ModelActs:
 
     def CCS_label_clusters(self, acts_yes, acts_no, labels):
         with torch.no_grad():
-            p0_out, p1_out = self.p0(acts_yes), self.p1(acts_no)
+            p0_out, p1_out = self.p0(acts_yes), self.p0(acts_no)
         avg_confidence = 0.5*(p0_out + (1-p1_out))
         predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
         acc = (predictions == labels).mean()
@@ -209,14 +213,16 @@ class ModelActs:
         acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
         acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
         with torch.no_grad():
-            p0_out, p1_out = self.p0(acts_yes), self.p1(acts_no)
+            p0_out, p1_out = self.p0(acts_yes), self.p0(acts_no)
         avg_confidence = 0.5*(p0_out + (1-p1_out))
         predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
         acc = (predictions == labels).mean()
-        if self.get_train_dir(): # Apply train_direction
+        if self.CCS_label_clusters(): # Apply train_direction
             acc = 1 - acc
         return acc
     
+#%%
+
     """
     Loads activations from activations folder. If id is None, then load the most recent activations. 
     If load_probes is True, load from saved probes.picle and all_heads_acc_np.npy files as well.
