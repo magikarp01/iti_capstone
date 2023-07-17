@@ -1,8 +1,9 @@
 # %%
+import os
 import torch
 import torch.distributed as dist
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import LlamaForCausalLM, LlamaTokenizer, LlamaModel
 from transformers.modeling_outputs import BaseModelOutputWithPastAndCrossAttentions
 
 from typing import Optional, Tuple, Union
@@ -13,16 +14,19 @@ TOTAL_RANKS = CLUSTER_SIZE * WORLD_SIZE
 
 # %%
 
-checkpoint = "gpt2"
+checkpoint = f"{os.getcwd()}/llama-13b-hf"
 
-model = AutoModelForCausalLM.from_pretrained(checkpoint)
-tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+model = LlamaModel.from_pretrained(checkpoint)
+tokenizer = LlamaTokenizer.from_pretrained(checkpoint)
+
+# %%
+causal_model = LlamaForCausalLM(model.config)
 
 
 # %%
 
 len(model.transformer.h) // TOTAL_RANKS
-
+#for gpt2 -> llama, self.transformer -> self.model; self.h -> self.layers
 
 
 # %%
