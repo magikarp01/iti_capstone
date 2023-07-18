@@ -2,13 +2,32 @@
 import os
 import torch
 import torch.nn as nn
-from transformers import LlamaModel, LlamaForCausalLM, LlamaTokenizer, LlamaConfig
+from transformers import LlamaModel, LlamaForCausalLM, LlamaTokenizer
+from transformers import GenerationConfig, LlamaConfig
 from transformers.modeling_outputs import BaseModelOutputWithPast
 from typing import List, Optional, Tuple, Union
+import time
+from accelerate import init_empty_weights, load_checkpoint_and_dispatch
+from huggingface_hub import snapshot_download
+
+
+
 
 
 GPU = torch.device('cuda')
 
+
+class TCM:
+    """context manager for timing code segments"""
+    def __init__(self):
+        self.start_time = 0
+
+    def __enter__(self):
+        self.start_time = time.time()
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print("Time: ", time.time() - self.start_time)
 
 
 class CustomLlamaModel(LlamaModel):
@@ -51,9 +70,8 @@ class CustomLlamaModel(LlamaModel):
         #if past_key_values is not None:
         #    past_key_values_length = past_key_values[0][0].shape[2]
         #    seq_length_with_past = seq_length_with_past + past_key_values_length
-
+        device = input_ids.device if input_ids is not None else inputs_embeds.device
         if position_ids is None:
-            device = input_ids.device if input_ids is not None else inputs_embeds.device
             position_ids = torch.arange(
                 past_key_values_length, seq_length + past_key_values_length, dtype=torch.long, device=device
             )
@@ -89,7 +107,19 @@ class CustomLlamaModel(LlamaModel):
 
         hidden_states = hidden_states.to(device)
 
+        chunk_length = 20
+
         for idx, decoder_layer in enumerate(self.layers):
+
+            if idx % chunk_length == 0:
+                if idx != 0:
+                    for sub_idx in range(idx-chunk_length, idx):
+                        self.layers[sub_idx] = self.layers[sub_idx].to('cpu')
+                    torch.cuda.empty_cache()
+
+                end_idx = len(self.layers) if (idx+chunk_length > len(self.layers)) else idx+chunk_length
+                for sub_idx in range(idx, end_idx):
+                    self.layers[sub_idx] = self.layers[sub_idx].to(device)
 
             if output_hidden_states:
                 all_hidden_states += (hidden_states,)
@@ -112,7 +142,7 @@ class CustomLlamaModel(LlamaModel):
             #         None,
             #     )
             # else:
-            decoder_layer = decoder_layer.to(device)
+            #decoder_layer = decoder_layer.to(device)
             layer_outputs = decoder_layer(
                 hidden_states,
                 attention_mask=attention_mask,
@@ -121,8 +151,8 @@ class CustomLlamaModel(LlamaModel):
                 output_attentions=output_attentions,
                 use_cache=use_cache,
             )
-            decoder_layer = decoder_layer.to('cpu')
-            torch.cuda.empty_cache()
+            #decoder_layer = decoder_layer.to('cpu')
+            #torch.cuda.empty_cache()
             hidden_states = layer_outputs[0]
 
             #if use_cache:
@@ -130,6 +160,10 @@ class CustomLlamaModel(LlamaModel):
 
             #if output_attentions:
             #    all_self_attns += (layer_outputs[1],)
+
+        for layer in self.layers:
+            self.layers[sub_idx] = self.layers[sub_idx].to('cpu')
+        torch.cuda.empty_cache()
         self.norm = self.norm.to(device)
         
         hidden_states = self.norm(hidden_states)
@@ -149,35 +183,66 @@ class CustomLlamaModel(LlamaModel):
         )
 
 
-class CustomLlamaForCausalLM(LlamaForCausalLM):
-    def __init__(self, config):
-        self.model = LlamaModel(config)
-
-        self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
-
-        self.post_init()
+# class CustomLlamaForCausalLM(LlamaForCausalLM):
+#     def __init__(self, config):
+#         self.model = LlamaModel(config)
+#         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
+#         self.post_init()
 
 
 # if __name__ == "__main__":
 
 # %%
-checkpoint = f"{os.getcwd()}/llama-13b-hf"
-model = CustomLlamaModel.from_pretrained(checkpoint)
-tokenizer = LlamaTokenizer.from_pretrained(checkpoint)
+#### Easing memory requirements on the cpu
+checkpoint_location = snapshot_download("decapoda-research/llama-65b-hf")
+with init_empty_weights(): #takes up near zero memory
+    model = LlamaForCausalLM.from_pretrained(checkpoint_location)
+model = load_checkpoint_and_dispatch(
+    model,
+    checkpoint_location,
+    device_map="auto",
+    dtype=torch.float16,
+    no_split_module_classes=["LlamaDecoderLayer"],
+)
+#tokenizer = LlamaTokenizer.from_pretrained(checkpoint_location)
 
 # %%
-causal_model = LlamaForCausalLM(model.config)
-causal_model.model = model
+tokenizer = LlamaTokenizer.from_pretrained(checkpoint_location)
+# %%
+text = "Hello, my name is"
+input_ids = torch.tensor(tokenizer(text)['input_ids']).unsqueeze(dim=0).to(0)
+
+outputs = model.generate(input_ids, max_new_tokens=10, do_sample=False)[0]
+tokenizer.decode(outputs.cpu().squeeze())
+
+
+
+
 
 # %%
-text = "I want to go for a swim"
+with TCM():
+    checkpoint = f"{os.getcwd()}/llama-13b-hf"
+    model = CustomLlamaModel.from_pretrained("decapoda-research/llama-65b-hf")
+    tokenizer = LlamaTokenizer.from_pretrained(checkpoint)
+
+# %%
+#causal_model = LlamaForCausalLM(model.config)
+with TCM():
+    causal_model = LlamaForCausalLM.from_pretrained("llama-65b-hf")
+    causal_model.model = model
+    causal_model.to(torch.float16)
+
+# %%
+text = "I want to go for a"
 input_ids = torch.tensor(tokenizer(text)['input_ids']).unsqueeze(dim=0).to(GPU)
 
 # %%
-causal_model.eval()
-causal_model.lm_head = causal_model.lm_head.to(GPU)
-with torch.no_grad():
-    output = causal_model(input_ids)
+with TCM():
+    causal_model.eval()
+    causal_model.lm_head = causal_model.lm_head.to(GPU)
+    with torch.no_grad():
+        output = causal_model(input_ids)
 
 # %%
-tokenizer.batch_decode(causal_model.generate(input_ids.to(GPU)))
+gconfig = GenerationConfig(max_new_tokens=3, use_cache=False, )
+tokenizer.batch_decode(causal_model.generate(input_ids.to(GPU), gconfig))
