@@ -8,6 +8,7 @@ from transformers.modeling_outputs import BaseModelOutputWithPast
 from typing import List, Optional, Tuple, Union
 import time
 from accelerate import init_empty_weights, load_checkpoint_and_dispatch
+from accelerate import infer_auto_device_map
 from huggingface_hub import snapshot_download
 
 
@@ -192,9 +193,31 @@ class CustomLlamaModel(LlamaModel):
 
 # if __name__ == "__main__":
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##################################################################################
 # %%
-#### Easing memory requirements on the cpu
-checkpoint_location = snapshot_download("decapoda-research/llama-65b-hf")
+
+# Using huggingface accelerate
+llama_two = "meta-llama/Llama-2-13b-chat-hf"
+api_key = "x"
+
+checkpoint_location = snapshot_download(llama_two, use_auth_token=api_key, local_dir=os.getcwd(), ignore_patterns=["*.safetensors", "model.safetensors.index.json"])
 with init_empty_weights(): #takes up near zero memory
     model = LlamaForCausalLM.from_pretrained(checkpoint_location)
 model = load_checkpoint_and_dispatch(
@@ -204,7 +227,7 @@ model = load_checkpoint_and_dispatch(
     dtype=torch.float16,
     no_split_module_classes=["LlamaDecoderLayer"],
 )
-#tokenizer = LlamaTokenizer.from_pretrained(checkpoint_location)
+tokenizer = LlamaTokenizer.from_pretrained(checkpoint_location)
 
 # %%
 tokenizer = LlamaTokenizer.from_pretrained(checkpoint_location)
@@ -214,6 +237,17 @@ input_ids = torch.tensor(tokenizer(text)['input_ids']).unsqueeze(dim=0).to(0)
 
 outputs = model.generate(input_ids, max_new_tokens=10, do_sample=False)[0]
 tokenizer.decode(outputs.cpu().squeeze())
+
+
+
+
+
+
+
+
+
+
+
 
 
 
