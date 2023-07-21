@@ -150,8 +150,15 @@ class ModelActs:
                     stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
                 cached_acts[act_type].append(stored_acts)
 
+            del cache
             gc.collect()
             gc.collect()
+            gc.collect()
+            gc.collect()
+            gc.collect()
+            torch.cuda.empty_cache()
+            torch.cuda.empty_cache()
+            torch.cuda.empty_cache()
             torch.cuda.empty_cache()
 
         # convert lists of tensors into tensors
@@ -193,7 +200,7 @@ class ModelActs:
 
 
         for epoch in range(n_epochs):
-            optimizer.zero_grad()
+            # optimizer.zero_grad()
 
             # Sample_pair based on batch_size
             prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(batch_size)
@@ -213,7 +220,7 @@ class ModelActs:
             acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
             acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
 
-            torch.set_grad_enabled(True)
+            torch.set_grad_enabled(True) # tl sets grad enabled = False, so you have to do this every iteration loop
 
             # Add requires grad (no idea why i have to do this)
             acts_yes = acts_yes.to(self.model.cfg.device)
@@ -224,36 +231,36 @@ class ModelActs:
 
             print(f"Memory allocated after device: {float(torch.cuda.memory_allocated())/2**30} GiB")
         
-            # # probe
-            # p0_out, p1_out = p0(acts_yes), p0(acts_no)
+            # probe
+            p0_out, p1_out = p0(acts_yes), p0(acts_no)
 
-            # # p0_out and p1_out do not have requires_grad = True
+            # p0_out and p1_out do not have requires_grad = True
 
-            # # get the corresponding loss
-            # informative_loss = (torch.min(p0_out, p1_out)**2).mean(0)
-            # consistent_loss = ((p0_out - (1-p1_out))**2).mean(0)
-            # loss = informative_loss + consistent_loss
+            # get the corresponding loss
+            informative_loss = (torch.min(p0_out, p1_out)**2).mean(0)
+            consistent_loss = ((p0_out - (1-p1_out))**2).mean(0)
+            loss = informative_loss + consistent_loss
 
-            # print(f"Memory allocated before backward: {float(torch.cuda.memory_allocated())/2**30} GiB")
+            print(f"Memory allocated before backward: {float(torch.cuda.memory_allocated())/2**30} GiB")
 
-            # print(loss.shape)
+            print(loss.shape)
 
-            # # update the parameters
-            # print(f"Loss: {loss}")
-            # loss.backward()
-            # optimizer.step()
+            # update the parameters
+            print(f"Loss: {loss}")
+            loss.backward()
+            optimizer.step()
 
-            # # torch.set_grad_enabled(False)
+            torch.set_grad_enabled(False) # do this else memory leak from transformer lens
 
-            # print(f"Memory allocated after backward: {float(torch.cuda.memory_allocated())/2**30} GiB")
+            print(f"Memory allocated after backward: {float(torch.cuda.memory_allocated())/2**30} GiB")
 
-            # torch.cuda.empty_cache()
+            torch.cuda.empty_cache()
 
-            # print(f"Memory allocated after cache clearing: {float(torch.cuda.memory_allocated())/2**30} GiB")
+            print(f"Memory allocated after cache clearing: {float(torch.cuda.memory_allocated())/2**30} GiB")
 
-            # if epoch == range(n_epochs):
-            #     self.p0 = p0
-            #     self.CCS_label_clusters(acts_yes, acts_no, y)
+            if epoch == range(n_epochs):
+                self.p0 = p0
+                self.CCS_label_clusters(acts_yes, acts_no, y)
 
         return loss.detach().cpu().item()
 
