@@ -190,6 +190,8 @@ class ModelActs:
             # Sample_pair based on batch_size
             prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(batch_size)
 
+            print(f"Memory allocated at beginning: {float(torch.cuda.memory_allocated())/2**30} GiB")
+
             # Get hidden states
             acts_yes = self.get_acts_of_prompts(prompt_yes)[act_type]
             print(f"acts_yes shape: {acts_yes.shape}")
@@ -211,6 +213,8 @@ class ModelActs:
             print(acts_yes.requires_grad)
             # acts_yes.requires_grad = True
             # acts_no.requires_grad = True
+
+            print(f"Memory allocated after device: {float(torch.cuda.memory_allocated())/2**30} GiB")
         
             # probe
             p0_out, p1_out = p0(acts_yes), p0(acts_no)
@@ -222,6 +226,8 @@ class ModelActs:
             consistent_loss = ((p0_out - (1-p1_out))**2).mean(0)
             loss = informative_loss + consistent_loss
 
+            print(f"Memory allocated before backward: {float(torch.cuda.memory_allocated())/2**30} GiB")
+
             print(loss.shape)
 
             # update the parameters
@@ -230,6 +236,12 @@ class ModelActs:
             optimizer.step()
 
             # torch.set_grad_enabled(False)
+
+            print(f"Memory allocated after backward: {float(torch.cuda.memory_allocated())/2**30} GiB")
+
+            torch.cuda.empty_cache()
+
+            print(f"Memory allocated after cache clearing: {float(torch.cuda.memory_allocated())/2**30} GiB")
 
             if epoch == range(n_epochs):
                 self.p0 = p0
