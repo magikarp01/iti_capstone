@@ -158,26 +158,31 @@ class ModelActs:
 
         return self.stored_acts
 
-    def CCS_train(self,batch_size, n_epochs, act_type = "z"):
+    def CCS_train(self, batch_size, n_epochs, act_type = "z"):
         """
         CCS = consistent contrast search
+
         """
 
         self.lr = 5e-3
         self.weight_decay = 1e-4
 
         # Get a single activation to get probe correct shape
-        prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(1)
+        prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(batch_size)
         acts_yes = self.get_acts_of_prompts(prompt_yes)
-        acts_yes = acts_yes[act_type]
-        acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
-        
+        acts_yes = acts_yes[act_type] # for z, (1, 32, 32, 128) --> (batch, seq, head_idxs, d_head)
+
+        # Model after _train_probes
+        acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2) # (batch, seq, head_idxs, d_head) --> (batch, seq * head_idxs, d_head). formatted.
+        num_probes = acts_yes.shape[1]
+
+        # HOW TO NORMALIZE
+
         # Initialize probe, optimizer
         print(f"Initial acts shape: {acts_yes.shape}")
         p0 = nn.Sequential(nn.Linear(acts_yes.shape[-1], 1), nn.Sigmoid()).to(self.model.cfg.device)
-        # for param in p0.parameters():
-        #     param.requires_grad = True
         optimizer = torch.optim.AdamW(p0.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+
 
         for epoch in range(n_epochs):
             optimizer.zero_grad()
@@ -191,6 +196,10 @@ class ModelActs:
             acts_no = self.get_acts_of_prompts(prompt_no)[act_type]
             # Normalize hidden states
             print(f"acts_no shape: {acts_no.shape}")
+
+            acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2)[:, 1, :]
+            acts_no = torch.flatten(acts_no, start_dim=1, end_dim=-2)[:, 1, :]
+
             acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
             acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
 
@@ -220,7 +229,7 @@ class ModelActs:
             loss.backward()
             optimizer.step()
 
-            torch.set_grad_enabled(False)
+            # torch.set_grad_enabled(False)
 
             if epoch == range(n_epochs):
                 self.p0 = p0
