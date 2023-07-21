@@ -257,6 +257,9 @@ class ModelActs:
         else:
             return True # do turn
 
+    # To do: Make a function that does train & testing
+    # To do: Make it faster by making it generate all activations beforehand
+    
     def CCS_inference(self, acts_yes, acts_no, labels, probe, act_type):
         """
         Returns CCS predictions (probabilities) as well as accuracies (when you threshold at 0.5)
