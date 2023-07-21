@@ -194,8 +194,6 @@ class ModelActs:
 
             for epoch in range(n_epochs):
 
-                
-                
                 optimizer.zero_grad()
 
                 prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(batch_size)
@@ -210,7 +208,7 @@ class ModelActs:
                 acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2)[:, probe, :]
                 acts_no = torch.flatten(acts_no, start_dim=1, end_dim=-2)[:, probe, :]
 
-                # Normalize
+                # Normalize (if batch dimension is greater than 1)
                 if acts_yes.shape[0] > 1:
                     acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
                     acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
@@ -241,11 +239,13 @@ class ModelActs:
                     self.CCS[act_type][probe] = p0
                     self.CCS_clabel[act_type][probe] = self.CCS_label_clusters(acts_yes, acts_no, y, p0)
 
-        return loss.detach().cpu().item()
+        return loss.detach().cpu().item() #@TODO make loss work
 
     def CCS_label_clusters(self, acts_yes, acts_no, labels, probe):
         """
-        Creates self.CCS_label_clusters, which gives the correct "direction" for the CCS probes given some data.
+        Gives the correct "direction" for the CCS probes given some data.
+
+        False means that the probe is already in the "correct direction" where a probe returns the probability of the true label, while True means that you should flip the probe direction because the probe returns the probability of the false label.
         """
         with torch.no_grad():
             p0_out, p1_out = probe(acts_yes), probe(acts_no)
@@ -257,17 +257,45 @@ class ModelActs:
         else:
             return True # do turn
 
-    def CCS_inference(self, acts_yes, acts_no, labels, probe):
-        acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
-        acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
-        with torch.no_grad():
-            p0_out, p1_out = probe(acts_yes), probe(acts_no)
-        avg_confidence = 0.5*(p0_out + (1-p1_out))
-        predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
-        acc = (predictions == labels).mean()
-        if self.CCS_label_clusters: # Apply train_direction
-            acc = 1 - acc
-        return acc
+    def CCS_inference(self, acts_yes, acts_no, labels, probe, act_type):
+        """
+        Returns CCS predictions (probabilities) as well as accuracies (when you threshold at 0.5)
+
+        Work in progress at the moment
+        """
+
+        # Format hidden states & select probe to train
+        acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2)[:, probe, :]
+        acts_no = torch.flatten(acts_no, start_dim=1, end_dim=-2)
+
+        # Normalize (if batch dimension is greater than 1)
+        if acts_yes.shape[0] > 1:
+            acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
+            acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
+
+        batch_size = acts_yes.shape[0]
+        num_probes = acts_yes.shape[1]
+        probe_dim = acts_yes.shape[2]
+
+        total_accuracy = torch.zeros((num_probes,))
+
+        for probe in range(num_probes):
+            acts_yes_subset = acts_yes[:, probe, :]
+            acts_no_subset = acts_no[:, probe, :]
+    
+            with torch.no_grad():
+                p0_out, p1_out = self.CCS[act_type][probe](acts_yes), self.CCS[act_type][probe](acts_no)
+                avg_confidence = 0.5*(p0_out + (1-p1_out))
+    
+            predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
+    
+            acc = (predictions == labels).mean()
+            if self.CCS_label_clusters: # Apply train_direction
+                acc = 1 - acc
+
+            total_accuracy[probe] = acc
+
+        return total_accuracy
     
 #%%
 
