@@ -196,26 +196,12 @@ class CustomLlamaModel(LlamaModel):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ##################################################################################
 # %%
 
 # Using huggingface accelerate
 llama_two = "meta-llama/Llama-2-13b-chat-hf"
-api_key = "x"
+api_key = "0" 
 
 checkpoint_location = snapshot_download(llama_two, use_auth_token=api_key, local_dir=os.getcwd(), ignore_patterns=["*.safetensors", "model.safetensors.index.json"])
 with init_empty_weights(): #takes up near zero memory
@@ -229,8 +215,7 @@ model = load_checkpoint_and_dispatch(
 )
 tokenizer = LlamaTokenizer.from_pretrained(checkpoint_location)
 
-# %%
-tokenizer = LlamaTokenizer.from_pretrained(checkpoint_location)
+
 # %%
 text = "Hello, my name is"
 input_ids = torch.tensor(tokenizer(text)['input_ids']).unsqueeze(dim=0).to(0)
