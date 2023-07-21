@@ -3,6 +3,7 @@ from sklearn.linear_model import LogisticRegression
 
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
+import gc
 import plotly.io as pio
 # pio.renderers.default = "png"
 # Import stuff
@@ -33,6 +34,8 @@ from collections import defaultdict
 
 from typing import TypeVar
 ModelActs = TypeVar("ModelActs")
+
+# ALWAYS export PYTORCH_NO_CUDA_MEMORY_CACHING=1 or you'll get an OOM on A100
 
 
 class ModelActs:
@@ -128,7 +131,10 @@ class ModelActs:
         names_filter = lambda name: any([name.endswith(act_type) for act_type in self.act_types])
 
         for prompt in tqdm(prompts):
+            print("Prompt: " + prompt)
             original_logits, cache = self.model.run_with_cache(prompt, names_filter=names_filter)
+
+            print(f"Memory allocated with cache: {float(torch.cuda.memory_allocated())/2**30} GiB")
 
             # store every act type in self.act_types
             for act_type in self.act_types:
@@ -144,6 +150,10 @@ class ModelActs:
                     stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
                 cached_acts[act_type].append(stored_acts)
 
+            gc.collect()
+            gc.collect()
+            torch.cuda.empty_cache()
+
         # convert lists of tensors into tensors
         stored_acts = {act_type: torch.stack(cached_acts[act_type]) for act_type in self.act_types} 
 
@@ -158,7 +168,7 @@ class ModelActs:
 
         return self.stored_acts
 
-    def CCS_train(self, batch_size, n_epochs, act_type = "z"):
+    def CCS_train(self, n_epochs, batch_size, act_type = "z"):
         """
         CCS = consistent contrast search
 
@@ -175,8 +185,6 @@ class ModelActs:
         # Model after _train_probes
         acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2) # (batch, seq, head_idxs, d_head) --> (batch, seq * head_idxs, d_head). formatted.
         num_probes = acts_yes.shape[1]
-
-        # HOW TO NORMALIZE
 
         # Initialize probe, optimizer
         print(f"Initial acts shape: {acts_yes.shape}")
@@ -196,8 +204,8 @@ class ModelActs:
             acts_yes = self.get_acts_of_prompts(prompt_yes)[act_type]
             print(f"acts_yes shape: {acts_yes.shape}")
             acts_no = self.get_acts_of_prompts(prompt_no)[act_type]
-            # Normalize hidden states
             print(f"acts_no shape: {acts_no.shape}")
+            # Normalize hidden states
 
             acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2)[:, 1, :]
             acts_no = torch.flatten(acts_no, start_dim=1, end_dim=-2)[:, 1, :]
@@ -216,36 +224,36 @@ class ModelActs:
 
             print(f"Memory allocated after device: {float(torch.cuda.memory_allocated())/2**30} GiB")
         
-            # probe
-            p0_out, p1_out = p0(acts_yes), p0(acts_no)
+            # # probe
+            # p0_out, p1_out = p0(acts_yes), p0(acts_no)
 
-            # p0_out and p1_out do not have requires_grad = True
+            # # p0_out and p1_out do not have requires_grad = True
 
-            # get the corresponding loss
-            informative_loss = (torch.min(p0_out, p1_out)**2).mean(0)
-            consistent_loss = ((p0_out - (1-p1_out))**2).mean(0)
-            loss = informative_loss + consistent_loss
+            # # get the corresponding loss
+            # informative_loss = (torch.min(p0_out, p1_out)**2).mean(0)
+            # consistent_loss = ((p0_out - (1-p1_out))**2).mean(0)
+            # loss = informative_loss + consistent_loss
 
-            print(f"Memory allocated before backward: {float(torch.cuda.memory_allocated())/2**30} GiB")
+            # print(f"Memory allocated before backward: {float(torch.cuda.memory_allocated())/2**30} GiB")
 
-            print(loss.shape)
+            # print(loss.shape)
 
-            # update the parameters
-            print(f"Loss: {loss}")
-            loss.backward()
-            optimizer.step()
+            # # update the parameters
+            # print(f"Loss: {loss}")
+            # loss.backward()
+            # optimizer.step()
 
-            # torch.set_grad_enabled(False)
+            # # torch.set_grad_enabled(False)
 
-            print(f"Memory allocated after backward: {float(torch.cuda.memory_allocated())/2**30} GiB")
+            # print(f"Memory allocated after backward: {float(torch.cuda.memory_allocated())/2**30} GiB")
 
-            torch.cuda.empty_cache()
+            # torch.cuda.empty_cache()
 
-            print(f"Memory allocated after cache clearing: {float(torch.cuda.memory_allocated())/2**30} GiB")
+            # print(f"Memory allocated after cache clearing: {float(torch.cuda.memory_allocated())/2**30} GiB")
 
-            if epoch == range(n_epochs):
-                self.p0 = p0
-                self.CCS_label_clusters(acts_yes, acts_no, y)
+            # if epoch == range(n_epochs):
+            #     self.p0 = p0
+            #     self.CCS_label_clusters(acts_yes, acts_no, y)
 
         return loss.detach().cpu().item()
 

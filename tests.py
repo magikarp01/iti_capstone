@@ -74,7 +74,7 @@ probing_utils = ModelActs(model, ccs_data)
 
 # %%
 
-probing_utils.CCS_train(6, 2)
+probing_utils.CCS_train(6, 3) # batch_size = 3
 
 # memory leak?
 
