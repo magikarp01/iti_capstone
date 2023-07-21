@@ -83,7 +83,7 @@ def get_iti_scores(model, dataset, alpha=10, topk=50, device=default_device, num
     cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
     patch_iti(model, acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=alpha, topk=topk)
 
-    gens_iti = get_model_generations(model, dataset, 50)
+    gens_iti = get_model_generations(model, dataset, num_gens)
     truth_score_iti, info_score_iti = get_judge_scores(gens_iti)
 
     print(f"{truth_score=}, {info_score=}, {truth_score_iti=}, {info_score_iti=}")

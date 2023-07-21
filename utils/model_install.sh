@@ -1,5 +1,7 @@
 #!/bin/sh
 
+sudo apt-get install git-lfs
+mkdir activations
 git lfs install
 
 # Stable Vicuna 13b
