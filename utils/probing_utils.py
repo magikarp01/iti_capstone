@@ -131,10 +131,7 @@ class ModelActs:
         names_filter = lambda name: any([name.endswith(act_type) for act_type in self.act_types])
 
         for prompt in tqdm(prompts):
-            print("Prompt: " + prompt)
             original_logits, cache = self.model.run_with_cache(prompt, names_filter=names_filter)
-
-            print(f"Memory allocated with cache: {float(torch.cuda.memory_allocated())/2**30} GiB")
 
             # store every act type in self.act_types
             for act_type in self.act_types:
@@ -177,109 +174,94 @@ class ModelActs:
 
     def CCS_train(self, n_epochs, batch_size, act_type = "z"):
         """
-        CCS = consistent contrast search
-
+        Runs arbitrary CCS probes on any act type's activations (must've been included in self.act_types).
+        self.stored_acts[act_type] should be shape (num_examples, ..., d_probe), will be flattened in the middle
         """
 
-        self.lr = 5e-3
-        self.weight_decay = 1e-4
+        # Get a single activation to get the correct dimension for the probe
+        ___, demo_prompt, ___, __ = self.dataset.sample_pair(batch_size)
+        demo_acts = self.get_acts_of_prompts(demo_prompt)[act_type]
+        demo_acts = torch.flatten(demo_acts, start_dim=1, end_dim=-2)
+        assert batch_size == demo_acts.shape[0]
+        num_probes = demo_acts.shape[1]
+        probe_dim = demo_acts.shape[2]
 
-        # Get a single activation to get probe correct shape
-        prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(batch_size)
-        acts_yes = self.get_acts_of_prompts(prompt_yes)
-        acts_yes = acts_yes[act_type] # for z, (1, 32, 32, 128) --> (batch, seq, head_idxs, d_head)
+        for probe in range(num_probes):
 
-        # Model after _train_probes
-        acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2) # (batch, seq, head_idxs, d_head) --> (batch, seq * head_idxs, d_head). formatted.
-        num_probes = acts_yes.shape[1]
+            # Initialize probe, optimizer
+            p0 = nn.Sequential(nn.Linear(probe_dim, 1), nn.Sigmoid()).to(self.model.cfg.device) # have to use pytorch for probe because custom loss function
+            optimizer = torch.optim.AdamW(p0.parameters())
 
-        # Initialize probe, optimizer
-        print(f"Initial acts shape: {acts_yes.shape}")
-        p0 = nn.Sequential(nn.Linear(acts_yes.shape[-1], 1), nn.Sigmoid()).to(self.model.cfg.device)
-        optimizer = torch.optim.AdamW(p0.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+            for epoch in range(n_epochs):
 
+                
+                
+                optimizer.zero_grad()
 
-        for epoch in range(n_epochs):
-            # optimizer.zero_grad()
+                prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(batch_size)
 
-            # Sample_pair based on batch_size
-            prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(batch_size)
+                # Get hidden states
+                acts_yes = self.get_acts_of_prompts(prompt_yes)[act_type]
+                print(f"acts_yes shape: {acts_yes.shape}")
+                acts_no = self.get_acts_of_prompts(prompt_no)[act_type]
+                print(f"acts_no shape: {acts_no.shape}")
+                
+                # Format hidden states & select probe to train
+                acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2)[:, probe, :]
+                acts_no = torch.flatten(acts_no, start_dim=1, end_dim=-2)[:, probe, :]
 
-            print(f"Memory allocated at beginning: {float(torch.cuda.memory_allocated())/2**30} GiB")
+                # Normalize
+                if acts_yes.shape[0] > 1:
+                    acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
+                    acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
 
-            # Get hidden states
-            acts_yes = self.get_acts_of_prompts(prompt_yes)[act_type]
-            print(f"acts_yes shape: {acts_yes.shape}")
-            acts_no = self.get_acts_of_prompts(prompt_no)[act_type]
-            print(f"acts_no shape: {acts_no.shape}")
-            # Normalize hidden states
+                torch.set_grad_enabled(True) # tl sets grad enabled = False, so you have to do this every iteration loop
 
-            acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2)[:, 1, :]
-            acts_no = torch.flatten(acts_no, start_dim=1, end_dim=-2)[:, 1, :]
+                # Just in case
+                acts_yes = acts_yes.to(self.model.cfg.device)
+                acts_no = acts_no.to(self.model.cfg.device)
 
-            acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
-            acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
+                p0_out, p1_out = p0(acts_yes), p0(acts_no)
 
-            torch.set_grad_enabled(True) # tl sets grad enabled = False, so you have to do this every iteration loop
+                # get the corresponding loss
+                informative_loss = (torch.min(p0_out, p1_out)**2).mean(0)
+                consistent_loss = ((p0_out - (1-p1_out))**2).mean(0)
+                loss = informative_loss + consistent_loss
 
-            # Add requires grad (no idea why i have to do this)
-            acts_yes = acts_yes.to(self.model.cfg.device)
-            acts_no = acts_no.to(self.model.cfg.device)
-            print(acts_yes.requires_grad)
-            # acts_yes.requires_grad = True
-            # acts_no.requires_grad = True
+                # update the parameters
+                print(f"Loss: {loss}")
+                loss.backward()
+                optimizer.step()
 
-            print(f"Memory allocated after device: {float(torch.cuda.memory_allocated())/2**30} GiB")
-        
-            # probe
-            p0_out, p1_out = p0(acts_yes), p0(acts_no)
+                torch.set_grad_enabled(False) # do this else huge memory leak from transformerlens
 
-            # p0_out and p1_out do not have requires_grad = True
+                torch.cuda.empty_cache() # just in case
 
-            # get the corresponding loss
-            informative_loss = (torch.min(p0_out, p1_out)**2).mean(0)
-            consistent_loss = ((p0_out - (1-p1_out))**2).mean(0)
-            loss = informative_loss + consistent_loss
-
-            print(f"Memory allocated before backward: {float(torch.cuda.memory_allocated())/2**30} GiB")
-
-            print(loss.shape)
-
-            # update the parameters
-            print(f"Loss: {loss}")
-            loss.backward()
-            optimizer.step()
-
-            torch.set_grad_enabled(False) # do this else memory leak from transformer lens
-
-            print(f"Memory allocated after backward: {float(torch.cuda.memory_allocated())/2**30} GiB")
-
-            torch.cuda.empty_cache()
-
-            print(f"Memory allocated after cache clearing: {float(torch.cuda.memory_allocated())/2**30} GiB")
-
-            if epoch == range(n_epochs):
-                self.p0 = p0
-                self.CCS_label_clusters(acts_yes, acts_no, y)
+                if epoch == range(n_epochs): # if last epoch, label & save
+                    self.CCS[act_type][probe] = p0
+                    self.CCS_clabel[act_type][probe] = self.CCS_label_clusters(acts_yes, acts_no, y, p0)
 
         return loss.detach().cpu().item()
 
-    def CCS_label_clusters(self, acts_yes, acts_no, labels):
+    def CCS_label_clusters(self, acts_yes, acts_no, labels, probe):
+        """
+        Creates self.CCS_label_clusters, which gives the correct "direction" for the CCS probes given some data.
+        """
         with torch.no_grad():
-            p0_out, p1_out = self.p0(acts_yes), self.p0(acts_no)
+            p0_out, p1_out = probe(acts_yes), probe(acts_no)
         avg_confidence = 0.5*(p0_out + (1-p1_out))
         predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
         acc = (predictions == labels).mean()
         if acc > 0.5:
-            self.CCS_label_clusters = False # don't turn
+            return False # don't turn
         else:
-            self.CCS_label_clusters = True # do turn
+            return True # do turn
 
-    def CCS_inference(self, acts_yes, acts_no, labels):
+    def CCS_inference(self, acts_yes, acts_no, labels, probe):
         acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
         acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
         with torch.no_grad():
-            p0_out, p1_out = self.p0(acts_yes), self.p0(acts_no)
+            p0_out, p1_out = probe(acts_yes), probe(acts_no)
         avg_confidence = 0.5*(p0_out + (1-p1_out))
         predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
         acc = (predictions == labels).mean()

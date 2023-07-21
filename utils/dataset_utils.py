@@ -501,7 +501,7 @@ class CCS_Dataset:
         self.format_prompt = format_prompt
         self.dataset_name = dataset_name
 
-    def sample_pair(self, sample_size: int, reset_seed=False, balanced=True, used_idx=[], max_token_length = 300): # WILL REFACTOR THIS & CLEAN IT UP LATER
+    def sample_pair(self, sample_size: int, reset_seed=False, balanced=True, used_idx=[], max_token_length = None): # WILL REFACTOR THIS & CLEAN IT UP LATER
         """
         indices is of type numpy array
         sample_prompts is of type List of Tensors

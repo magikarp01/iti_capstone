@@ -74,13 +74,9 @@ probing_utils = ModelActs(model, ccs_data)
 
 # %%
 
-probing_utils.CCS_train(6, 3) # batch_size = 3
-
-# memory leak?
+probing_utils.CCS_train(30, 5) # batch_size = 3
 
 # %%
-
-# TL probably sets disable_grad = True
 
 #%%
 
@@ -107,10 +103,8 @@ print(output_tensor.requires_grad)
 
 """
 Major changes:
-- simplify ccs_label_clusters and put in function
-- make everything self. (including get_acts)
-- make a better get_acts function
-- make CCS_inference function fix
-
-- does it work with batch size 1?
+- train-test split & testing
+- make CCS_inference draw from self.CCS
+- make a better get_acts function --> ask phillip
 """
+# %%
