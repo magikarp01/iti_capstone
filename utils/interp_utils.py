@@ -8,10 +8,11 @@ from transformer_lens import HookedTransformer
 
 def tot_logit_diff(tokenizer, model_acts, use_probs=False, eps=1e-8, test_only=True, act_type="z", check_balanced_output=False, 
                    positive_str_tokens = ["Yes", "yes", "True", "true"],
-                   negative_str_tokens = ["No", "no", "False", "false"]):
+                   negative_str_tokens = ["No", "no", "False", "false"], scale_relative=False):
     """
-    Get difference in positive and negative logits for each sample stored in model_acts, aggregated together.
+    Get difference in correct and incorrect or positive and negative logits for each sample stored in model_acts, aggregated together.
     Should be same number of positive and negative tokens.
+    If scale_relative is True, then scale probs/logits so that only correct vs incorrect or positive and negative probs/logits are considered
     """
     # positive_str_tokens = ["Yes", "yes", " Yes", " yes", "True", "true", " True", " true"]
     # negative_str_tokens = ["No", "no", " No", " no", "False", "false", " False", " false"]
@@ -52,8 +53,13 @@ def tot_logit_diff(tokenizer, model_acts, use_probs=False, eps=1e-8, test_only=T
             probs = torch.nn.functional.softmax(logits, dim=1)
             positive_prob = probs[0, correct_tokens].sum(dim=-1)
             negative_prob = probs[0, incorrect_tokens].sum(dim=-1)
-            positive_sum[idx] = positive_prob #/ (positive_prob + negative_prob + eps)
-            negative_sum[idx] = negative_prob #/ (positive_prob + negative_prob + eps)
+
+            if scale_relative:
+                positive_sum[idx] = positive_prob / (positive_prob + negative_prob + eps)
+                negative_sum[idx] = negative_prob / (positive_prob + negative_prob + eps)
+            else:
+                positive_sum[idx] = positive_prob 
+                negative_sum[idx] = negative_prob 
 
         else:
             positive_sum[idx] = logits[0, correct_tokens].sum(dim=-1)
@@ -95,10 +101,12 @@ def logit_attrs(model: HookedTransformer, dataset, act_types = ["resid_pre", "re
 
 
         # positive_tokens = ["Yes", "yes", " Yes", " yes", "True", "true", " True", " true"]
-        positive_str_tokens = ["Yes", "yes", "True", "true"]
+        # positive_str_tokens = ["Yes", "yes", "True", "true"]
+        positive_str_tokens = ["True"]
 
         # negative_tokens = ["No", "no", " No", " no", "False", "false", " False", " false"]
-        negative_str_tokens = ["No", "no", "False", "false"]
+        # negative_str_tokens = ["No", "no", "False", "false"]
+        negative_str_tokens = ["False"]
 
         positive_tokens = [model.tokenizer(token).input_ids[-1] for token in positive_str_tokens]
         negative_tokens = [model.tokenizer(token).input_ids[-1] for token in negative_str_tokens]
