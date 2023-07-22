@@ -6,13 +6,15 @@ from tqdm import tqdm
 import torch.nn.functional as F
 from transformer_lens import HookedTransformer
 
-def tot_logit_diff(tokenizer, model_acts, use_probs=False, eps=1e-8, test_only=True, act_type="z", check_balanced_output=False):
+def tot_logit_diff(tokenizer, model_acts, use_probs=False, eps=1e-8, test_only=True, act_type="z", check_balanced_output=False, 
+                   positive_str_tokens = ["Yes", "yes", "True", "true"],
+                   negative_str_tokens = ["No", "no", "False", "false"]):
     """
     Get difference in positive and negative logits for each sample stored in model_acts, aggregated together.
     Should be same number of positive and negative tokens.
     """
-    positive_str_tokens = ["Yes", "yes", " Yes", " yes", "True", "true", " True", " true"]
-    negative_str_tokens = ["No", "no", " No", " no", "False", "false", " False", " false"]
+    # positive_str_tokens = ["Yes", "yes", " Yes", " yes", "True", "true", " True", " true"]
+    # negative_str_tokens = ["No", "no", " No", " no", "False", "false", " False", " false"]
 
     positive_tokens = [tokenizer(token).input_ids[-1] for token in positive_str_tokens]
     negative_tokens = [tokenizer(token).input_ids[-1] for token in negative_str_tokens]
@@ -120,6 +122,25 @@ def logit_attrs(model: HookedTransformer, dataset, act_types = ["resid_pre", "re
         all_logits.append(original_logits)
 
     return all_logits, total_logit_attrs
+
+
+
+def get_head_bools(model, logit_heads, flattened=False):
+    """
+    Method to get boolean array (n_l x n_h), 1 if head is selected at 0 if not, from a list of heads to select logit_heads.
+    The flattened parameter describes the logit_heads list: if flattened is true, input to logit_heads is 1D.
+    """
+    if flattened:
+        head_bools = torch.zeros(size=(model.cfg.total_heads,))
+        for head in logit_heads:
+            head_bools[head] = 1
+        head_bools = einops.rearrange(head_bools, '(n_l n_h) -> n_l n_h', n_l=model.cfg.n_layers)    
+    else:
+        head_bools = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads))
+        for head in logit_heads:
+            head_bools[head[0], head[1]] = 1
+    return head_bools
+
 
 def query_logits(tokenizer, logits, return_type = "logits", TOP_N = 10):
     """

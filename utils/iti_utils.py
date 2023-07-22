@@ -203,3 +203,4 @@ def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, us
     top_head_bools = einops.rearrange(top_head_bools, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers) # rearrange back
     
     _patch_arbitrary_heads(model, top_head_bools, old_activations, topk=topk, alpha=alpha, use_MMD=use_MMD, use_probe=use_probe, truth_indices=truth_indices, probes=probes, cache_interventions=cache_interventions, model_device=model_device, permanent=permanent)'''
+    
