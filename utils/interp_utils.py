@@ -57,7 +57,7 @@ def tot_logit_diff(tokenizer, model_acts, use_probs=False, eps=1e-8, test_only=T
             positive_sum[idx] = logits[0, correct_tokens].sum(dim=-1)
             negative_sum[idx] = logits[0, incorrect_tokens].sum(dim=-1)
 
-    print(f"proportion of positive labels is {check_positive_prop/len(meta_indices)}")
+    # print(f"proportion of positive labels is {check_positive_prop/len(meta_indices)}")
     return positive_sum, negative_sum
 
 

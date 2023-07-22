@@ -144,6 +144,7 @@ def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, us
             truth_indices = torch.tensor(model_acts.dataset.all_labels)[model_acts.indices_trains["z"]].to(device=model_device)
         else:
             truth_indices = torch.tensor(model_acts.dataset.all_labels)[model_acts.indices].to(device=model_device)
+        print(truth_indices.sum())
         probes=None
         # print(f"{attn_activations.shape=}, {probe_accuracies.shape=}, {truth_indices.shape=}")
     elif use_probe:
