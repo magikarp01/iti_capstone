@@ -7,6 +7,7 @@ from transformers import LlamaForCausalLM, LlamaTokenizer
 
 def load_llama(model_name, model_dir, dtype="torch.float16"):
     #checkpoint_location = snapshot_download(f"decapoda-research/{model_name}")
+    #checkpoint_location = snapshot_download(llama_two, use_auth_token=api_key, local_dir=os.getcwd(), ignore_patterns=["*.safetensors", "model.safetensors.index.json"])
     #MUST FIRST RUN SCRIPT load_stable_vicuna_13b.sh
     #hard code meta data in here (e.g. n_layers, d_head, etc)
     checkpoint_location = f"{model_dir}/{model_name}"
