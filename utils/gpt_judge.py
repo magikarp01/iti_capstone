@@ -44,7 +44,7 @@ from transformer_lens import HookedTransformer, HookedTransformerConfig, Factore
 import numpy as np
 from utils.dataset_utils import TQA_MC_Dataset
 
-def get_model_generations(model: HookedTransformer, dataset, num_gens, seed=None, max_tokens=20):
+def get_model_generations(model: HookedTransformer, dataset, num_gens, seed=None, max_tokens=20, temperature=1):
     if seed is not None:
         np.random.seed(seed)
     
@@ -54,7 +54,7 @@ def get_model_generations(model: HookedTransformer, dataset, num_gens, seed=None
         string_sample = model.tokenizer.batch_decode(sample)[0]
         question_sample = string_sample.split("A: ")[0]
         model_prompt = question_sample + "A:"
-        completion = model.generate(model_prompt, max_new_tokens=max_tokens, verbose=False)
+        completion = model.generate(model_prompt, max_new_tokens=max_tokens, verbose=False, temperature=temperature)
         completions.append(completion)
     return completions
 
@@ -64,11 +64,11 @@ import torch
 from utils.iti_utils import patch_iti
 from utils.dataset_utils import EZ_Dataset
 
-def get_iti_scores(model, dataset, alpha=10, topk=50, device=default_device, num_gens=50, existing_acts=None, n_acts=1000):
+def get_iti_scores(model, dataset, alpha=10, topk=50, device=default_device, num_gens=50, existing_acts=None, n_acts=1000, temperature=1):
     model.reset_hooks()
     # ez_data = EZ_Dataset(model.tokenizer, seed=0)
 
-    gens = get_model_generations(model, dataset, num_gens)
+    gens = get_model_generations(model, dataset, num_gens, temperature=temperature)
     truth_score, info_score = get_judge_scores(gens)
 
     if existing_acts is None:
@@ -83,7 +83,7 @@ def get_iti_scores(model, dataset, alpha=10, topk=50, device=default_device, num
     cache_interventions = torch.zeros(size=(model.cfg.n_layers, model.cfg.n_heads, model.cfg.d_head))
     patch_iti(model, acts, use_MMD=True, cache_interventions=cache_interventions, model_device=device, alpha=alpha, topk=topk)
 
-    gens_iti = get_model_generations(model, dataset, num_gens)
+    gens_iti = get_model_generations(model, dataset, num_gens, temperature=temperature)
     truth_score_iti, info_score_iti = get_judge_scores(gens_iti)
 
     print(f"{truth_score=}, {info_score=}, {truth_score_iti=}, {info_score_iti=}")
