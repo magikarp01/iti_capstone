@@ -140,7 +140,7 @@ def patch_heads(model, model_acts: ModelActs, head_bools, alpha=20, use_MMD=Fals
         probes=None
         # print(f"{attn_activations.shape=}, {probe_accuracies.shape=}, {truth_indices.shape=}")
     elif use_probe:
-        probes = model_acts.probes
+        probes = model_acts.probes["z"]
         truth_indices=None
 
     _patch_arbitrary_heads(model, head_bools, old_activations, alpha=alpha, use_MMD=use_MMD, use_probe=use_probe, truth_indices=truth_indices, probes=probes, cache_interventions=cache_interventions, model_device=model_device, permanent=permanent)
