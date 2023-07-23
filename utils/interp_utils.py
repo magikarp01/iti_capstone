@@ -83,7 +83,8 @@ def logit_attrs_tokens(cache, stored_acts, positive_tokens=[], negative_tokens=[
     return torch.stack(all_attrs).mean(0)
 
 
-def logit_attrs(model: HookedTransformer, dataset, act_types = ["resid_pre", "result"], N = 1000, indices=None):
+def logit_attrs(model: HookedTransformer, dataset, act_types = ["resid_pre", "result"], N = 1000, indices=None, 
+                positive_str_tokens=["True"], negative_str_tokens=["False"]):
     total_logit_attrs = defaultdict(list)
 
     if indices is None:
@@ -95,18 +96,12 @@ def logit_attrs(model: HookedTransformer, dataset, act_types = ["resid_pre", "re
 
     for i in tqdm(indices):
         original_logits, cache = model.run_with_cache(dataset.all_prompts[i].to(model.cfg.device))
-        
-        positive_tokens = torch.tensor([2081, 6407, 3763, 3363])
-        negative_tokens = torch.tensor([3991, 10352, 645, 1400])
 
 
         # positive_tokens = ["Yes", "yes", " Yes", " yes", "True", "true", " True", " true"]
         # positive_str_tokens = ["Yes", "yes", "True", "true"]
-        positive_str_tokens = ["True"]
-
         # negative_tokens = ["No", "no", " No", " no", "False", "false", " False", " false"]
         # negative_str_tokens = ["No", "no", "False", "false"]
-        negative_str_tokens = ["False"]
 
         positive_tokens = [model.tokenizer(token).input_ids[-1] for token in positive_str_tokens]
         negative_tokens = [model.tokenizer(token).input_ids[-1] for token in negative_str_tokens]
