@@ -257,18 +257,20 @@ class ModelActs:
         else:
             return True # do turn
 
+    # To do: Test CCS_inference
     # To do: Make a function that does train & testing
     # To do: Make it faster by making it generate all activations beforehand
+    # Ask a bit about CCS design to Phillip
     
-    def CCS_inference(self, acts_yes, acts_no, labels, probe, act_type):
+    def CCS_inference(self, acts_yes, acts_no, labels, act_type):
         """
         Returns CCS predictions (probabilities) as well as accuracies (when you threshold at 0.5)
 
-        Work in progress at the moment
+        Testing is currently work in progress (WIP) at the moment
         """
 
         # Format hidden states & select probe to train
-        acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2)[:, probe, :]
+        acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2)
         acts_no = torch.flatten(acts_no, start_dim=1, end_dim=-2)
 
         # Normalize (if batch dimension is greater than 1)
@@ -281,6 +283,7 @@ class ModelActs:
         probe_dim = acts_yes.shape[2]
 
         total_accuracy = torch.zeros((num_probes,))
+        all_predictions = torch.zeros((num_probes, batch_size))
 
         for probe in range(num_probes):
             acts_yes_subset = acts_yes[:, probe, :]
@@ -297,8 +300,9 @@ class ModelActs:
                 acc = 1 - acc
 
             total_accuracy[probe] = acc
+            all_predictions[probe] = predictions
 
-        return total_accuracy
+        return all_predictions, total_accuracy
     
 #%%
 
