@@ -569,4 +569,4 @@ class CCS_Dataset:
         # pos_p = np.stack(all_pos_hs)
         # y = np.stack(all_gt_labels)
 
-        return all_neg_hs, all_pos_hs, all_gt_labels, used_idxs
+        return all_neg_hs, all_pos_hs, all_gt_labels, used_idxs # prompt_no, prompt_yes, y, used_idxs # TODO rename

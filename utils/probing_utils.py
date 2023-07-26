@@ -118,75 +118,112 @@ class ModelActs:
 
         # return self.indices, self.attn_head_acts
 
-#%%
+#%% CCS modifications begin here
 
-    def get_acts_of_prompts(self, prompts, store_acts = True, filepath = "activations/", id = None, storage_device="cpu"):
+    def get_acts_pairs(self, N=1000, store_acts = True, filepath = "activations/", id = None, storage_device="cpu"):
         """
-        this gen_acts differs because it does model.run_with_cache but takes in a list of prompts, not on a list of indices.
+        Uses the CCS_Dataset class to generate many prompt activations, and places them on the storage_device = "cpu" by default.
         """
 
-        cached_acts = defaultdict(list)
+        cached_acts_yes = defaultdict(list)
+        cached_acts_no = defaultdict(list)
+
+        prompt_no, prompt_yes, y, used_idxs = self.dataset.sample(N)
 
         # names filter for efficiency, only cache in self.act_types
         names_filter = lambda name: any([name.endswith(act_type) for act_type in self.act_types])
 
-        for prompt in tqdm(prompts):
-            original_logits, cache = self.model.run_with_cache(prompt, names_filter=names_filter)
+        for prompt_list, cached_acts in [(prompt_yes, cached_acts_yes), (prompt_no, cached_acts_no)]:
+            for prompt in tqdm(prompts):
+                original_logits, cache = self.model.run_with_cache(prompt, names_filter=names_filter)
 
-            # store every act type in self.act_types
-            for act_type in self.act_types:
+                # store every act type in self.act_types
+                for act_type in self.act_types:
 
-                if act_type == "result":
-                    # get last seq position
-                    stored_acts = cache.stack_head_results(layer=-1, pos_slice=-1).squeeze().to(device=storage_device)
-                
-                elif act_type == "logits":
-                    stored_acts = original_logits[:,-1].to(device=storage_device) # logits of last token
+                    if act_type == "result":
+                        # get last seq position
+                        stored_acts = cache.stack_head_results(layer=-1, pos_slice=-1).squeeze().to(device=storage_device)
+                    
+                    elif act_type == "logits":
+                        stored_acts = original_logits[:,-1].to(device=storage_device) # logits of last token
 
-                else:
-                    stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
-                cached_acts[act_type].append(stored_acts)
+                    else:
+                        stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
+                    cached_acts[act_type].append(stored_acts)
 
-            del cache
-            gc.collect()
-            gc.collect()
-            gc.collect()
-            gc.collect()
-            gc.collect()
-            torch.cuda.empty_cache()
-            torch.cuda.empty_cache()
-            torch.cuda.empty_cache()
-            torch.cuda.empty_cache()
+                del cache
+                gc.collect()
+                gc.collect() # sometimes need to do it twice idk i didn't check this
+                torch.cuda.empty_cache()
+                torch.cuda.empty_cache() # i assumed the same for this
 
         # convert lists of tensors into tensors
-        stored_acts = {act_type: torch.stack(cached_acts[act_type]) for act_type in self.act_types} 
+        stored_acts_yes = {act_type: torch.stack(cached_acts_yes[act_type]) for act_type in self.act_types} 
+        stored_acts_no = {act_type: torch.stack(cached_acts_no[act_type]) for act_type in self.act_types} 
 
-        self.stored_acts = stored_acts
-        
-        if store_acts:
-            if id is None:
-                id = np.random.randint(10000)
-            for act_type in self.act_types:
-                torch.save(self.stored_acts[act_type], f'{filepath}{id}_{act_type}_acts.pt')
-            print(f"Stored at {id}")
+        # CCS class uses these
+        self.stored_acts_pairs = (stored_acts_yes, stored_acts_no, y, used_idxs)
 
-        return self.stored_acts
+        # if store_acts:
+        #     if id is None:
+        #         id = np.random.randint(10000)
+        #     for act_type in self.act_types:
+        #         torch.save(self.stored_acts[act_type], f'{filepath}{id}_{act_type}_acts.pt')
+        #     print(f"Stored at {id}")
+
+        return self.stored_acts_pairs
 
     def CCS_train(self, n_epochs, batch_size, act_type = "z"):
         """
         Runs arbitrary CCS probes on any act type's activations (must've been included in self.act_types).
-        self.stored_acts[act_type] should be shape (num_examples, ..., d_probe), will be flattened in the middle
+        self.stored_acts_pairs for an act_type should be shape (num_examples, ..., d_probe), will be flattened in the middle.
         """
 
-        # Get a single activation to get the correct dimension for the probe
-        ___, demo_prompt, ___, __ = self.dataset.sample_pair(batch_size)
-        demo_acts = self.get_acts_of_prompts(demo_prompt)[act_type]
-        demo_acts = torch.flatten(demo_acts, start_dim=1, end_dim=-2)
-        assert batch_size == demo_acts.shape[0]
-        num_probes = demo_acts.shape[1]
-        probe_dim = demo_acts.shape[2]
+        stored_acts_yes, stored_acts_no, y, used_idxs = self.stored_acts_pairs
 
-        for probe in range(num_probes):
+        # Flatten & get dimensions
+        stored_acts_yes = torch.flatten(stored_acts_yes, start_dim=1, end_dim=-2)
+        stored_acts_no = torch.flatten(stored_acts_yes, start_dim=1, end_dim=-2)
+        assert stored_acts_yes.shape == stored_acts_no.shape
+        assert len(stored_acts_yes.shape) == 3
+        num_samples = stored_acts_yes.shape[0]
+        num_probes = stored_acts_yes.shape[1]
+        probe_dim = stored_acts_yes.shape[2]
+
+        # Normalize (if batch dimension is greater than 1)
+        if num_samples > 1:
+            stored_acts_yes = (stored_acts_yes - stored_acts_yes.mean(axis=0, keepdims=True)) / stored_acts_yes.std(axis=0, keepdims=True)
+            stored_acts_no = (stored_acts_no - stored_acts_no.mean(axis=0, keepdims=True)) / stored_acts_no.std(axis=0, keepdims=True)
+
+        # Train-test split
+        indices = torch.randperm(batch_size) # random indices
+        train_size = int(num_samples * 0.8)
+        test_size = num_samples - train_size
+        train_indices = indices[:train_size]
+        test_indices = indices[train_size:]
+
+        X_train_yes, X_train_no, X_test_yes, X_test_no, y_train, y_test = stored_acts_yes[train_indices], stored_acts_no[train_indices], stored_acts_yes[test_indices], stored_acts_no[test_indices], y[train_indices], y[test_indices]
+
+        # Train
+        probe, cluster_label, accuracy = self._CCS_train(num_probes, X_train_yes, X_train_no, X_test_yes, X_test_no, y_test, n_epochs, batch_size)
+
+        # Store
+        self.CCS[act_type] = probe
+        self.CCS_cluster_label[act_type] = cluster_label
+        self.CCS_accuracy[act_type] = accuracy
+
+    def _CCS_train(self, num_probes, X_train_yes, X_train_no, X_test_yes, X_test_no, y_test, n_epochs, batch_size):
+        """
+        batch_size has not yet been implemented; as of now, it goes through the entirety of x_train_yes and x_train_no.
+        """
+
+        total_batch_size = acts_yes.shape[0]
+
+        probe = []
+        cluster_label = []
+        accuracy = []
+
+        for i in range(num_probes):
 
             # Initialize probe, optimizer
             p0 = nn.Sequential(nn.Linear(probe_dim, 1), nn.Sigmoid()).to(self.model.cfg.device) # have to use pytorch for probe because custom loss function
@@ -194,112 +231,62 @@ class ModelActs:
 
             for epoch in range(n_epochs):
 
+                # get batch
+                batch_indices = torch.randperm(total_batch_size)[:batch_size] # subset of batch this time
+                acts_yes = X_train_yes[:,i,:].to(self.model.cfg.device)[batch_indices]
+                acts_no = X_train_no[:,i,:].to(self.model.cfg.device)[batch_indices]
+
                 optimizer.zero_grad()
-
-                prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(batch_size)
-
-                # Get hidden states
-                acts_yes = self.get_acts_of_prompts(prompt_yes)[act_type]
-                print(f"acts_yes shape: {acts_yes.shape}")
-                acts_no = self.get_acts_of_prompts(prompt_no)[act_type]
-                print(f"acts_no shape: {acts_no.shape}")
-                
-                # Format hidden states & select probe to train
-                acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2)[:, probe, :]
-                acts_no = torch.flatten(acts_no, start_dim=1, end_dim=-2)[:, probe, :]
-
-                # Normalize (if batch dimension is greater than 1)
-                if acts_yes.shape[0] > 1:
-                    acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
-                    acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
-
                 torch.set_grad_enabled(True) # tl sets grad enabled = False, so you have to do this every iteration loop
-
-                # Just in case
-                acts_yes = acts_yes.to(self.model.cfg.device)
-                acts_no = acts_no.to(self.model.cfg.device)
-
                 p0_out, p1_out = p0(acts_yes), p0(acts_no)
-
                 # get the corresponding loss
                 informative_loss = (torch.min(p0_out, p1_out)**2).mean(0)
                 consistent_loss = ((p0_out - (1-p1_out))**2).mean(0)
                 loss = informative_loss + consistent_loss
-
                 # update the parameters
                 print(f"Loss: {loss}")
                 loss.backward()
                 optimizer.step()
-
                 torch.set_grad_enabled(False) # do this else huge memory leak from transformerlens
 
-                torch.cuda.empty_cache() # just in case
+                # just in case, i can't be bothered w memory
+                del acts_yes
+                del acts_no
+                torch.cuda.empty_cache() 
 
-                if epoch == range(n_epochs): # if last epoch, label & save
-                    self.CCS[act_type][probe] = p0
-                    self.CCS_clabel[act_type][probe] = self.CCS_label_clusters(acts_yes, acts_no, y, p0)
+            cluster_label[i] = self._CCS_label_clusters(acts_yes, acts_no, y, p0)
+            accuracy[i] = self._CCS_inference(X_test_yes[:,i,:], X_test_no[:,i,:], y_test, p0, cluster_label[i])
+            probe[i] = p0
 
-        return loss.detach().cpu().item() #@TODO make loss work
+        return probe, cluster_label, accuracy
 
-    def CCS_label_clusters(self, acts_yes, acts_no, labels, probe):
+    def _CCS_label_clusters(self, acts_yes, acts_no, labels, probe):
         """
         Gives the correct "direction" for the CCS probes given some data.
 
         False means that the probe is already in the "correct direction" where a probe returns the probability of the true label, while True means that you should flip the probe direction because the probe returns the probability of the false label.
+        """
+        self._CCS_inference(acts_yes, acts_no, labels, probe, cluster_label = None)
+        if acc > 0.5:
+            return False # don't turn
+        else:
+            return True # do turn
+    
+    def _CCS_inference(self, acts_yes, acts_no, labels, probe, cluster_label = None):
+        """
+        Returns CCS predictions (probabilities) as well as accuracies (when you threshold at 0.5).
+        Takes in input (batch_size, d_probe) for acts_yes and acts_no.
         """
         with torch.no_grad():
             p0_out, p1_out = probe(acts_yes), probe(acts_no)
         avg_confidence = 0.5*(p0_out + (1-p1_out))
         predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
         acc = (predictions == labels).mean()
-        if acc > 0.5:
-            return False # don't turn
-        else:
-            return True # do turn
+        if cluster_label is not None and cluster_label == True: # apply train_direction
+            acc = 1 - acc
+        return acc
     
-    def CCS_inference(self, acts_yes, acts_no, labels, act_type):
-        """
-        Returns CCS predictions (probabilities) as well as accuracies (when you threshold at 0.5)
-
-        Testing is currently work in progress (WIP) at the moment
-        """
-
-        # Format hidden states & select probe to train
-        acts_yes = torch.flatten(acts_yes, start_dim=1, end_dim=-2)
-        acts_no = torch.flatten(acts_no, start_dim=1, end_dim=-2)
-
-        # Normalize (if batch dimension is greater than 1)
-        if acts_yes.shape[0] > 1:
-            acts_yes = (acts_yes - acts_yes.mean(axis=0, keepdims=True)) / acts_yes.std(axis=0, keepdims=True)
-            acts_no = (acts_no - acts_no.mean(axis=0, keepdims=True)) / acts_no.std(axis=0, keepdims=True)
-
-        batch_size = acts_yes.shape[0]
-        num_probes = acts_yes.shape[1]
-        probe_dim = acts_yes.shape[2]
-
-        total_accuracy = torch.zeros((num_probes,))
-        all_predictions = torch.zeros((num_probes, batch_size))
-
-        for probe in range(num_probes):
-            acts_yes_subset = acts_yes[:, probe, :]
-            acts_no_subset = acts_no[:, probe, :]
-    
-            with torch.no_grad():
-                p0_out, p1_out = self.CCS[act_type][probe](acts_yes), self.CCS[act_type][probe](acts_no)
-                avg_confidence = 0.5*(p0_out + (1-p1_out))
-    
-            predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
-    
-            acc = (predictions == labels).mean()
-            if self.CCS_label_clusters: # Apply train_direction
-                acc = 1 - acc
-
-            total_accuracy[probe] = acc
-            all_predictions[probe] = predictions
-
-        return all_predictions, total_accuracy
-    
-#%%
+#%% CCS modifications end here
 
     """
     Loads activations from activations folder. If id is None, then load the most recent activations. 

@@ -74,12 +74,8 @@ probing_utils = ModelActs(model, ccs_data)
 
 # %%
 
+probing_utils.get_acts_pairs()
 probing_utils.CCS_train(2, 2) # batch_size = 3
-
-
-# %%
-all_neg_hs, all_pos_hs, all_gt_labels, used_indxs = CCS_Dataset.sample_pair(4)
-probing_utils.CCS_inference(all_pos_hs, all_neg_hs, all_gt_labels, "z")
 
 #%%
 
