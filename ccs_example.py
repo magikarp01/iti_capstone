@@ -104,10 +104,9 @@ print(output_tensor.requires_grad)
 
 # %%
 
-"""
-Major changes:
-- train-test split & testing
-- make CCS_inference draw from self.CCS
-- make a better get_acts function --> ask phillip
-"""
-# %%
+## REAL TODO
+# CCS_inference -> test function. --> doing rn
+# Make a function that does train & testing (inference).
+# Make it faster by making it generate all activations beforehand.
+
+# THEN, when everything works, rewrite & rethink function type signatures

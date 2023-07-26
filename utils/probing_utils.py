@@ -256,11 +256,6 @@ class ModelActs:
             return False # don't turn
         else:
             return True # do turn
-
-    # To do: Test CCS_inference
-    # To do: Make a function that does train & testing
-    # To do: Make it faster by making it generate all activations beforehand
-    # Ask a bit about CCS design to Phillip
     
     def CCS_inference(self, acts_yes, acts_no, labels, act_type):
         """
