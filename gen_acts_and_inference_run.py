@@ -16,9 +16,11 @@ from huggingface_hub import snapshot_download
 import csv
 import gc
 
+#from utils.torch_hooks_utils import HookedModule
+
 
 model_name = "meta-llama/Llama-2-70b-chat-hf" #chat only right now
-api_key = ""
+api_key = "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"
 
 
 weights_dir = f"{os.getcwd()}/llama-weights"
@@ -111,9 +113,9 @@ for idx, batch in tqdm(enumerate(loader)):
         false_prob = output[false_ids].sum().item()
         
         if honest:
-            buffer["honest"][batch['__index_level_0__']] = (true_prob, false_prob, batch['Correct'].item())
+            buffer["honest"][batch['__index_level_0__'].item()] = (true_prob, false_prob, batch['Correct'].item())
         else:
-            buffer["liar"][batch['__index_level_0__']] = (true_prob, false_prob, batch['Correct'].item())
+            buffer["liar"][batch['__index_level_0__'].item()] = (true_prob, false_prob, batch['Correct'].item())
 
         if idx % 50 == 0:
             if honest:
