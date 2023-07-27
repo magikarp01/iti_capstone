@@ -1,4 +1,4 @@
-
+# %%
 import os
 import torch
 import torch.nn as nn
@@ -19,15 +19,17 @@ import gc
 #from utils.torch_hooks_utils import HookedModule
 
 
-model_name = "meta-llama/Llama-2-70b-chat-hf" #chat only right now
-api_key = "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"
+model_name = "meta-llama/Llama-2-13b-chat-hf" #chat only right now
+api_key = "x"
+
+device = "cuda"
 
 
-weights_dir = f"{os.getcwd()}/llama-weights"
+weights_dir = f"{os.getcwd()}/llama-weights-13b"
 if not os.path.exists(weights_dir):
     os.system(f"mkdir {weights_dir}")
 
-# checkpoint_location = snapshot_download(model_name, use_auth_token=api_key, local_dir=weights_dir, ignore_patterns=["*.safetensors", "model.safetensors.index.json"])
+#checkpoint_location = snapshot_download(model_name, use_auth_token=api_key, local_dir=weights_dir, ignore_patterns=["*.safetensors", "model.safetensors.index.json"])
 checkpoint_location = weights_dir
 
 with init_empty_weights():
@@ -37,7 +39,6 @@ model = load_checkpoint_and_dispatch(
     model,
     checkpoint_location,
     device_map="auto",
-    max_memory={0: "72GiB"},
     offload_folder=weights_dir,
     dtype=torch.float16,
     no_split_module_classes=["LlamaDecoderLayer"],
@@ -101,7 +102,7 @@ for idx, batch in tqdm(enumerate(loader)):
     for honest in [True, False]:
         text = create_prompt(statement, honest=honest)
         
-        input_ids = torch.tensor(tokenizer(text)['input_ids']).unsqueeze(dim=0).to(0)
+        input_ids = torch.tensor(tokenizer(text)['input_ids']).unsqueeze(dim=0).to(device)
 
         with torch.no_grad():
             output = model(input_ids, use_cache=False)
@@ -119,9 +120,9 @@ for idx, batch in tqdm(enumerate(loader)):
 
         if idx % 50 == 0:
             if honest:
-                file_name = 'inference_output_honest.csv'
+                file_name = 'inference_output_honest_13b.csv'
             else:
-                file_name = 'inference_output_liar.csv'
+                file_name = 'inference_output_liar_13b.csv'
 
             with open(file_name, 'a', newline='') as f:
                 writer = csv.writer(f)
@@ -150,3 +151,5 @@ for idx, batch in tqdm(enumerate(loader)):
 # ideally probing rates will be similar between the two (bcuz representing the actual truth-value is useful in lying)
 # other hypothesis: forcing the model to think about truth-value is more likely to give us (more) robust representations
 
+
+ 
