@@ -65,7 +65,7 @@ def format_prompt(label, text, text1, text2, dataset_name = "imdb"):
 
 #%%
 
-model = vicuna_7b()
+model = vicuna_7b(device = "cuda:6")
 dataset = load_dataset("imdb")["train"]
 
 #%%
@@ -74,7 +74,8 @@ probing_utils = ModelActs(model, ccs_data)
 
 # %%
 
-probing_utils.get_acts_pairs()
+probing_utils.get_acts_pairs(N=75)
+#%%
 probing_utils.CCS_train(2, 2) # batch_size = 3
 
 #%%
