@@ -25,7 +25,7 @@ class HookedModule(nn.Module):
             # Add hooks
             for hook_position, hook_fn in fwd:
                 module = self._get_module_by_path(hook_position)
-                handle = module.register_forward_hook(hook_fn)
+                handle = module.register_forward_hook(hook_fn) #if you want to modify input, use pre_hook
                 info = HookInfo(handle=handle, level=self.context_level)
                 self._hooks.append(info)
 
