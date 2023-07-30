@@ -22,10 +22,12 @@ from functools import partial
 #Before running, 
 # 1) paste huggingface API key
 # 2) set up AWS (download the CLI, run aws configure and ssenter credentials)
+# 3) clear out activations/unformatted/ folder
 
 num_params = "70b"
 model_name = f"meta-llama/Llama-2-{num_params}-chat-hf"
 api_key = "x"
+run_id = 2
 
 device = "cuda" #change when not running locally
 
@@ -114,8 +116,6 @@ def create_prompt(statement, honest=True):
 
 
 
-
-
 #Strange Llama tokenizer issue
 #two separate token ids both decode to each word
 true_ids = [5574, 5852, 1565, 3009] #includes "true" and "True"
@@ -136,7 +136,7 @@ if not os.path.exists(f"{os.getcwd()}/activations"):
 if not os.path.exists(f"{os.getcwd()}/activations/unformatted"):
     os.system(f"mkdir {os.getcwd()}/activations/unformatted")
 
-
+set_time = time.time()
 for idx, batch in tqdm(enumerate(loader)):
     statement = batch['Question'][0]
     torch.cuda.empty_cache()
@@ -150,7 +150,7 @@ for idx, batch in tqdm(enumerate(loader)):
                 output = hmodel(input_ids)
 
         prompt_tag = "honest" if honest else "liar"
-        activation_filename = f"large_run_{num_params}_{prompt_tag}_{int(batch['__index_level_0__'].item())}.pt"
+        activation_filename = f"large_run_{run_id}_{num_params}_{prompt_tag}_{int(batch['__index_level_0__'].item())}.pt"
         torch.save(activation_buffer, f"{os.getcwd()}/activations/unformatted/{activation_filename}")
 
         output = output['logits'][:,-1,:] #last sequence position
@@ -161,8 +161,10 @@ for idx, batch in tqdm(enumerate(loader)):
         
         inference_buffer[prompt_tag][batch['__index_level_0__'].item()] = (true_prob, false_prob, batch['Correct'].item())
         
-        if idx % 50 == 0:
-            file_name = f'inference_output_{prompt_tag}_{num_params}.csv'
+        if idx % 500 == 0:
+            print("500 iterations time: ", time.time() - set_time)
+            set_time = time.time()
+            file_name = f'inference_output_{run_id}_{prompt_tag}_{num_params}.csv'
             with open(file_name, 'a', newline='') as f:
                 writer = csv.writer(f)
                 if f.tell() == 0:
@@ -184,5 +186,5 @@ for idx, batch in tqdm(enumerate(loader)):
     torch.save(activation_buffer, f"{os.getcwd()}/activations/unformatted/{activation_filename}")
 
 os.system(f"aws s3 cp {os.getcwd()}/activations/ s3://iti-capston/activations/ --recursive")
-os.system(f"aws s3 cp {os.getcwd()}/inference_output_honest_{num_params}.csv s3://iti-capston/")
-os.system(f"aws s3 cp {os.getcwd()}/inference_output_liar_{num_params}.csv s3://iti-capston/")
+os.system(f"aws s3 cp {os.getcwd()}/inference_output_{run_id}_honest_{num_params}.csv s3://iti-capston/")
+os.system(f"aws s3 cp {os.getcwd()}/inference_output_{run_id}_liar_{num_params}.csv s3://iti-capston/")
