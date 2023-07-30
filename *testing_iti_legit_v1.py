@@ -10,44 +10,18 @@ from utils.iti_utils import patch_iti
 from utils.dataset_utils import MS_Dataset, Elem_Dataset, MisCons_Dataset, Kinder_Dataset, HS_Dataset, BoolQ_Question_Dataset, TruthfulQA_Tfn, CounterFact_Tfn, Fever_Tfn, BoolQ_Tfn, Creak_Tfn, CommonClaim_Tfn, CounterFact_Dataset, TQA_MC_Dataset, EZ_Dataset, TQA_GEN_Dataset
 from datasets import Dataset, load_dataset
 import random
+from utils.gpt_judge import get_model_generations, get_judge_scores, get_iti_scores
 
 #%%
 
 model = vicuna_7b(device="cuda")
 model.tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
-# #%%
-# # Define a ModelActs, train probes
-# dataset = EZ_Dataset(model.tokenizer)
-# acts = ModelActs(model, dataset, act_types=["z"])
-# acts.gen_acts(N=1000, store_acts=False)
-# acts.train_probes("z", max_iter=1000)
-
-# #%%
-
-# # Actually do ITI
-# model.reset_hooks()
-# patch_iti(model, acts, topk=10, alpha=0.1, use_probe=True, model_device='cuda')
-# model.generate("True or False: The sky is blue.", max_new_tokens = 200)
-
-# #%%
-
-# for dataset in [EZ_Dataset(model.tokenizer), ]:
-
-#     acts = ModelActs(model, dataset, act_types=["z"])
-#     acts.gen_acts(N=1000, store_acts=False)
-#     acts.train_probes("z", max_iter=1000)
-
-#     model.reset_hooks()
-#     patch_iti(model, acts, topk=10, alpha=0.1, use_probe=True, model_device='cuda')
-#     print(model.generate("True or False: The sky is blue. Answer:", max_new_tokens = 200))
-
-
 #%%
-
 # Look at generations when you do ITI, versus ones where you don't for [TruthfulQA, EZ]
+# Manually understand generations and GPT-Judge scores.
 
-# Training dataset -- needs to be dataset_utils..py format
+# Training dataset -- needs to be dataset_utils.py format
 # Testing dataset -- just needs to be a list of strings
 def compare_iti_gen(train_dataset, test_dataset):
 
@@ -71,24 +45,28 @@ def compare_iti_gen(train_dataset, test_dataset):
         iti_generation.append(gen)
         # Add GPT-Judge score
         print("*** Question --- ", test)
-        print("No ITI --- ", no_iti_generation[i])
-        print("ITI --- ", iti_generation[i])
+        print("*** No ITI --- ", no_iti_generation[i])
+        # print(f"Judge score, true & helpful: {get_judge_scores([no_iti_generation[i]])}")
+        print("*** ITI --- ", iti_generation[i])
+        # print(f"Judge score, true & helpful: {get_judge_scores([no_iti_generation[i]])}")
 
 #%%
 
-tqa_dataset = TruthfulQA_Tfn(model.tokenizer) # "Is the question below true or false? ... Answer:"
-tqa_dataset_2 = TQA_GEN_Dataset(model.tokenizer) # direct truthfulQA generation validation
-
-#%%
-
+tqa_dataset = TruthfulQA_Tfn(model.tokenizer) # "Is the below statement true or false? " + prompt + " Answer:"
+# tqa_dataset_2 = TQA_GEN_Dataset(model.tokenizer) # direct truthfulQA generation validation
 tqa_dataset_3 = random.sample(load_dataset("truthful_qa", "generation")['validation']['question'], k=50)
 
-
+# NOTE THAT HERE TEST / TRAIN IS DRAWING FROM SAME DATASET
+tqa_dataset_4 = TQA_MC_Dataset(model.tokenizer) # direct truthfulQA MC validation. "Q: ... A: ..."
+tqa_dataset_5 = ["Q: " + s + " A:" for s in random.sample(load_dataset("truthful_qa", "multiple_choice")['validation']['question'], k=50)] # direct truthfulQA MC validation. "Q: ... A: ..."
 
 #%%
 # Look at performance when you prompt "T" vs "F" for [EZ, Miscons, MS, HS]
 
-compare_iti_gen(tqa_dataset, tqa_dataset_3)
+compare_iti_gen(tqa_dataset_4, tqa_dataset_5)
+
+
+#%%
 
 
 #%%  NOT MY CODE BELOW
