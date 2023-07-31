@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from datasets import Dataset
 from transformer_lens import HookedTransformer
+from torch import utils
 
 
 def get_balanced_indices(indices, labels, sample_size):
@@ -517,3 +518,47 @@ def test_model_output(model: HookedTransformer, input_str=None, dataset: Abstrac
                 print(output)
             responses.append(model.tokenizer.decode(output[0], skip_special_tokens=True))
         return responses
+    
+
+
+class TorchDataset(Dataset):
+    """
+    Wraps Abstract_Dataset objects with pytorch dataset abstractions. 
+    Increases usability for those familiar with PyTorch Dataset classes. 
+    Currently only works with tqa, cfact, & ez. 
+    Plug-and-play for Abtrast_Dataset
+    """
+    def __init__(self, tokenizer, dataname, seed=5):
+        self.indices = "all"
+
+        if dataname=="tqa":
+            self.dataset = TQA_MC_Dataset(tokenizer, seed=seed)
+        elif dataname=="cfact":
+            self.dataset = CounterFact_Dataset(tokenizer, seed=seed)
+        elif dataname=="ez":
+            self.dataset = EZ_Dataset(tokenizer, seed=seed)
+
+        self.all_prompts = self.dataset.all_prompts #make sure you're not creating extra copy
+        self.all_labels = self.dataset.all_labels
+    
+    def __getitem__(self, idx):
+        return self.all_prompts[idx], self.all_labels[idx]
+    
+    def __len__(self):
+        return len(self.all_prompts)
+    
+    def sample(self, sample_size: int, reset_seed=False):
+        return self.dataset.sample(sample_size, reset_seed)
+
+        
+class TorchSample(Dataset):
+    def __init__(self, prompts=None, labels=None, indices=None):
+        self.all_prompts = prompts #not actually 'all' prompts, just using for name consistency
+        self.all_labels = labels
+        self.indices = indices #store for book-keeping purposes
+
+    def __getitem__(self, idx):
+        return self.all_prompts[idx], self.all_labels[idx]
+    
+    def __len__(self):
+        return len(self.all_prompts)
