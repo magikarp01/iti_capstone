@@ -32,8 +32,8 @@ liar_accs = []
 liar_total = []
 
 for thresh in threshs:
-    h_acc, h_tot = get_accuracy('inference_output_honest.csv', threshold=thresh)
-    l_acc, l_tot = get_accuracy('inference_output_liar.csv', threshold=thresh)
+    h_acc, h_tot = get_accuracy('inference_outputs/inference_output_2_honest_70b.csv', threshold=thresh)
+    l_acc, l_tot = get_accuracy('inference_outputs/inference_output_2_liar_70b.csv', threshold=thresh)
     honest_accs.append(h_acc)
     honest_total.append(h_tot)
     liar_accs.append(l_acc)
