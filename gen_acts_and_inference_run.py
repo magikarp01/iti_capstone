@@ -15,7 +15,7 @@ from accelerate import infer_auto_device_map
 from huggingface_hub import snapshot_download
 import csv
 import gc
-
+import datasets
 from utils.torch_hooks_utils import HookedModule
 from functools import partial
 
@@ -27,7 +27,7 @@ from functools import partial
 num_params = "70b"
 model_name = f"meta-llama/Llama-2-{num_params}-chat-hf"
 api_key = "x"
-run_id = 2
+run_id = 3
 
 device = "cuda" #change when not running locally
 
@@ -123,8 +123,10 @@ false_ids = [7700, 8824, 2089, 4541]
 
 
 
-dataset = load_dataset("notrichardren/elem_tf") #code below relies on using this dataset, will have to edit for other datasets
-dataset = dataset["train"].remove_columns(['Unnamed: 0','Topic'])
+dataset = load_dataset("notrichardren/gpt_generated_10k") #code below relies on using this dataset, will have to edit for other datasets
+dataset = datasets.concatenate_datasets([dataset["train"], dataset["test"]])
+dataset = dataset.flatten_indices()
+
 # ['Unnamed: 0', 'Topic', 'Question', 'Correct', '__index_level_0__']
 
 loader = DataLoader(dataset, batch_size=1, shuffle=False)
@@ -135,6 +137,7 @@ if not os.path.exists(f"{os.getcwd()}/activations"):
     os.system(f"mkdir {os.getcwd()}/activations")
 if not os.path.exists(f"{os.getcwd()}/activations/unformatted"):
     os.system(f"mkdir {os.getcwd()}/activations/unformatted")
+
 
 set_time = time.time()
 for idx, batch in tqdm(enumerate(loader)):
@@ -159,22 +162,24 @@ for idx, batch in tqdm(enumerate(loader)):
         true_prob = output[true_ids].sum().item()
         false_prob = output[false_ids].sum().item()
         
-        inference_buffer[prompt_tag][batch['__index_level_0__'].item()] = (true_prob, false_prob, batch['Correct'].item())
+        inference_buffer[prompt_tag][idx] = (true_prob, false_prob, batch['Correct'].item(), batch['__index_level_0__'].item(), batch['original_dataset'])
         
         if idx % 500 == 0:
-            print("500 iterations time: ", time.time() - set_time)
+            with open(f'performance_log_{run_id}.txt', 'a') as file:
+                file.write(f"500 iterations time: {time.time() - set_time}\n")
             set_time = time.time()
+
             file_name = f'inference_output_{run_id}_{prompt_tag}_{num_params}.csv'
             with open(file_name, 'a', newline='') as f:
                 writer = csv.writer(f)
                 if f.tell() == 0:
-                    writer.writerow(['index', 'P(true)', 'P(false)', 'label']) 
+                    writer.writerow(['index', 'P(true)', 'P(false)', 'label','base_index','original_dataset']) 
                 if honest:
                     for index, data_point in inference_buffer["honest"].items():
-                        writer.writerow([index, data_point[0], data_point[1], data_point[2]])
+                        writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
                 else:
                     for index, data_point in inference_buffer["liar"].items():
-                        writer.writerow([index, data_point[0], data_point[1], data_point[2]])
+                        writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
                     inference_buffer = {"honest":{}, "liar":{}}
                     gc.collect()
     text = statement
@@ -188,3 +193,5 @@ for idx, batch in tqdm(enumerate(loader)):
 os.system(f"aws s3 cp {os.getcwd()}/activations/ s3://iti-capston/activations/ --recursive")
 os.system(f"aws s3 cp {os.getcwd()}/inference_output_{run_id}_honest_{num_params}.csv s3://iti-capston/")
 os.system(f"aws s3 cp {os.getcwd()}/inference_output_{run_id}_liar_{num_params}.csv s3://iti-capston/")
+os.system(f"aws s3 cp {os.getcwd()}/performance_log_{run_id}.txt s3://iti-capston/")
+
