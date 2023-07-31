@@ -7,3 +7,5 @@ convert_llama_weights_to_hf.py
 .pytest_cache
 *__pycache__*
 vicuna-7b-hf
+.DS_Store
+inference_outputs/*

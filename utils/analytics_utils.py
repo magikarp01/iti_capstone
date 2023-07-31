@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import plotly.express as px
 import einops
+import csv
 
 def plot_probe_accuracies(model_acts, sorted = False, other_head_accs=None, title = "Probe Accuracies"):
     """
@@ -64,3 +65,24 @@ def plot_downstream_diffs(model_acts_iti, model_acts, cache_interventions, div=T
 
     return px.imshow(norm_diffs, labels = {"x" : "Heads", "y": "Layers"},title = "Norm Differences (divided by original norm) of ITI and Normal Head Activations", color_continuous_midpoint = 0, color_continuous_scale="RdBu", origin = "lower")
 
+def get_inference_accuracy(filename, threshold=0):
+    num_correct = 0
+    num_total = 0
+    acc = 0
+    with open(filename, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        for idx, row in enumerate(reader):
+            if idx>0:
+                p_true = float(row[1])
+                p_false = float(row[2])
+                if p_true > threshold or p_false > threshold:
+                    label = int(float(row[3]))
+                    
+                    pred = p_true > p_false
+                    correct = (pred == label) #bool
+
+                    num_correct += correct
+                    num_total += 1
+    if num_total > 0:
+        acc = num_correct / num_total
+    return acc, num_total
