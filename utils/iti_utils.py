@@ -91,7 +91,7 @@ def patch_activation_hook_fn(activations, hook, head, term_to_add):
     """
     activations[:,-1,head] += term_to_add #.to(device=device)
 
-def patch_arbitrary_heads(model, head_bools, old_activations, topk=20, alpha=20, use_MMD=False, use_probe=False, truth_indices=None, probes=None, cache_interventions=None, model_device='cpu', permanent=False):
+def _patch_arbitrary_heads(model, head_bools, old_activations, topk=20, alpha=20, use_MMD=False, use_probe=False, truth_indices=None, probes=None, cache_interventions=None, model_device='cpu', permanent=False):
     """
     Function to patch (with ITI) arbitrary heads, given by head_bools. head_bools should be a n_l x n_h tensor of booleans, where a particular element is True if that head should be patched.
     """
@@ -117,7 +117,53 @@ def patch_arbitrary_heads(model, head_bools, old_activations, topk=20, alpha=20,
                     model.add_hook(utils.get_act_name("z", layer), patch_activation_with_head)
 
 
+def patch_heads(model, model_acts: ModelActs, head_bools, alpha=20, use_MMD=False, use_probe=False, cache_interventions=None, model_device='cpu', permanent=False, train_only=True):
+    """
+    Do arbitrary head patching (on heads) given a model and a ModelActs object that has already trained probes.
+    One of use_MMD, use_probe must be true
+    If train_only is true, then old_activations is only from the train split (saved in model_acts.indices_trains)
+    """
+    assert use_MMD ^ use_probe
+    model.reset_hooks()
+    
+    if train_only:
+        meta_indices = np.array([np.where(model_acts.indices == i)[0][0] for i in model_acts.indices_trains["z"]])
+
+        old_activations = model_acts.stored_acts["z"][meta_indices].to(device=model_device)
+    else:
+        old_activations = model_acts.stored_acts["z"].to(device=model_device)
+    if use_MMD:
+        if train_only:
+            truth_indices = torch.tensor(model_acts.dataset.all_labels)[model_acts.indices_trains["z"]].to(device=model_device)
+        else:
+            truth_indices = torch.tensor(model_acts.dataset.all_labels)[model_acts.indices].to(device=model_device)
+        probes=None
+        # print(f"{attn_activations.shape=}, {probe_accuracies.shape=}, {truth_indices.shape=}")
+    elif use_probe:
+        probes = model_acts.probes["z"]
+        truth_indices=None
+
+    _patch_arbitrary_heads(model, head_bools, old_activations, alpha=alpha, use_MMD=use_MMD, use_probe=use_probe, truth_indices=truth_indices, probes=probes, cache_interventions=cache_interventions, model_device=model_device, permanent=permanent)
+
+
 def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, use_probe=False, cache_interventions=None, model_device='cpu', permanent=False, train_only=True):
+    """
+    Do iti patching (on heads) given a model and a ModelActs object that has already trained probes.
+    One of use_MMD, use_probe must be true
+    If train_only is true, then old_activations is only from the train split (saved in model_acts.indices_trains)
+    """
+
+    probe_accuracies = torch.tensor(einops.rearrange(model_acts.probe_accs["z"], "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers)).to(device=model_device)
+    
+    top_head_indices = torch.topk(einops.rearrange(probe_accuracies, "n_l n_h -> (n_l n_h)"), k=topk).indices.to(device=model_device) # take top k indices
+    top_head_bools = torch.zeros(size=(probe_accuracies.shape[0] * probe_accuracies.shape[1],)).to(device=model_device) # set all the ones that aren't top to 0
+
+    top_head_bools[top_head_indices] = torch.ones_like(top_head_bools[top_head_indices]).to(device=model_device) # set all the ones that are top to 1
+    top_head_bools = einops.rearrange(top_head_bools, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers) # rearrange back
+    
+    patch_heads(model, model_acts, top_head_bools, alpha=alpha, use_MMD=use_MMD, use_probe=use_probe, cache_interventions=cache_interventions, model_device=model_device, permanent=permanent, train_only=train_only)
+
+'''def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, use_probe=False, cache_interventions=None, model_device='cpu', permanent=False, train_only=True):
     """
     Do iti patching (on heads) given a model and a ModelActs object that has already trained probes.
     One of use_MMD, use_probe must be true
@@ -144,7 +190,6 @@ def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, us
             truth_indices = torch.tensor(model_acts.dataset.all_labels)[model_acts.indices_trains["z"]].to(device=model_device)
         else:
             truth_indices = torch.tensor(model_acts.dataset.all_labels)[model_acts.indices].to(device=model_device)
-        print(truth_indices.sum())
         probes=None
         # print(f"{attn_activations.shape=}, {probe_accuracies.shape=}, {truth_indices.shape=}")
     elif use_probe:
@@ -157,4 +202,5 @@ def patch_iti(model, model_acts: ModelActs, topk=50, alpha=20, use_MMD=False, us
     top_head_bools[top_head_indices] = torch.ones_like(top_head_bools[top_head_indices]).to(device=model_device) # set all the ones that are top to 1
     top_head_bools = einops.rearrange(top_head_bools, "(n_l n_h) -> n_l n_h", n_l=model.cfg.n_layers) # rearrange back
     
-    patch_arbitrary_heads(model, top_head_bools, old_activations, topk=topk, alpha=alpha, use_MMD=use_MMD, use_probe=use_probe, truth_indices=truth_indices, probes=probes, cache_interventions=cache_interventions, model_device=model_device, permanent=permanent)
+    _patch_arbitrary_heads(model, top_head_bools, old_activations, topk=topk, alpha=alpha, use_MMD=use_MMD, use_probe=use_probe, truth_indices=truth_indices, probes=probes, cache_interventions=cache_interventions, model_device=model_device, permanent=permanent)'''
+    

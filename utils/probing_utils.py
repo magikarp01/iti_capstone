@@ -32,6 +32,7 @@ from transformer_lens import HookedTransformer, HookedTransformerConfig, Factore
 import pickle
 from collections import defaultdict
 
+from utils.dataset_utils import Abstract_Dataset
 from utils.torch_hooks_utils import HookedModule
 from utils.dataset_utils import TorchSample
 from functools import partial
@@ -49,7 +50,7 @@ class ModelActs:
     Initialize ModelActs class specifying which activation types to store.
     First, generate acts using gen_acts. Acts can be saved/loaded. Then, train probes on these acts using train_probes: these probes are stored in self.probes dictionary and accuracies are stored in self.probe_accs dictionary.
     """
-    def __init__(self, model: HookedTransformer, dataset, seed = None, act_types = ["z"]):
+    def __init__(self, model: HookedTransformer, dataset: Abstract_Dataset, seed = None, act_types = ["z"]):
         """
         dataset must have sample(sample_size) method returning indices of samples, sample_prompts, and sample_labels.
         act_types is a list of which activations to cache and operate on.
@@ -74,12 +75,12 @@ class ModelActs:
         self.indices_trains = {}
         self.indices_tests = {}
 
-    """
-    Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
-    Refactored so that activations are not reshaped by default, and will be reshaped at some other time.
-    """
-    def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu"):
-        
+
+    def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu", verbose=False):
+        """
+        Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
+        Refactored so that activations are not reshaped by default, and will be reshaped at some other time.
+        """        
         if indices is None:
             indices, all_prompts, all_labels = self.dataset.sample(N)
         
@@ -101,12 +102,23 @@ class ModelActs:
                 elif act_type == "logits":
                     stored_acts = original_logits[:,-1].to(device=storage_device) # logits of last token
 
+                elif act_type == "attn_scores":
+                    # shape of cache.stack_activation(act_type, layer = -1) is (n_l, 1, n_h, s, s)
+                    stored_acts = cache.stack_activation(act_type, layer=-1).squeeze().to(device=storage_device)
+
                 else:
                     stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
+                    if verbose:
+                        print(f"{act_type=}, {cache.stack_activation(act_type, layer = -1).shape=}")
                 cached_acts[act_type].append(stored_acts)
         
         # convert lists of tensors into tensors
-        stored_acts = {act_type: torch.stack(cached_acts[act_type]) for act_type in self.act_types} 
+        stored_acts = {}
+        for act_type in self.act_types:
+            try:
+                stored_acts[act_type] = torch.stack(cached_acts[act_type])
+            except: # if cached_acts cannot be stacked, if they are different sizes, probably for attention scores
+                stored_acts[act_type] = cached_acts[act_type]
 
         self.stored_acts = stored_acts
         self.indices = indices
@@ -121,11 +133,11 @@ class ModelActs:
 
         # return self.indices, self.attn_head_acts
 
-    """
-    Loads activations from activations folder. If id is None, then load the most recent activations. 
-    If load_probes is True, load from saved probes.picle and all_heads_acc_np.npy files as well.
-    """
     def load_acts(self, id, filepath = "activations/", load_probes=False):
+        """
+        Loads activations from activations folder. If id is None, then load the most recent activations. 
+        If load_probes is True, load from saved probes.picle and all_heads_acc_np.npy files as well.
+        """
         indices = torch.load(f'{filepath}{id}_indices.pt')
 
         self.stored_acts = {}
