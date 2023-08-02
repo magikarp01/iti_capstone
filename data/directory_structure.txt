@@ -1,0 +1,13 @@
+-> data
+	- run_map.txt
+	- directory_structure.txt
+	-> large_run_{id}
+		- config file
+		- performance_log_{run_id}.txt
+		-> inference_outputs
+			- inference_output_{run_id}_{prompt_tag}.txt
+		-> activations
+			-> unformatted
+				- large_run_{run_id}_{prompt_tag}_{data_idx}.pt
+			-> formatted
+				- large_run_{run_id}_{prompt_tag}_l{layer}_h{head}.pt
