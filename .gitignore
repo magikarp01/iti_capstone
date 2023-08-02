@@ -1,5 +1,5 @@
 /llama_model
-/data
+/data/large_run*
 7B.zip
 tokenizers.zip
 convert_llama_weights_to_hf.py
