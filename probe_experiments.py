@@ -13,7 +13,7 @@ import pickle
 from datasets import load_dataset
 
 
-def reformat_acts_for_probing(run_id, N, d_head, n_layers, n_heads, num_params, prompt_tag):
+def reformat_acts_for_probing(run_id, N, d_head, n_layers, n_heads, prompt_tag):
     activations_dir = f"{os.getcwd()}/data/large_run_{run_id}/activations"
     load_path = f"{activations_dir}/unformatted"
     save_path = f"{activations_dir}/formatted"
@@ -28,10 +28,10 @@ def reformat_acts_for_probing(run_id, N, d_head, n_layers, n_heads, num_params, 
             head_start = head*d_head
             head_end = head_start + d_head
             for idx in range(N): #can do smarter things to reduce # of systems calls; O(layers*heads*N)
-                if os.path.exists(f"{load_path}/large_run_{run_id}_{num_params}_{prompt_tag}_{idx}.pt"): #quick patch
-                    acts: Float[Tensor, "n_layers d_model"] = torch.load(f"{load_path}/large_run_{run_id}_{num_params}_{prompt_tag}_{idx}.pt") #saved activation buffers
+                if os.path.exists(f"{load_path}/large_run_{run_id}_{prompt_tag}_{idx}.pt"): #quick patch
+                    acts: Float[Tensor, "n_layers d_model"] = torch.load(f"{load_path}/large_run_{run_id}_{prompt_tag}_{idx}.pt") #saved activation buffers
                     probe_dataset[idx,:] = acts[layer, head_start:head_end].squeeze()
-            torch.save(probe_dataset, f"{save_path}/large_run_{run_id}_{num_params}_{prompt_tag}_l{layer}_h{head}.pt")
+            torch.save(probe_dataset, f"{save_path}/large_run_{run_id}_{prompt_tag}_l{layer}_h{head}.pt")
 
 
 
@@ -41,20 +41,20 @@ N = 2500 #upper bound the global (level 0) index
 d_head = 128
 n_layers = 80
 n_heads = 64
-num_params = "70b"
+# num_params = "70b"
 
-#reformat_acts_for_probing(run_id, N, d_head, n_layers, n_heads, num_params, "honest")
-#reformat_acts_for_probing(run_id, N, d_head, n_layers, n_heads, num_params, "liar")
-#reformat_acts_for_probing(run_id, N, d_head, n_layers, n_heads, num_params, "neutral")
+reformat_acts_for_probing(run_id, N, d_head, n_layers, n_heads, "honest")
+reformat_acts_for_probing(run_id, N, d_head, n_layers, n_heads, "liar")
+reformat_acts_for_probing(run_id, N, d_head, n_layers, n_heads, "neutral")
 
 
-dataset_name = "notrichardren/elem_tf"
-dataset = load_dataset(dataset_name)
-dataset = dataset["train"].remove_columns(['Unnamed: 0','Topic','Question'])
-#MAY NEED TO EDIT TO BE VERY CAREFUL ABOUT INDEXING
-loader = DataLoader(dataset, batch_size=1, shuffle=False)
-labels = [batch['Correct'] for batch in loader]
-labels = torch.tensor(labels)
+# dataset_name = "notrichardren/elem_tf"
+# dataset = load_dataset(dataset_name)
+# dataset = dataset["train"].remove_columns(['Unnamed: 0','Topic','Question'])
+# #MAY NEED TO EDIT TO BE VERY CAREFUL ABOUT INDEXING
+# loader = DataLoader(dataset, batch_size=1, shuffle=False)
+# labels = [batch['Correct'] for batch in loader]
+# labels = torch.tensor(labels)
 
 
 
