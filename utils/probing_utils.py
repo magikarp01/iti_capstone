@@ -300,7 +300,7 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
     and can thus handle model quantization as well as parallelism. Activation caching is achieved using PyTorch hooks (update: use gen_acts_and_inference_run instead of gen_acts)
 
     Pipeline:
-    1. gen_acts: 
+    1. gen_acts (deprecated: use gen_acts_and_inference_run): 
         -(optionally) subsamples from dataset, self.dataset is now TorchSample
         -loops through data, runs model, caches activations and saves in disk labeled 
         as "large_run{id}_{idx}.pt" coupled with "large_run{id}_indices.pt" and/or "large_run{id}_labels.pt" file
@@ -343,6 +343,7 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
 
     def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu", save_labels=True, distributed=False):
         """
+        Deprecated. If you're going to do a large run to cache activations, use gen_acts_and_inference_run.py
         Doesn't save acts in active memory. Acts may be several hundreds of GB.
         """
         assert store_acts, "If you're using ModelActsLarge, you probably want to store the activations"
@@ -390,7 +391,7 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
         #torch.cuda.empty_cache()
         #consider clearing model so can run pipeline all in one swoop
 
-    #note: please make a new folder for this
+    
     def reformat_acts_for_probing(self, id, N=0, filepath="activations/"):
         """
         need to define n_layers, d_head, n_heads, N

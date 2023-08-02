@@ -126,6 +126,7 @@ false_ids = [7700, 8824, 2089, 4541]
 dataset = load_dataset("notrichardren/gpt_generated_10k") #code below relies on using this dataset, will have to edit for other datasets
 dataset = datasets.concatenate_datasets([dataset["train"], dataset["test"]])
 dataset = dataset.flatten_indices()
+dataset = dataset.remove_columns(['Unnamed: 0','Topic'])
 
 # ['Unnamed: 0', 'Topic', 'Question', 'Correct', '__index_level_0__']
 
