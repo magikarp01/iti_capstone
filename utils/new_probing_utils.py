@@ -128,13 +128,17 @@ class ModelActs:
         If train test split is not already set, set it with given keywords.
         """
         if self.indices_tests is None and self.indices_trains is None:
-            self.set_train_test_split(self.activations[act_type][0].shape[0], test_ratio=test_ratio, train_ratio=train_ratio)
+
+            act_index = self.activations[act_type].keys()[0]
+            num_acts = self.activations[act_type][act_index].shape[0]
+
+            self.set_train_test_split(num_acts, test_ratio=test_ratio, train_ratio=train_ratio)
         
         if act_type not in self.probes:
             self.probes[act_type] = {}
             self.probe_accs[act_type] = {}
 
-        for probe_index in self.activations[act_type]:
+        for probe_index in tqdm(self.activations[act_type]):
             clf, acc = self._train_probe(act_type, probe_index, max_iter=max_iter)
             self.probes[act_type][probe_index] = clf
             self.probe_accs[act_type][probe_index] = acc
@@ -207,8 +211,10 @@ class SmallModelActs(ModelActs):
         
         # indices of data
         self.data_indices = None
-        
         self.act_types=act_types
+
+        if "result" in act_types:
+            model.set_use_attn_result(True)
     
         if seed is not None:
             np.random.seed(seed)
@@ -289,15 +295,21 @@ class SmallModelActs(ModelActs):
 
                 cached_acts[act_type].append(stack_acts)
 
+        print("Finished generating activations")
+
         for act_type in self.act_types:
             try:
-                stacked_acts = torch.stack(cached_acts[act_type], dim=0) # shape (n_acts, n_l, n_h, d)
-                stacked_acts = einops.rearrange(stacked_acts, "n_acts ... d -> ... n_acts d")
+                stacked_acts = einops.rearrange(torch.stack(cached_acts[act_type], dim=0), "n_acts ... d -> ... n_acts d")
+                cached_acts[act_type] = stacked_acts
             except:
                 print(f"Cannot stack activations, {act_type} not implemented yet")
                 stacked_acts = cached_acts[act_type]   
                 continue
-
+        
+        print("Activations stacked")
+        
+        for act_type in self.act_types:
+            stacked_acts = cached_acts[act_type]
             if act_type == "result" or act_type == "z":
                 act_dict = self._tensor_to_dict(stacked_acts, head_tensor=True)
             elif act_type == "logits":
@@ -309,10 +321,13 @@ class SmallModelActs(ModelActs):
                 # mlp or resid
                 assert len(stacked_acts.shape) == 3
                 act_dict = self._tensor_to_dict(stacked_acts, head_tensor=False)
+            del stacked_acts
 
             self.activations[act_type] = act_dict
         
         self.data_indices = data_indices
+        self.labels = all_labels
+
         if store_acts:
             if id is None:
                 id = np.random.randint(10000)
