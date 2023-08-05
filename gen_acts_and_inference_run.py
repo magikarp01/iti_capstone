@@ -19,6 +19,8 @@ import datasets
 from utils.torch_hooks_utils import HookedModule
 from functools import partial
 
+# NOTE: THIS FILE IS CUTTING OFF INFERENCE OUTPUTS BY ONLY SAVING EVERY 500!!!
+
 #Before running, 
 # 1) paste huggingface API key
 # 2) set up AWS (download the CLI, run aws configure and ssenter credentials)

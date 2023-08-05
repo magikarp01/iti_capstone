@@ -14,6 +14,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datasets import load_dataset
 
+import csv
+
+
 
 def reformat_acts_for_probing_fully_batched(run_id, N, d_head, n_layers, n_heads, prompt_tag):
     activations_dir = f"{os.getcwd()}/data/large_run_{run_id}/activations"
@@ -82,9 +85,9 @@ n_layers = 80
 n_heads = 64
 # num_params = "70b"
 
-# reformat_acts_for_probing_fully_batched(run_id, N, d_head, n_layers, n_heads, "honest")
-# reformat_acts_for_probing_fully_batched(run_id, N, d_head, n_layers, n_heads, "liar")
-# reformat_acts_for_probing_fully_batched(run_id, N, d_head, n_layers, n_heads, "neutral")
+#reformat_acts_for_probing_fully_batched(run_id, N, d_head, n_layers, n_heads, "honest")
+#reformat_acts_for_probing_fully_batched(run_id, N, d_head, n_layers, n_heads, "liar")
+#reformat_acts_for_probing_fully_batched(run_id, N, d_head, n_layers, n_heads, "neutral")
 
 # %%
 
@@ -93,7 +96,10 @@ dataset = load_dataset(dataset_name)
 dataset = dataset["train"].remove_columns(['Unnamed: 0','Topic','Question'])
 #MAY NEED TO EDIT TO BE VERY CAREFUL ABOUT INDEXING
 loader = DataLoader(dataset, batch_size=1, shuffle=False)
-labels = [batch['Correct'] for batch in loader]
+#labels = [batch['Correct'] for batch in loader]
+#THIS IS AN EXTREMELY HACKY FIX, REMOVE WHEN USING AN OTHER DATASETS
+dont_include = [2477, 2478, 2479, 2480, 2481, 2482, 2483, 2484, 2485]
+labels = [batch['Correct'] for batch in loader if not batch['__index_level_0__'] in dont_include]
 labels = torch.tensor(labels)
 
 
@@ -141,10 +147,11 @@ class ModelActsLargeSimple:
         #y_pred = clf.predict(X_train.numpy())
 
         y_val_pred = clf.predict(X_test.numpy())
+        y_val_pred_prob = clf.predict(X_test.numpy())
         
         acc = accuracy_score(y_test.numpy(), y_val_pred)
 
-        return clf, acc, y_val_pred
+        return clf, acc, y_val_pred_prob
 
     # def get_probe_pred(self, tag):
     # need to implement way to get top preds without storing all preds in large data scenarios
@@ -221,12 +228,90 @@ def get_top_heads(probe_accs, k=10):
     #return values, indices_2d
 
 
-heads_honest = get_top_heads(probe_accs_honest)
-heads_neutral = get_top_heads(probe_accs_neutral)
-heads_liar = get_top_heads(probe_accs_liar)
+heads_honest = get_top_heads(probe_accs_honest, k=200)
+heads_neutral = get_top_heads(probe_accs_neutral, k=200)
+heads_liar = get_top_heads(probe_accs_liar, k=200)
 
 
-def get_probing_acc
+labels_honest = labels[acts_honest.test_indices]
+labels_neutral = labels[acts_neutral.test_indices]
+labels_liar = labels[acts_liar.test_indices]
 
+
+def get_probe_accs_across_top_heads_by_datapoint(heads_to_include, preds, labels):
+    #heads to include List[(Int, Int),...]
+    #preds shape (n_layers, n_heads, num_test_points)
+    #labels for the test set
+    top_heads = torch.zeros((len(heads_to_include), len(labels)))
+    for idx, (layer, head) in enumerate(heads_to_include):
+        top_heads[idx,:] = preds[layer,head,:]
+    accs = (top_heads == labels) #broadcasting
+    accs = torch.sum(accs, dim=0)/len(heads_to_include)
+    return accs #vector of length test_points
+# %%
+
+accs_honest = get_probe_accs_across_top_heads_by_datapoint(heads_honest, preds_honest, labels_honest)
+accs_liar = get_probe_accs_across_top_heads_by_datapoint(heads_liar, preds_liar, labels_liar)
+
+# %%
+
+def get_inference_accuracy_calibrated(filename, test_indices, threshold=0):
+
+    calibrated_accs = torch.zeros((N,))
+    
+    with open(filename, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        for idx, row in enumerate(reader):
+            if idx>0:
+
+                base_idx = int(row[0])
+
+                p_true = float(row[1])
+                p_false = float(row[2])
+                if p_true > threshold or p_false > threshold:
+                    label = int(float(row[3]))
+                    
+                    pred = p_true/(p_true + p_false)
+                    dist = abs(pred - label)
+                    acc = 1 - dist
+                    calibrated_accs[base_idx] = acc
+                    #pred = p_true > p_false
+                    #correct = (pred == label) #bool
+
+                    #num_correct += correct
+                    #num_total += 1
+    mask = (calibrated_accs != 0)
+
+    calibrated_accs = calibrated_accs[mask]
+    assert len(calibrated_accs) == len(labels)
+    calibrated_accs = calibrated_accs[test_indices]
+    return calibrated_accs
+
+# %%
+get_inf_file = lambda prompt_tag: f"{os.getcwd()}/data/large_run_1/inference_outputs/inference_output_1_{prompt_tag}_70b.csv"
+
+inf_honest = get_inference_accuracy_calibrated(get_inf_file("honest"), acts_honest.test_indices)
+inf_liar = get_inference_accuracy_calibrated(get_inf_file("liar"), acts_liar.test_indices)
+#there is no neutral inference accuracy
+
+# %%
+fig, ax = plt.subplots()
+
+ax.scatter(accs_honest.tolist(), inf_honest.tolist(), color='blue', alpha=.03, label='honest')
+ax.scatter(accs_liar.tolist(), inf_liar.tolist(), color='red', alpha=.03, label='liar')
+
+ax.set_xlabel("probing accuracy")
+ax.set_ylabel("inference accuracy")
+
+plt.show()
+# %%
+plt.hexbin(accs_honest.tolist(), inf_honest.tolist(), gridsize=50, cmap='Blues')
+cb = plt.colorbar(label='count in bin')
+# %%
+plt.hexbin(accs_liar.tolist(), inf_liar.tolist(), gridsize=50, cmap='Reds')
+cb = plt.colorbar(label='count in bin')
+# %%
+plt.hist2d(accs_honest.tolist(), inf_honest.tolist(), bins=(50, 50), cmap=plt.cm.jet)
+plt.colorbar()
 
 # %%
