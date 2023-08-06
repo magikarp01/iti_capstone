@@ -63,14 +63,24 @@ class ModelActs:
         indices_tests: reserved activation/test indices (not used to train probe). A subset of np.arange(num_samples).
     """
     
-    # each of these is a dictionary, keys are act type
-    activations = {}
-    probes = {}
-    probe_accs = {}
+    # def __init__(self, activations={}, probes={}, probe_accs={}, labels=None, indices_trains=None, indices_tests=None):
+    def __init__(self):
+        # each of these is a dictionary, keys are act type
+        # self.activations = activations
+        # self.probes = probes
+        # self.probe_accs = probe_accs
 
-    labels: np.ndarray or torch.T = None
-    indices_trains: np.array = None
-    indices_tests: np.array = None
+        # self.labels: np.ndarray or torch.T = labels
+        # self.indices_trains: np.array = indices_trains
+        # self.indices_tests: np.array = indices_tests
+        self.activations = {}
+        self.probes = {}
+        self.probe_accs = {}
+
+        self.labels: np.ndarray or torch.T = None
+        self.indices_trains: np.array = None
+        self.indices_tests: np.array = None
+
 
     @abstractclassmethod
     def load_acts(self):
@@ -404,8 +414,8 @@ class ModelActsLargeSimple(ModelActs):
         
         self.labels = labels
 
-
-        self.activations["z"] = {}
+        if "z" not in self.activations:
+            self.activations["z"] = {}
         for layer in tqdm(range(n_layers)):
             for head in range(n_heads):
                 if component_indices[layer, head]:
