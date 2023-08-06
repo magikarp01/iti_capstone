@@ -75,7 +75,7 @@ class ModelActs:
     @abstractclassmethod
     def load_acts(self):
         """
-        Load activations into self.activations dictionary. Should be implemented by child classes.
+        Load activations into self.activations dictionary and labels into self.labels. Should be implemented by child classes.
         """
         raise NotImplementedError
 
@@ -107,19 +107,19 @@ class ModelActs:
         Returns probe, accuracy
         """
 
-        # X_acts = self.activations[act_type][probe_index]
+        X_acts = self.activations[act_type][probe_index]
 
-        # X_train_head = X_acts[self.indices_trains] # integer array indexing
-        # y_train = self.labels[self.indices_trains]
+        X_train_head = X_acts[self.indices_trains] # integer array indexing
+        y_train = self.labels[self.indices_trains]
 
-        # X_test_head = X_acts[self.indices_tests]
+        X_test_head = X_acts[self.indices_tests]
         y_test = self.labels[self.indices_tests]
 
-        # clf = LogisticRegression(max_iter=max_iter).fit(X_train_head, y_train)
-        clf = LogisticRegression(max_iter=max_iter).fit(self.activations[act_type][probe_index][self.indices_trains], self.labels[self.indices_trains])
+        clf = LogisticRegression(max_iter=max_iter).fit(X_train_head, y_train)
+        # clf = LogisticRegression(max_iter=max_iter).fit(self.activations[act_type][probe_index][self.indices_trains], self.labels[self.indices_trains])
 
-        # y_val_pred = clf.predict(X_test_head)
-        y_val_pred = clf.predict(self.activations[act_type][probe_index][self.indices_tests])
+        y_val_pred = clf.predict(X_test_head)
+        # y_val_pred = clf.predict(self.activations[act_type][probe_index][self.indices_tests])
         acc = accuracy_score(y_test, y_val_pred)
 
         return clf, acc
@@ -297,8 +297,9 @@ class SmallModelActs(ModelActs):
                     print(f"{act_type=}, {stack_acts.shape=}")
 
                 cached_acts[act_type].append(stack_acts)
-
-        print("Finished generating activations")
+        
+        if verbose:
+            print("Finished generating activations")
 
         for act_type in self.act_types:
             try:
@@ -309,10 +310,12 @@ class SmallModelActs(ModelActs):
                 stacked_acts = cached_acts[act_type]   
                 continue
         
-        print("Activations stacked")
+        if verbose:
+            print("Activations stacked")
         
         for act_type in self.act_types:
-            print(f"{act_type}, ")
+            if verbose:
+                print(f"{act_type}, ")
             stacked_acts = cached_acts[act_type]
             if act_type == "result" or act_type == "z":
                 act_dict = self._tensor_to_dict(stacked_acts, head_tensor=True)
@@ -328,7 +331,8 @@ class SmallModelActs(ModelActs):
 
             self.activations[act_type] = act_dict
         
-        print("Finished formatting")
+        if verbose:
+            print("Finished formatting")
 
         self.data_indices = data_indices
         self.labels = np.array(all_labels)
@@ -379,90 +383,50 @@ class SmallModelActs(ModelActs):
 
 class ModelActsLargeSimple(ModelActs):
     """
-    
+    A class that implements functionality of ModelActs, but optimized for large models. This class doesn't generate the activations itself: instead, it loads the activations of specific components and probes only those.
+
+    * presumes that we already have formatted activations
     """
-    """presumes that we already have formatted activations"""
-    def __init__(self, run_id, labels, prompt_tag):
-        self.run_id = run_id
-        self.acts_path = f"{os.getcwd()}/data/large_run_{run_id}/activations/formatted"
-        self.labels = labels
-        self.prompt_tag = prompt_tag
+    # def __init__(self, run_id, labels, prompt_tag):
+    #     self.run_id = run_id
+    #     self.acts_path = f"{os.getcwd()}/data/large_run_{run_id}/activations/formatted"
+    #     self.labels = labels
+    #     self.prompt_tag = prompt_tag
 
-        self.train_indices = None
-        self.test_indices = None
+    #     self.train_indices = None
+    #     self.test_indices = None
 
-        self.probes = None
+    #     self.probes = None
 
-    def get_train_test_split(self, X_acts: Float[Tensor, "N d_head"], labels: Float[Tensor, "N"], test_ratio = 0.2):
-        probe_dataset = TensorDataset(X_acts, labels)
-        if self.train_indices is None and self.test_indices is None:
-            generator1 = torch.Generator().manual_seed(42)
-            train_data, test_data = random_split(probe_dataset, [1-test_ratio, test_ratio], generator=generator1) 
-            self.train_indices = train_data.indices
-            self.test_indices = test_data.indices
+    def load_acts(self, file_prefix, n_layers, n_heads, labels,component_indices=None, exclude_points=None):
+        """
+        Load z and logit activations and labels from formatted_acts directory. 
 
-        X_train, y_train = probe_dataset[self.train_indices]
-        X_test, y_test = probe_dataset[self.test_indices]
-
-        return X_train, y_train, X_test, y_test
-    
-
-    def _train_single_probe(self, layer, head, max_iter=1000): #Use regularization!!!
-        # load_path = f"~/iti_capstone/{filepath}"
-        X_acts: Float[Tensor, "N d_head"] = torch.load(f"{self.acts_path}/large_run_{self.run_id}_{self.prompt_tag}_l{layer}_h{head}.pt")
-        mask = torch.any(X_acts != 0, dim=1) #mask out zero rows because of difference between global and local indices
-        X_acts = X_acts[mask]
-
-        assert X_acts.shape[0] == self.labels.shape[0], "X_acts.shape[0] != self.labels, zero mask fail?"
-
-        X_train, y_train, X_test, y_test = self.get_train_test_split(X_acts, labels) # (train_size, d_head), (test_size, d_head)
-
-        clf = LogisticRegression(max_iter=max_iter).fit(X_train.numpy(), y_train.numpy()) #check shapes
-        #also implement plug-and-play pytorch logistic regression and compare performance
-        #y_pred = clf.predict(X_train.numpy())
-
-        y_val_pred = clf.predict(X_test.numpy())
+        Args:
+            file_prefix: prefix of the file name including directories, e.g. "data/large_run_1/activations/formatted/large_run_1_honest"
+            n_layers and n_heads: number of layers and heads in the model
+            labels: labels of the data in numpy array (for now, loaded externally from huggingface)
+            component_indices: which heads to store and load. If none, default to loading and storing all heads. Should be a boolean array of shape (n_l, n_h)
+            exclude_points: datapoints (indices) to exclude for any reason
+        """
+        if component_indices is None:
+            component_indices = np.full(shape=(n_layers, n_heads), fill_value=True)
         
-        acc = accuracy_score(y_test.numpy(), y_val_pred)
+        self.labels = labels
 
-        return clf, acc, y_val_pred
 
-    # def get_probe_pred(self, tag):
-    # need to implement way to get top preds without storing all preds in large data scenarios
-    #     X_acts: Float[Tensor, "N d_head"] = torch.load(f"{self.acts_path}/large_run_{self.run_id}_{self.prompt_tag}_l{layer}_h{head}.pt")
-    #     mask = torch.any(X_acts != 0, dim=1) #mask out zero rows because of difference between global and local indices
-    #     X_acts = X_acts[mask]
-
-    #     X_train, y_train, X_test, y_test = self.get_train_test_split(X_acts, labels) 
-
-    #     clf = self.probes[tag]
-
-    def train_z_probes(self, max_iter=1000):
-        probes = {}
-        #preds = np.zeros(n_layers, n_heads, len(self.test_indices)) # this is being incredibly dumb with memory usage, def fix before using larger data
-        #accs = {}
-        probe_accs = torch.zeros(n_layers, n_heads)
-        for layer in tqdm(range(n_layers), desc='layer'): #RELYING ON N_LAYERS AND N_HEADS BEING A GLOBAL HERE
-            for head in tqdm(range(n_heads), desc='head', leave=False):
-                probe, acc, pred = self._train_single_probe(layer, head, max_iter=max_iter)
-
-                tag = f"l{layer}h{head}"
-                probe_accs[layer, head] = acc
-
-                if layer == 0 and head == 0: #hacky
-                    preds = torch.zeros((n_layers, n_heads, len(self.test_indices))) # this is being incredibly dumb with memory usage, def fix before using larger data
-
-                preds[layer, head, :] = torch.tensor(pred)
-
-                probes[tag] = probe
-        # self.probes = probes
-        return probe_accs, probes, preds
-        #        probes[tag] = probe
-        #        accs[tag] = acc
-        #with open(f"large_run_{self.run_id}_probes.pkl", "wb") as file:
-        #    pickle.dump(probes, file)
-        #with open(f"large_run{self.run_id}_accs.pkl", "wb") as file:
-        #    pickle.dump(accs, file)
+        self.activations["z"] = {}
+        for layer in tqdm(range(n_layers)):
+            for head in range(n_heads):
+                if component_indices[layer, head]:
+                    X_acts = torch.load(f"{file_prefix}_l{layer}_h{head}.pt")
+                    mask = torch.any(X_acts != 0, dim=1)
+                    if exclude_points is not None:
+                        for point in exclude_points:
+                            mask[point] = False
+                    X_acts = X_acts[mask]
+                    
+                    self.activations["z"][(layer, head)] = X_acts.numpy()
 
 
 class ModelActsLarge(ModelActs):

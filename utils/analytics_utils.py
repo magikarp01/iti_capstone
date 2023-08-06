@@ -21,6 +21,22 @@ def plot_probe_accuracies(model_acts, sorted = False, other_head_accs=None, titl
         accs_sorted = all_head_accs_np.reshape(model_acts.model.cfg.n_layers, model_acts.model.cfg.n_heads)
     return px.imshow(accs_sorted, labels = {"x" : "Heads (sorted)", "y": "Layers"}, title = title, color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
 
+def plot_z_probe_accuracies(acc_dict, n_layers, n_heads, sorted = False, title = "Probe Accuracies"):
+    """
+    Plot z probe accuracies given an acc dict, with keys (layer, head) and value accuracy.
+    """
+    head_accs = np.ones(shape=(n_layers, n_heads)) * -1
+    for layer in range(n_layers):
+        for head in range(n_heads):
+            if (layer, head) in acc_dict:
+                head_accs[layer, head] = acc_dict[(layer, head)]
+    
+    if sorted:
+        head_accs = -np.sort(-head_accs, axis = 1)
+
+    return px.imshow(head_accs, labels = {"x" : "Heads (sorted)", "y": "Layers"}, title = title, color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
+
+
 def plot_norm_diffs(model_acts_iti, model_acts, div=True):
     """
     Plots the norm diffs across head z activations
