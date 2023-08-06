@@ -44,7 +44,7 @@ ModelActs = TypeVar("ModelActs")
 
 from dataclasses import dataclass
 import pickle
-
+from abc import abstractclassmethod
 
 @dataclass
 class ModelActs:
@@ -72,7 +72,7 @@ class ModelActs:
     indices_trains: np.array = None
     indices_tests: np.array = None
 
-
+    @abstractclassmethod
     def load_acts(self):
         """
         Load activations into self.activations dictionary. Should be implemented by child classes.
@@ -460,9 +460,22 @@ class ModelActsLargeSimple(ModelActs):
         #    pickle.dump(accs, file)
 
 
+class ModelActsLarge(ModelActs):
+    """
+    A class that implements functionality of ModelActs, but optimized for large models. This class doesn't generate the activations itself: instead, it loads specific 
+    """
+    def __init__(self, run_id, labels, prompt_tag):
+        self.run_id = run_id
+        self.acts_path = f"{os.getcwd()}/data/large_run_{run_id}/activations/formatted"
+        self.labels = labels
+        self.prompt_tag = prompt_tag
 
+    def load_acts(self, acts_path=None, component_indices=None):
+        """
+        Load acts into self.activations. For efficiency, user can specify component indices so that only those activations will be loaded/stored and probed. 
+        """
 
-
+'''
 #todo
 #data/probing parallelism
 #path handling is atrocious (at the very least abstract it to its own method)
@@ -679,3 +692,4 @@ class ModelActsLarge: #separate class for now, can make into subclass later (nee
     def show_top_z_probes(self, topk=50):
         #super?
         raise NotImplementedError
+'''
