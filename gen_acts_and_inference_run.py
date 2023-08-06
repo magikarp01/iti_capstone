@@ -21,6 +21,12 @@ from functools import partial
 
 # NOTE: THIS FILE IS CUTTING OFF INFERENCE OUTPUTS BY ONLY SAVING EVERY 500!!!
 
+#JAMES TODO:
+#   use A6000's as a performance test ground
+#
+
+
+
 #Before running, 
 # 1) paste huggingface API key
 # 2) set up AWS (download the CLI, run aws configure and ssenter credentials)
