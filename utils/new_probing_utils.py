@@ -107,16 +107,19 @@ class ModelActs:
         Returns probe, accuracy
         """
 
-        X_acts = self.activations[act_type][probe_index]
+        # X_acts = self.activations[act_type][probe_index]
 
-        X_train_head = X_acts[self.indices_trains] # integer array indexing
-        y_train = self.labels[self.indices_trains]
+        # X_train_head = X_acts[self.indices_trains] # integer array indexing
+        # y_train = self.labels[self.indices_trains]
 
-        X_test_head = X_acts[self.indices_tests]
+        # X_test_head = X_acts[self.indices_tests]
         y_test = self.labels[self.indices_tests]
 
-        clf = LogisticRegression(max_iter=max_iter).fit(X_train_head, y_train)
-        y_val_pred = clf.predict(X_test_head)
+        # clf = LogisticRegression(max_iter=max_iter).fit(X_train_head, y_train)
+        clf = LogisticRegression(max_iter=max_iter).fit(self.activations[act_type][probe_index][self.indices_trains], self.labels[self.indices_trains])
+
+        # y_val_pred = clf.predict(X_test_head)
+        y_val_pred = clf.predict(self.activations[act_type][probe_index][self.indices_tests])
         acc = accuracy_score(y_test, y_val_pred)
 
         return clf, acc
@@ -129,7 +132,7 @@ class ModelActs:
         """
         if self.indices_tests is None and self.indices_trains is None:
 
-            act_index = self.activations[act_type].keys()[0]
+            act_index = list(self.activations[act_type].keys())[0]
             num_acts = self.activations[act_type][act_index].shape[0]
 
             self.set_train_test_split(num_acts, test_ratio=test_ratio, train_ratio=train_ratio)
@@ -180,7 +183,7 @@ class ModelActs:
         """
         
         data_acts = data_source.activations[act_type][probe_index]
-        data_labels = data_source.labels[act_type] # test indices from data_source
+        data_labels = data_source.labels # test indices from data_source
 
         probe = self.probes[act_type][probe_index]
         y_pred = probe.predict(data_acts)
@@ -309,6 +312,7 @@ class SmallModelActs(ModelActs):
         print("Activations stacked")
         
         for act_type in self.act_types:
+            print(f"{act_type}, ")
             stacked_acts = cached_acts[act_type]
             if act_type == "result" or act_type == "z":
                 act_dict = self._tensor_to_dict(stacked_acts, head_tensor=True)
@@ -321,12 +325,13 @@ class SmallModelActs(ModelActs):
                 # mlp or resid
                 assert len(stacked_acts.shape) == 3
                 act_dict = self._tensor_to_dict(stacked_acts, head_tensor=False)
-            del stacked_acts
 
             self.activations[act_type] = act_dict
         
+        print("Finished formatting")
+
         self.data_indices = data_indices
-        self.labels = all_labels
+        self.labels = np.array(all_labels)
 
         if store_acts:
             if id is None:
