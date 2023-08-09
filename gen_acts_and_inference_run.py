@@ -1,4 +1,3 @@
-# %%
 import os
 import torch
 import torch.nn as nn
@@ -18,15 +17,6 @@ import gc
 import datasets
 from utils.torch_hooks_utils import HookedModule
 from functools import partial
-
-
-# %%
-
-# NOTE: THIS FILE IS CUTTING OFF INFERENCE OUTPUTS BY ONLY SAVING EVERY 500!!!
-
-#JAMES TODO:
-#   use A6000's as a performance test ground
-#
 
 
 
@@ -97,29 +87,22 @@ def cache_mlp_out_hook_fnc(module, input, output, name="", layer_num=0):
     activation_buffer_mlp_out[:,layer_num,:] = output[0,seq_positions,:].detach().clone()
 
 hook_pairs = []
-for seq_position in seq_positions:
-    # add z hooks
-    for layer in range(n_layers):
-        act_name = f"model.layers.{layer}.self_attn.o_proj" #start with model if using CausalLM object
-        hook_pairs.append((act_name, partial(cache_z_hook_fnc, name=act_name, layer_num=layer)))
-    # add resid_mid hooks
-    for layer in range(n_layers):
-        act_name = f"model.layers.{layer}.post_attention_layernorm"
-        hook_pairs.append((act_name, partial(cache_resid_mid_hook_fnc, name=act_name, layer_num=layer)))
-    # add resid_post hooks
-    for layer in range(n_layers):
-        act_name = f"model.layers.{layer}" #save output of LlamaDecoderLayer
-        hook_pairs.append((act_name, partial(cache_resid_post_hook_fnc, name=act_name, layer_num=layer)))
-    # add mlp_out hooks
-    for layer in range(n_layers):
-        act_name = f"model.layers.{layer}.mlp"
-        hook_pairs.append((act_name, partial(cache_mlp_out_hook_fnc, name=act_name, layer_num=layer)))
-
-
-
-
-
-#write tests comparing desired activations to same thing in transformerlens. ensure that pytorch hooks are being used correctly.
+# add z hooks
+for layer in range(n_layers):
+    act_name = f"model.layers.{layer}.self_attn.o_proj" #start with model if using CausalLM object
+    hook_pairs.append((act_name, partial(cache_z_hook_fnc, name=act_name, layer_num=layer)))
+# add resid_mid hooks
+for layer in range(n_layers):
+    act_name = f"model.layers.{layer}.post_attention_layernorm"
+    hook_pairs.append((act_name, partial(cache_resid_mid_hook_fnc, name=act_name, layer_num=layer)))
+# add resid_post hooks
+for layer in range(n_layers):
+    act_name = f"model.layers.{layer}" #save output of LlamaDecoderLayer
+    hook_pairs.append((act_name, partial(cache_resid_post_hook_fnc, name=act_name, layer_num=layer)))
+# add mlp_out hooks
+for layer in range(n_layers):
+    act_name = f"model.layers.{layer}.mlp"
+    hook_pairs.append((act_name, partial(cache_mlp_out_hook_fnc, name=act_name, layer_num=layer)))
 
 
 
@@ -147,11 +130,11 @@ this. Violating the rules stated here will result in harsh punishment."""
 
 #### Add more system prompts here
 
-def create_prompt(statement, honest=True):
+def create_prompt(statement, prompt_tag):
     # can get far more rigorous about exact formatting later
-    if honest:
+    if prompt_tag == "honest":
         persona = system_prompt_honest
-    else:
+    elif prompt_tag == "liar":
         persona = system_prompt_liar
     text = f"""{persona}
 
@@ -173,78 +156,81 @@ false_ids = [7700, 8824, 2089, 4541]
 
 
 
-dataset = load_dataset("notrichardren/gpt_generated_10k") #code below relies on using this dataset, will have to edit for other datasets
-dataset = datasets.concatenate_datasets([dataset["train"], dataset["test"]])
-dataset = dataset.flatten_indices()
-dataset = dataset.remove_columns(['Unnamed: 0','Topic'])
-
-# ['Unnamed: 0', 'Topic', 'Question', 'Correct', '__index_level_0__']
-
+#dataset = load_dataset("notrichardren/truthfulness_high_quality", split="all")
+dataset = load_dataset("notrichardren/truthfulness_high_quality", revision="acc0003145978dc37ecd3f6448012e082f1a2b53", split='test')
+# assumes fields are ['claim','label','dataset','qa_type','ind']
 loader = DataLoader(dataset, batch_size=1, shuffle=False)
 
 model.eval()
 
-if not os.path.exists(f"{os.getcwd()}/activations"):
-    os.system(f"mkdir {os.getcwd()}/activations")
-if not os.path.exists(f"{os.getcwd()}/activations/unformatted"):
-    os.system(f"mkdir {os.getcwd()}/activations/unformatted")
+activations_dir = f"{os.getcwd}/data/large_run_{run_id}/activations/unformatted"
+inference_dir = f"{os.getcwd}/data/large_run_{run_id}/inference_outputs"
+
+os.makedirs(activations_dir, exist_ok=True)
+os.makedirs(inference_dir, exist_ok=True)
 
 
 set_time = time.time()
 for idx, batch in tqdm(enumerate(loader)):
-    statement = batch['Question'][0]
+    statement = batch['claim'][0] #batch['claim'] gives a list, ints are wrapped in tensors
     torch.cuda.empty_cache()
-    for honest in [True, False]:
-        text = create_prompt(statement, honest=honest)
+    for prompt_tag in ["honest", "liar"]:
+        text = create_prompt(statement, prompt_tag)
         
         input_ids = torch.tensor(tokenizer(text)['input_ids']).unsqueeze(dim=0).to(device)
-        print(input_ids.shape)
+
         with torch.no_grad():
             with hmodel.hooks(fwd=hook_pairs):
                 output = hmodel(input_ids)
 
-        prompt_tag = "honest" if honest else "liar"
-        activation_filename = f"large_run_{run_id}_{prompt_tag}_{int(batch['__index_level_0__'].item())}.pt"
-        torch.save(activation_buffer, f"{os.getcwd()}/activations/unformatted/{activation_filename}")
+        for seq_pos in seq_positions: #might be slow with all the system calls
+            activation_filename = lambda act_type: f"run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{int(batch['ind'].item())}.pt" #e.g. run_4_liar_-1_resid_post_20392.pt
+            torch.save(activation_buffer_z, f"{activations_dir}/{activation_filename('z')}")
+            torch.save(activation_buffer_resid_mid, f"{activations_dir}/{activation_filename('resid_mid')}")
+            torch.save(activation_buffer_resid_post, f"{activations_dir}/{activation_filename('resid_post')}")
+            torch.save(activation_buffer_mlp_out, f"{activations_dir}/{activation_filename('mlp_out')}")
+
 
         output = output['logits'][:,-1,:] #last sequence position
-        #### Save logits here
+        torch.save(output, f"{inference_dir}/logits_{run_id}_{prompt_tag}_{int(batch['ind'].item())}.pt") #save logits for Phillip
         output = torch.nn.functional.softmax(output, dim=-1)
         output = output.squeeze()
         true_prob = output[true_ids].sum().item()
         false_prob = output[false_ids].sum().item()
         
-        inference_buffer[prompt_tag][idx] = (true_prob, false_prob, batch['Correct'].item(), batch['__index_level_0__'].item(), batch['original_dataset'])
+        inference_buffer[prompt_tag][int(batch['ind'].item())] = (true_prob, false_prob, batch['label'].item(), batch['dataset'], batch['qa_type'])
         
-        if idx % 500 == 0:
-            #### Fix inference buffer saving here
-            with open(f'performance_log_{run_id}.txt', 'a') as file:
-                file.write(f"500 iterations time: {time.time() - set_time}\n")
-            set_time = time.time()
-
-            file_name = f'inference_output_{run_id}_{prompt_tag}.csv'
-            with open(file_name, 'a', newline='') as f:
+        if idx % 500 == 0 or (idx+1==len(loader)):
+            inference_filename = f'inference_output_{run_id}_{prompt_tag}.csv'
+            with open(inference_filename, 'a', newline='') as f:
                 writer = csv.writer(f)
                 if f.tell() == 0:
-                    writer.writerow(['index', 'P(true)', 'P(false)', 'label','base_index','original_dataset']) 
-                if honest:
+                    writer.writerow(['index', 'P(true)', 'P(false)', 'label','dataset','qa_type']) 
+                if prompt_tag == "honest":
                     for index, data_point in inference_buffer["honest"].items():
                         writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
-                else:
+                elif prompt_tag == "liar":
                     for index, data_point in inference_buffer["liar"].items():
                         writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
                     inference_buffer = {"honest":{}, "liar":{}}
                     gc.collect()
+
     text = statement
     input_ids = torch.tensor(tokenizer(text)['input_ids']).unsqueeze(dim=0).to(device)
     with torch.no_grad():
         with hmodel.hooks(fwd=hook_pairs):
             output = hmodel(input_ids)
-    activation_filename = f"large_run_neutral_{int(batch['__index_level_0__'].item())}.pt"
-    torch.save(activation_buffer, f"{os.getcwd()}/activations/unformatted/{activation_filename}")
+    prompt_tag = "neutral"
+    for seq_pos in seq_positions: #might be slow with all the system calls
+        activation_filename = lambda act_type: f"run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{int(batch['ind'].item())}.pt" #e.g. run_4_liar_-1_resid_post_20392.pt
+        torch.save(activation_buffer_z, f"{activations_dir}/{activation_filename('z')}")
+        torch.save(activation_buffer_resid_mid, f"{activations_dir}/{activation_filename('resid_mid')}")
+        torch.save(activation_buffer_resid_post, f"{activations_dir}/{activation_filename('resid_post')}")
+        torch.save(activation_buffer_mlp_out, f"{activations_dir}/{activation_filename('mlp_out')}")
 
-os.system(f"aws s3 cp {os.getcwd()}/activations/ s3://iti-capston/activations/ --recursive")
-os.system(f"aws s3 cp {os.getcwd()}/inference_output_{run_id}_honest.csv s3://iti-capston/")
-os.system(f"aws s3 cp {os.getcwd()}/inference_output_{run_id}_liar.csv s3://iti-capston/")
-os.system(f"aws s3 cp {os.getcwd()}/performance_log_{run_id}.txt s3://iti-capston/")
+    if idx % 500 == 0:
+        with open(f'performance_log_{run_id}.txt', 'a') as file:
+            file.write(f"500 iterations time: {time.time() - set_time}\n")
+        set_time = time.time()
 
+os.system(f"~/bin/aws s3 cp {os.getcwd()}/data/large_run_{run_id} s3://iti-capston/data/large_run_{run_id} --recursive")
