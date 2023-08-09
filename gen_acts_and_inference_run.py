@@ -1,3 +1,4 @@
+
 import os
 import torch
 import torch.nn as nn
@@ -18,12 +19,11 @@ import datasets
 from utils.torch_hooks_utils import HookedModule
 from functools import partial
 
-
+#TODO: make everything configurable up to a yaml file
 
 #Before running, 
 # 1) paste huggingface API key
 # 2) set up AWS (download the CLI, run aws configure and ssenter credentials)
-# 3) clear out activations/unformatted/ folder
 
 model_name = f"meta-llama/Llama-2-70b-chat-hf"
 api_key = "x"
@@ -47,7 +47,7 @@ with init_empty_weights():
 model = load_checkpoint_and_dispatch(
     model,
     checkpoint_location,
-    device_map="auto",
+    device_map="sequential",
     offload_folder=weights_dir,
     dtype=torch.float16,
     no_split_module_classes=["LlamaDecoderLayer"],
@@ -60,7 +60,7 @@ n_layers = model.config.num_hidden_layers
 n_heads = model.config.num_attention_heads
 d_model = model.config.hidden_size
 #d_head = int(d_model/n_heads) 
-seq_positions = [-1, -3, -10] #we want to cache activations for 5 sequence positions
+seq_positions = [-1, -3] #we want to cache activations for 5 sequence positions
 
 
 inference_buffer = {"honest":{}, "liar":{}}
@@ -163,8 +163,8 @@ loader = DataLoader(dataset, batch_size=1, shuffle=False)
 
 model.eval()
 
-activations_dir = f"{os.getcwd}/data/large_run_{run_id}/activations/unformatted"
-inference_dir = f"{os.getcwd}/data/large_run_{run_id}/inference_outputs"
+activations_dir = f"{os.getcwd()}/data/large_run_{run_id}/activations/unformatted"
+inference_dir = f"{os.getcwd()}/data/large_run_{run_id}/inference_outputs"
 
 os.makedirs(activations_dir, exist_ok=True)
 os.makedirs(inference_dir, exist_ok=True)
@@ -183,12 +183,12 @@ for idx, batch in tqdm(enumerate(loader)):
             with hmodel.hooks(fwd=hook_pairs):
                 output = hmodel(input_ids)
 
-        for seq_pos in seq_positions: #might be slow with all the system calls
+        for seq_idx, seq_pos in enumerate(seq_positions): #might be slow with all the system calls
             activation_filename = lambda act_type: f"run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{int(batch['ind'].item())}.pt" #e.g. run_4_liar_-1_resid_post_20392.pt
-            torch.save(activation_buffer_z, f"{activations_dir}/{activation_filename('z')}")
-            torch.save(activation_buffer_resid_mid, f"{activations_dir}/{activation_filename('resid_mid')}")
-            torch.save(activation_buffer_resid_post, f"{activations_dir}/{activation_filename('resid_post')}")
-            torch.save(activation_buffer_mlp_out, f"{activations_dir}/{activation_filename('mlp_out')}")
+            torch.save(activation_buffer_z[seq_idx], f"{activations_dir}/{activation_filename('z')}")
+            torch.save(activation_buffer_resid_mid[seq_idx], f"{activations_dir}/{activation_filename('resid_mid')}")
+            torch.save(activation_buffer_resid_post[seq_idx], f"{activations_dir}/{activation_filename('resid_post')}")
+            torch.save(activation_buffer_mlp_out[seq_idx], f"{activations_dir}/{activation_filename('mlp_out')}")
 
 
         output = output['logits'][:,-1,:] #last sequence position
@@ -201,7 +201,7 @@ for idx, batch in tqdm(enumerate(loader)):
         inference_buffer[prompt_tag][int(batch['ind'].item())] = (true_prob, false_prob, batch['label'].item(), batch['dataset'], batch['qa_type'])
         
         if idx % 500 == 0 or (idx+1==len(loader)):
-            inference_filename = f'inference_output_{run_id}_{prompt_tag}.csv'
+            inference_filename = f'{inference_dir}/inference_output_{run_id}_{prompt_tag}.csv'
             with open(inference_filename, 'a', newline='') as f:
                 writer = csv.writer(f)
                 if f.tell() == 0:
@@ -221,12 +221,12 @@ for idx, batch in tqdm(enumerate(loader)):
         with hmodel.hooks(fwd=hook_pairs):
             output = hmodel(input_ids)
     prompt_tag = "neutral"
-    for seq_pos in seq_positions: #might be slow with all the system calls
+    for seq_idx, seq_pos in enumerate(seq_positions): #might be slow with all the system calls
         activation_filename = lambda act_type: f"run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{int(batch['ind'].item())}.pt" #e.g. run_4_liar_-1_resid_post_20392.pt
-        torch.save(activation_buffer_z, f"{activations_dir}/{activation_filename('z')}")
-        torch.save(activation_buffer_resid_mid, f"{activations_dir}/{activation_filename('resid_mid')}")
-        torch.save(activation_buffer_resid_post, f"{activations_dir}/{activation_filename('resid_post')}")
-        torch.save(activation_buffer_mlp_out, f"{activations_dir}/{activation_filename('mlp_out')}")
+        torch.save(activation_buffer_z[seq_idx], f"{activations_dir}/{activation_filename('z')}")
+        torch.save(activation_buffer_resid_mid[seq_idx], f"{activations_dir}/{activation_filename('resid_mid')}")
+        torch.save(activation_buffer_resid_post[seq_idx], f"{activations_dir}/{activation_filename('resid_post')}")
+        torch.save(activation_buffer_mlp_out[seq_idx], f"{activations_dir}/{activation_filename('mlp_out')}")
 
     if idx % 500 == 0:
         with open(f'performance_log_{run_id}.txt', 'a') as file:
@@ -234,3 +234,4 @@ for idx, batch in tqdm(enumerate(loader)):
         set_time = time.time()
 
 os.system(f"~/bin/aws s3 cp {os.getcwd()}/data/large_run_{run_id} s3://iti-capston/data/large_run_{run_id} --recursive")
+os.system(f"cp -r {os.getcwd()}/data/large_run_{run_id} /mnt/ssd-2/jamescampbell/data")
