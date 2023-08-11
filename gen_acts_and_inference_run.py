@@ -196,7 +196,7 @@ for idx, batch in tqdm(enumerate(loader)):
             true_prob = output[true_ids].sum().item()
             false_prob = output[false_ids].sum().item()
             
-            inference_buffer[prompt_tag][int(batch['ind'].item())] = (true_prob, false_prob, batch['label'].item(), batch['dataset'], batch['qa_type'])
+            inference_buffer[prompt_tag][int(batch['ind'].item())] = (true_prob, false_prob, batch['label'].item(), batch['dataset'][0], batch['qa_type'].item())
             
             if idx % 500 == 0 or (idx+1==len(loader)):
                 inference_filename = f'{inference_dir}/inference_output_{run_id}_{prompt_tag}.csv'
