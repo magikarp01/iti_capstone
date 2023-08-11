@@ -1,4 +1,4 @@
-
+# %%
 import os
 import torch
 import torch.nn as nn
@@ -21,7 +21,7 @@ from functools import partial
 
 #TODO: make everything configurable up to a yaml file
 
-model_name = f"meta-llama/Llama-2-70b-chat-hf"
+model_name = "meta-llama/Llama-2-70b-chat-hf"
 api_key = "x"
 run_id = 5
 GPU_map = {0: "140GiB", 1: "140GiB"}
@@ -45,7 +45,7 @@ device_map = infer_auto_device_map(model, max_memory=GPU_map, no_split_module_cl
 model = load_checkpoint_and_dispatch(
     model,
     checkpoint_location,
-    device_map="sequential",
+    device_map=device_map,
     offload_folder=weights_dir,
     dtype=torch.float16,
 )
