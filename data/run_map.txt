@@ -2,3 +2,4 @@ run_id, description
 1, "elem_facts"
 2, "10K test set but didn’t account for global indexing (deleted)"
 3, "10K with global indexing"
+4, "15K test set before memory error of truthfulness_high_quality"

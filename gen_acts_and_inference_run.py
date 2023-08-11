@@ -27,8 +27,10 @@ from functools import partial
 
 model_name = f"meta-llama/Llama-2-70b-chat-hf"
 api_key = "x"
-run_id = 4
+run_id = 5
 
+
+save_dir = "/mnt/ssd-2/jamescampbell2"
 device = "cuda"
 
 weights_dir = f"{os.getcwd()}/llama-weights-70b"
@@ -136,6 +138,8 @@ def create_prompt(statement, prompt_tag):
         persona = system_prompt_honest
     elif prompt_tag == "liar":
         persona = system_prompt_liar
+    elif prompt_tag == "neutral":
+        return statement
     text = f"""{persona}
 
     Human: In one word, please tell me if the following is true or false.
@@ -156,15 +160,15 @@ false_ids = [7700, 8824, 2089, 4541]
 
 
 
-#dataset = load_dataset("notrichardren/truthfulness_high_quality", split="all")
+#dataset = load_dataset("notrichardren/truthfulness_high_quality", split="combined")
 dataset = load_dataset("notrichardren/truthfulness_high_quality", revision="acc0003145978dc37ecd3f6448012e082f1a2b53", split='test')
 # assumes fields are ['claim','label','dataset','qa_type','ind']
 loader = DataLoader(dataset, batch_size=1, shuffle=False)
 
 model.eval()
 
-activations_dir = f"{os.getcwd()}/data/large_run_{run_id}/activations/unformatted"
-inference_dir = f"{os.getcwd()}/data/large_run_{run_id}/inference_outputs"
+activations_dir = f"{save_dir}/data/large_run_{run_id}/activations/unformatted"
+inference_dir = f"{save_dir}/data/large_run_{run_id}/inference_outputs"
 
 os.makedirs(activations_dir, exist_ok=True)
 os.makedirs(inference_dir, exist_ok=True)
@@ -174,7 +178,7 @@ set_time = time.time()
 for idx, batch in tqdm(enumerate(loader)):
     statement = batch['claim'][0] #batch['claim'] gives a list, ints are wrapped in tensors
     torch.cuda.empty_cache()
-    for prompt_tag in ["honest", "liar"]:
+    for prompt_tag in ["honest", "liar", "neutral"]:
         text = create_prompt(statement, prompt_tag)
         
         input_ids = torch.tensor(tokenizer(text)['input_ids']).unsqueeze(dim=0).to(device)
@@ -185,53 +189,39 @@ for idx, batch in tqdm(enumerate(loader)):
 
         for seq_idx, seq_pos in enumerate(seq_positions): #might be slow with all the system calls
             activation_filename = lambda act_type: f"run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{int(batch['ind'].item())}.pt" #e.g. run_4_liar_-1_resid_post_20392.pt
-            torch.save(activation_buffer_z[seq_idx], f"{activations_dir}/{activation_filename('z')}")
-            torch.save(activation_buffer_resid_mid[seq_idx], f"{activations_dir}/{activation_filename('resid_mid')}")
-            torch.save(activation_buffer_resid_post[seq_idx], f"{activations_dir}/{activation_filename('resid_post')}")
-            torch.save(activation_buffer_mlp_out[seq_idx], f"{activations_dir}/{activation_filename('mlp_out')}")
+            torch.save(activation_buffer_z[seq_idx].half().clone(), f"{activations_dir}/{activation_filename('z')}")
+            torch.save(activation_buffer_resid_mid[seq_idx].half().clone(), f"{activations_dir}/{activation_filename('resid_mid')}")
+            torch.save(activation_buffer_resid_post[seq_idx].half().clone(), f"{activations_dir}/{activation_filename('resid_post')}")
+            torch.save(activation_buffer_mlp_out[seq_idx].half().clone(), f"{activations_dir}/{activation_filename('mlp_out')}")
 
-
-        output = output['logits'][:,-1,:] #last sequence position
-        torch.save(output, f"{inference_dir}/logits_{run_id}_{prompt_tag}_{int(batch['ind'].item())}.pt") #save logits for Phillip
-        output = torch.nn.functional.softmax(output, dim=-1)
-        output = output.squeeze()
-        true_prob = output[true_ids].sum().item()
-        false_prob = output[false_ids].sum().item()
-        
-        inference_buffer[prompt_tag][int(batch['ind'].item())] = (true_prob, false_prob, batch['label'].item(), batch['dataset'], batch['qa_type'])
-        
-        if idx % 500 == 0 or (idx+1==len(loader)):
-            inference_filename = f'{inference_dir}/inference_output_{run_id}_{prompt_tag}.csv'
-            with open(inference_filename, 'a', newline='') as f:
-                writer = csv.writer(f)
-                if f.tell() == 0:
-                    writer.writerow(['index', 'P(true)', 'P(false)', 'label','dataset','qa_type']) 
-                if prompt_tag == "honest":
-                    for index, data_point in inference_buffer["honest"].items():
-                        writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
-                elif prompt_tag == "liar":
-                    for index, data_point in inference_buffer["liar"].items():
-                        writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
-                    inference_buffer = {"honest":{}, "liar":{}}
-                    gc.collect()
-
-    text = statement
-    input_ids = torch.tensor(tokenizer(text)['input_ids']).unsqueeze(dim=0).to(device)
-    with torch.no_grad():
-        with hmodel.hooks(fwd=hook_pairs):
-            output = hmodel(input_ids)
-    prompt_tag = "neutral"
-    for seq_idx, seq_pos in enumerate(seq_positions): #might be slow with all the system calls
-        activation_filename = lambda act_type: f"run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{int(batch['ind'].item())}.pt" #e.g. run_4_liar_-1_resid_post_20392.pt
-        torch.save(activation_buffer_z[seq_idx], f"{activations_dir}/{activation_filename('z')}")
-        torch.save(activation_buffer_resid_mid[seq_idx], f"{activations_dir}/{activation_filename('resid_mid')}")
-        torch.save(activation_buffer_resid_post[seq_idx], f"{activations_dir}/{activation_filename('resid_post')}")
-        torch.save(activation_buffer_mlp_out[seq_idx], f"{activations_dir}/{activation_filename('mlp_out')}")
-
+        if prompt_tag in ["honest", "liar"]:
+            output = output['logits'][:,-1,:].cpu() #last sequence position
+            torch.save(output, f"{inference_dir}/logits_{run_id}_{prompt_tag}_{int(batch['ind'].item())}.pt")
+            output = torch.nn.functional.softmax(output, dim=-1)
+            output = output.squeeze()
+            true_prob = output[true_ids].sum().item()
+            false_prob = output[false_ids].sum().item()
+            
+            inference_buffer[prompt_tag][int(batch['ind'].item())] = (true_prob, false_prob, batch['label'].item(), batch['dataset'], batch['qa_type'])
+            
+            if idx % 500 == 0 or (idx+1==len(loader)):
+                inference_filename = f'{inference_dir}/inference_output_{run_id}_{prompt_tag}.csv'
+                with open(inference_filename, 'a', newline='') as f:
+                    writer = csv.writer(f)
+                    if f.tell() == 0:
+                        writer.writerow(['index', 'P(true)', 'P(false)', 'label','dataset','qa_type']) 
+                    if prompt_tag == "honest":
+                        for index, data_point in inference_buffer["honest"].items():
+                            writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
+                    elif prompt_tag == "liar":
+                        for index, data_point in inference_buffer["liar"].items():
+                            writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
+                        inference_buffer = {"honest":{}, "liar":{}}
+                        gc.collect()
     if idx % 500 == 0:
-        with open(f'performance_log_{run_id}.txt', 'a') as file:
+        with open(f'{save_dir}/data/large_run_{run_id}/performance_log_{run_id}.txt', 'a') as file:
             file.write(f"500 iterations time: {time.time() - set_time}\n")
         set_time = time.time()
 
-os.system(f"~/bin/aws s3 cp {os.getcwd()}/data/large_run_{run_id} s3://iti-capston/data/large_run_{run_id} --recursive")
-os.system(f"cp -r {os.getcwd()}/data/large_run_{run_id} /mnt/ssd-2/jamescampbell/data")
+#os.system(f"~/bin/aws s3 cp {os.getcwd()}/data/large_run_{run_id} s3://iti-capston/data/large_run_{run_id} --recursive")
+#os.system(f"cp -r {os.getcwd()}/data/large_run_{run_id} /mnt/ssd-2/jamescampbell/data")
