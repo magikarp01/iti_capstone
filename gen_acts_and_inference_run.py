@@ -21,17 +21,13 @@ from functools import partial
 
 #TODO: make everything configurable up to a yaml file
 
-#Before running, 
-# 1) paste huggingface API key
-# 2) set up AWS (download the CLI, run aws configure and ssenter credentials)
-
 model_name = f"meta-llama/Llama-2-70b-chat-hf"
 api_key = "x"
 run_id = 5
-
-
-save_dir = "/mnt/ssd-2/jamescampbell2"
-device = "cuda"
+GPU_map = {0: "140GiB", 1: "140GiB"}
+data_range = range(0, 25000)
+save_dir = "/mnt/ssd-2/jamescampbell3" #must have write access
+device = 0
 
 weights_dir = f"{os.getcwd()}/llama-weights-70b"
 os.makedirs(weights_dir, exist_ok=True)
@@ -44,7 +40,7 @@ checkpoint_location = weights_dir
 with init_empty_weights():
     model = LlamaForCausalLM.from_pretrained(checkpoint_location)
 
-#device_map = infer_auto_device_map() only use 6 GPU's across eleuther cluster
+device_map = infer_auto_device_map(model, max_memory=GPU_map, no_split_module_classes=["LlamaDecoderLayer"]) 
 
 model = load_checkpoint_and_dispatch(
     model,
@@ -52,7 +48,6 @@ model = load_checkpoint_and_dispatch(
     device_map="sequential",
     offload_folder=weights_dir,
     dtype=torch.float16,
-    no_split_module_classes=["LlamaDecoderLayer"],
 )
 tokenizer = LlamaTokenizer.from_pretrained(checkpoint_location)
 
@@ -160,8 +155,7 @@ false_ids = [7700, 8824, 2089, 4541]
 
 
 
-#dataset = load_dataset("notrichardren/truthfulness_high_quality", split="combined")
-dataset = load_dataset("notrichardren/truthfulness_high_quality", revision="acc0003145978dc37ecd3f6448012e082f1a2b53", split='test')
+dataset = load_dataset("notrichardren/truthfulness_high_quality", split="combined").select(data_range)
 # assumes fields are ['claim','label','dataset','qa_type','ind']
 loader = DataLoader(dataset, batch_size=1, shuffle=False)
 
@@ -224,4 +218,3 @@ for idx, batch in tqdm(enumerate(loader)):
         set_time = time.time()
 
 #os.system(f"~/bin/aws s3 cp {os.getcwd()}/data/large_run_{run_id} s3://iti-capston/data/large_run_{run_id} --recursive")
-#os.system(f"cp -r {os.getcwd()}/data/large_run_{run_id} /mnt/ssd-2/jamescampbell/data")
