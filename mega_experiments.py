@@ -15,21 +15,41 @@ import matplotlib.pyplot as plt
 from datasets import load_dataset
 
 import csv
+import pandas as pd
 
-# %%
+
 data_dir = "/mnt/ssd-2/jamescampbell3"
 
+inference_honest_unordered_path = "data/large_run_5/inference_outputs/inference_output_5_honest_unordered.csv"
 inference_honest_path = "data/large_run_5/inference_outputs/inference_output_5_honest.csv"
-inference_honest_ordered_path = "data/large_run_5/inference_outputs/inference_output_5_honest_ordered.csv"
 
+inference_liar_unordered_path = "data/large_run_5/inference_outputs/inference_output_5_liar_unordered.csv"
 inference_liar_path = "data/large_run_5/inference_outputs/inference_output_5_liar.csv"
-inference_liar_ordered_path = "data/large_run_5/inference_outputs/inference_output_5_liar_ordered.csv"
+
+mega_splits = ['sciq',
+        'commonclaim',
+        'creak',
+        'azaria_mitchell_cities',
+        'truthfulqa',
+        'azaria_mitchell_capitals',
+        'azaria_mitchell_companies',
+        'azaria_mitchell_animals',
+        'azaria_mitchell_elements',
+        'azaria_mitchell_inventions',
+        'azaria_mitchell_facts',
+        ]
+
+def order_inference_output(unordered_filename, ordered_filename):
+    data = pd.read_csv(f"{data_dir}/{unordered_filename}")
+    sorted_data = data.sort_values(by=data.columns[0])
+    sorted_data.to_csv(f"{data_dir}/{ordered_filename}", index=False)
 
 
-def get_inference_accuracy(filename, threshold=0, split='all', include_qa_type=[0,1]):
+def get_inference_accuracy(filename, threshold=0, include_qa_type=[0,1], splits=mega_splits):
     num_correct = 0
     num_total = 0
     acc = 0
+
     with open(filename, 'r') as csvfile:
         reader = csv.reader(csvfile)
         for idx, row in enumerate(reader):
@@ -38,7 +58,8 @@ def get_inference_accuracy(filename, threshold=0, split='all', include_qa_type=[
                 p_false = float(row[2])
                 #row[4] #split
                 qa_type = float(row[5]) #qa_type
-                if (p_true > threshold or p_false > threshold) and (qa_type in include_qa_type):
+                origin_dataset = row[4]
+                if (p_true > threshold or p_false > threshold) and (qa_type in include_qa_type) and (origin_dataset in splits):
                     label = int(float(row[3]))
                     
                     pred = p_true > p_false
@@ -60,17 +81,17 @@ def get_num_labels(filename):
                 num_labels += label
     return num_labels
 
-def plot_against_confidence_threshold(include_qa_type=[0,1]):
+def plot_against_confidence_threshold(include_qa_type=[0,1], splits=mega_splits):
     accs_honest = []
     accs_liar = []
     totals_honest = []
     totals_liar = []
     threshs = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9]
     for thresh in threshs:
-        acc_honest, total_honest = get_inference_accuracy(f"{data_dir}/{inference_honest_path}", threshold=thresh, include_qa_type=include_qa_type)
+        acc_honest, total_honest = get_inference_accuracy(f"{data_dir}/{inference_honest_path}", threshold=thresh, include_qa_type=include_qa_type, splits=splits)
         accs_honest.append(acc_honest)
         totals_honest.append(total_honest)
-        acc_liar, total_liar = get_inference_accuracy(f"{data_dir}/{inference_liar_path}", threshold=thresh, include_qa_type=include_qa_type)
+        acc_liar, total_liar = get_inference_accuracy(f"{data_dir}/{inference_liar_path}", threshold=thresh, include_qa_type=include_qa_type, splits=splits)
         accs_liar.append(acc_liar)
         totals_liar.append(total_liar)
 
@@ -86,5 +107,11 @@ def plot_against_confidence_threshold(include_qa_type=[0,1]):
     plt.legend()
     plt.show()
 
-# %%
-plot_against_confidence_threshold(include_qa_type=[1])
+
+def get_accs_by_split(filename, splits=mega_splits, threshold=0, include_qa_type=[0,1]):
+    accs_by_split = {}
+    for split in splits:
+        acc, total = get_inference_accuracy(f"{data_dir}/{filename}", splits=[split], threshold=threshold, include_qa_type=include_qa_type)
+        accs_by_split[split] = (acc, total)
+    return accs_by_split
+
