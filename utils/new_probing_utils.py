@@ -46,6 +46,11 @@ from dataclasses import dataclass
 import pickle
 from abc import abstractclassmethod
 
+import os
+from torch import Tensor
+
+
+
 @dataclass
 class ModelActs:
     """
@@ -135,7 +140,7 @@ class ModelActs:
         return clf, acc
 
 
-    def train_probes(self, act_type, test_ratio=0.2, train_ratio=None, max_iter=1000):
+    def train_probes(self, act_type, test_ratio=0.2, train_ratio=None, max_iter=1000, verbose=False):
         """
         Train probes on all provided activations of act_type in self.activations.
         If train test split is not already set, set it with given keywords.
@@ -151,11 +156,16 @@ class ModelActs:
             self.probes[act_type] = {}
             self.probe_accs[act_type] = {}
 
-        for probe_index in tqdm(self.activations[act_type]):
-            clf, acc = self._train_probe(act_type, probe_index, max_iter=max_iter)
-            self.probes[act_type][probe_index] = clf
-            self.probe_accs[act_type][probe_index] = acc
-
+        if verbose:            
+            for probe_index in tqdm(self.activations[act_type]):
+                clf, acc = self._train_probe(act_type, probe_index, max_iter=max_iter)
+                self.probes[act_type][probe_index] = clf
+                self.probe_accs[act_type][probe_index] = acc
+        else:
+            for probe_index in self.activations[act_type]:
+                clf, acc = self._train_probe(act_type, probe_index, max_iter=max_iter)
+                self.probes[act_type][probe_index] = clf
+                self.probe_accs[act_type][probe_index] = acc
 
     def save_probes(self, id, filepath = "activations/"):
         """
@@ -413,6 +423,7 @@ class ModelActsLargeSimple(ModelActs):
             component_indices = np.full(shape=(n_layers, n_heads), fill_value=True)
         
         self.labels = labels
+        self.file_prefix = file_prefix
 
         if "z" not in self.activations:
             self.activations["z"] = {}
@@ -428,3 +439,135 @@ class ModelActsLargeSimple(ModelActs):
                     
                     self.activations["z"][(layer, head)] = X_acts.numpy()
 
+
+
+class ChunkedModelActs(ModelActs):
+    """
+    A class that loads formatted activations in chunks, then trains probes on each chunk. This is useful for large activation sets that don't fit in memory. Will not actually store any activations in memory.
+    """
+    
+    def load_one_act(self, file_name, exclude_points=None):
+        X_acts = torch.load(file_name)
+        mask = torch.any(X_acts != 0, dim=1)
+        if exclude_points is not None:
+            for point in exclude_points:
+                mask[point] = False
+        X_acts = X_acts[mask]
+        return X_acts
+
+    def load_z_acts_per_layer(self, file_prefix, n_layers, n_heads, labels,component_indices=None, exclude_points=None, test_ratio=.2, train_ratio=None):
+        """
+        Load z activations and labels from formatted_acts directory and trains probes, layer by layer. 
+
+        Args:
+            file_prefix: prefix of the file name including directories, e.g. "data/large_run_1/activations/formatted/large_run_1_honest"
+            n_layers and n_heads: number of layers and heads in the model
+            labels: labels of the data in numpy array (for now, loaded externally from huggingface)
+            component_indices: which heads to store and load. If none, default to loading and storing all heads. Should be a boolean array of shape (n_l, n_h)
+            exclude_points: datapoints (indices) to exclude for any reason
+        """
+        if component_indices is None:
+            component_indices = np.full(shape=(n_layers, n_heads), fill_value=True)
+        
+        self.labels = labels
+        self.file_prefix = file_prefix
+        self.exclude_points = exclude_points
+
+        if "z" not in self.activations:
+            self.activations["z"] = {}
+        for layer in tqdm(range(n_layers)):
+            for head in range(n_heads):
+                if component_indices[layer, head]:
+                    
+                    self.activations["z"][(layer, head)] = self.load_one_act(f"{file_prefix}_l{layer}_h{head}.pt", layer, head, exclude_points=exclude_points).numpy()
+
+            self.train_probes("z", test_ratio=test_ratio, train_ratio=train_ratio)
+
+            del self.activations["z"] # clear activations from layer
+            self.activations["z"] = {}
+
+    def get_probe_transfer_acc(self, act_type, probe_index, data_source: ModelActs, file_prefix=None, exclude_points=None):
+        """
+        Get transfer accuracy of probes trained on these model acts on another set of model acts, on new data. 
+        Have to also load data from file here.
+        """
+        
+        # data_acts = data_source.activations[act_type][probe_index]
+        layer, head = probe_index
+        if file_prefix is None:
+            file_prefix = data_source.file_prefix
+        if exclude_points is None:
+            exclude_points = data_source.exclude_points
+        data_acts = self.load_one_act(file_prefix, layer, head, exclude_points=exclude_points).numpy()
+        data_labels = data_source.labels
+
+        probe = self.probes[act_type][probe_index]
+        y_pred = probe.predict(data_acts)
+        acc = accuracy_score(data_labels, y_pred)
+
+        return acc
+
+
+def reformat_acts_for_probing_fully_batched(run_id, N, d_head, n_layers, n_heads, prompt_tag):
+    """
+    Method to reformat activations for probing. This is a fully batched version that loads all activations into memory at once. This is only feasible for small datasets and large RAM.
+    """
+
+    activations_dir = f"{os.getcwd()}/data/large_run_{run_id}/activations"
+    load_path = f"{activations_dir}/unformatted"
+    save_path = f"{activations_dir}/formatted"
+
+    os.makedirs(save_path, exist_ok=True)
+
+    probe_dataset = torch.zeros((N, n_layers, d_head*n_heads)) #for small dataset and large RAM, just do one load operation
+    
+    for idx in range(N): 
+        if os.path.exists(f"{load_path}/large_run_{run_id}_{prompt_tag}_{idx}.pt"):
+            probe_dataset[idx,:,:] = torch.load(f"{load_path}/large_run_{run_id}_{prompt_tag}_{idx}.pt")
+
+    for layer in tqdm(range(n_layers), desc='layer'):
+        for head in tqdm(range(n_heads), desc='head', leave=False):
+            head_start = head*d_head
+            head_end = head_start + d_head
+            torch.save(probe_dataset[:,layer,head_start:head_end].squeeze().clone(), f"{save_path}/large_run_{run_id}_{prompt_tag}_l{layer}_h{head}.pt")
+
+
+def reformat_acts_for_probing_batched_across_heads(run_id, N, d_head, n_layers, n_heads, prompt_tag):
+    activations_dir = f"{os.getcwd()}/data/large_run_{run_id}/activations"
+    load_path = f"{activations_dir}/unformatted"
+    save_path = f"{activations_dir}/formatted"
+
+    os.makedirs(save_path, exist_ok=True)
+
+    probe_dataset = torch.zeros((N, d_head*n_heads)) #if this doesn't fit in memory, don't use batched version
+    
+    for layer in tqdm(range(n_layers), desc='layer'):
+        for idx in range(N): 
+            if os.path.exists(f"{load_path}/large_run_{run_id}_{prompt_tag}_{idx}.pt"):
+                acts: Float[Tensor, "n_layers d_model"] = torch.load(f"{load_path}/large_run_{run_id}_{prompt_tag}_{idx}.pt")
+                probe_dataset[idx,:] = acts[layer,:].squeeze()
+        for head in tqdm(range(n_heads), desc='head', leave=False):
+            head_start = head*d_head
+            head_end = head_start + d_head
+            torch.save(probe_dataset[:,head_start:head_end], f"{save_path}/large_run_{run_id}_{prompt_tag}_l{layer}_h{head}.pt")
+
+
+def reformat_acts_for_probing(run_id, N, d_head, n_layers, n_heads, prompt_tag):
+    activations_dir = f"{os.getcwd()}/data/large_run_{run_id}/activations"
+    load_path = f"{activations_dir}/unformatted"
+    save_path = f"{activations_dir}/formatted"
+
+    if not os.path.exists(save_path):
+        os.system(f"mkdir {save_path}")
+
+    probe_dataset = torch.zeros((N, d_head))
+    
+    for layer in tqdm(range(n_layers), desc='layer', ):
+        for head in tqdm(range(n_heads), desc='head', leave=False):
+            head_start = head*d_head
+            head_end = head_start + d_head
+            for idx in range(N): #can do smarter things to reduce # of systems calls; O(layers*heads*N)
+                if os.path.exists(f"{load_path}/large_run_{run_id}_{prompt_tag}_{idx}.pt"): #quick patch
+                    acts: Float[Tensor, "n_layers d_model"] = torch.load(f"{load_path}/large_run_{run_id}_{prompt_tag}_{idx}.pt") #saved activation buffers
+                    probe_dataset[idx,:] = acts[layer, head_start:head_end].squeeze()
+            torch.save(probe_dataset, f"{save_path}/large_run_{run_id}_{prompt_tag}_l{layer}_h{head}.pt")
