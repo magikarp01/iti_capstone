@@ -20,6 +20,7 @@ def vicuna_7b(device = "cuda"):
     model.set_use_attn_result(True)
     model.cfg.total_heads = model.cfg.n_heads * model.cfg.n_layers
     model.tokenizer = tokenizer
+    model.tokenizer.pad_token='[PAD]'
     model.reset_hooks()
     return model
 
