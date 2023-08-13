@@ -6,6 +6,28 @@ from utils.model_utils import vicuna_7b
 from datasets import load_dataset, Dataset
 
 #%%
+
+import importlib
+
+import utils.dataset_utils
+importlib.reload(utils.dataset_utils)
+from utils.dataset_utils import CCS_Dataset
+
+import utils.probing_utils
+importlib.reload(utils.probing_utils)
+from utils.probing_utils import ModelActs
+
+import utils.model_utils
+importlib.reload(utils.model_utils)
+from utils.model_utils import vicuna_7b
+
+# For external libraries, like `datasets`, you may or may not need to reload
+# it depends on whether you've made local changes
+import datasets
+importlib.reload(datasets)
+from datasets import load_dataset, Dataset
+
+#%%
 label_dict = {
     "imdb": ["negative", "positive"], # This is for normal IMDB
     "amazon_polarity": ["negative", "positive"],
@@ -65,7 +87,7 @@ def format_prompt(label, text, text1, text2, dataset_name = "imdb"):
 
 #%%
 
-model = vicuna_7b(device = "cuda:6")
+model = vicuna_7b(device = "cuda:4")
 dataset = load_dataset("imdb")["train"]
 
 #%%
@@ -74,9 +96,9 @@ probing_utils = ModelActs(model, ccs_data)
 
 # %%
 
-probing_utils.get_acts_pairs(N=75)
+probing_utils.get_acts_pairs(N=100)
 #%%
-probing_utils.CCS_train(2, 2) # batch_size = 3
+probing_utils.CCS_train(5, 10) # batch_size = 3
 
 #%%
 

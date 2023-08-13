@@ -522,7 +522,7 @@ class CCS_Dataset:
         pos_labels_limit = sample_size-neg_labels_limit
 
         # keep track
-        print(f"intial used_idx: {used_idx}")
+        # print(f"intial used_idx: {used_idx}")
         used_idxs = used_idx
         visited_idxs = used_idx
         toolong_idxs = []
@@ -559,7 +559,7 @@ class CCS_Dataset:
                     break
             for i, label in enumerate(self.label_dict.get(self.dataset_name)):
                 if i != true_label:
-                    neg_prompt = self.format_prompt(i, text, text1, text2, dataset_name = "imdb")
+                    neg_prompt = self.format_prompt(i, text, text1, text2, self.dataset_name)
                     all_neg_hs.append(neg_prompt)
                     all_pos_hs.append(pos_prompt)
                     all_gt_labels.append(true_label)

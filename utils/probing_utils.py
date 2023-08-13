@@ -135,6 +135,7 @@ class ModelActs:
 
         for prompts, cached_acts in [(prompt_yes, cached_acts_yes), (prompt_no, cached_acts_no)]:
             for prompt in tqdm(prompts):
+                
                 original_logits, cache = self.model.run_with_cache(prompt, names_filter=names_filter)
 
                 # store every act type in self.act_types
@@ -150,12 +151,6 @@ class ModelActs:
                     else:
                         stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
                     cached_acts[act_type].append(stored_acts)
-
-                # del cache
-                # gc.collect()
-                # gc.collect() # sometimes need to do it twice idk i didn't check this
-                # torch.cuda.empty_cache()
-                # torch.cuda.empty_cache() # i assumed the same for this
 
         # convert lists of tensors into tensors
         stored_acts_yes = {act_type: torch.stack(cached_acts_yes[act_type]) for act_type in self.act_types} 
@@ -178,14 +173,13 @@ class ModelActs:
         Runs arbitrary CCS probes on any act type's activations (must've been included in self.act_types).
         self.stored_acts_pairs for an act_type should be shape (num_examples, ..., d_probe), will be flattened in the middle.
         """
-
         stored_acts_yes, stored_acts_no, y, used_idxs = self.stored_acts_pairs
         stored_acts_yes = stored_acts_yes[act_type]
         stored_acts_no = stored_acts_no[act_type]
 
         # Flatten & get dimensions
         stored_acts_yes = torch.flatten(stored_acts_yes, start_dim=1, end_dim=-2)
-        stored_acts_no = torch.flatten(stored_acts_yes, start_dim=1, end_dim=-2)
+        stored_acts_no = torch.flatten(stored_acts_no, start_dim=1, end_dim=-2)
         assert stored_acts_yes.shape == stored_acts_no.shape
         assert len(stored_acts_yes.shape) == 3
         num_samples = stored_acts_yes.shape[0]
@@ -198,29 +192,34 @@ class ModelActs:
             stored_acts_no = (stored_acts_no - stored_acts_no.mean(axis=0, keepdims=True)) / stored_acts_no.std(axis=0, keepdims=True)
 
         # Train-test split
-        indices = torch.randperm(batch_size) # random indices
+        indices = torch.randperm(num_samples) # random indices
         train_size = int(num_samples * 0.8)
         test_size = num_samples - train_size
         train_indices = indices[:train_size].to(torch.int64)
         test_indices = indices[train_size:].to(torch.int64)
 
-        # print(train_indices)
-        # print(train_indices.shape)
-        # print(type(train_indices))
-
         X_train_yes = stored_acts_yes[train_indices]
         X_train_no = stored_acts_no[train_indices]
-
         X_test_yes = stored_acts_yes[test_indices]  
         X_test_no = stored_acts_no[test_indices]
-
         y_train = y[train_indices]
         y_test = y[test_indices]
+
+        print(f"X_train_yes shape: {X_train_yes.shape}")
+        print(f"X_train_no shape: {X_train_no.shape}")
+        print(f"X_test_yes shape: {X_test_yes.shape}")
+        print(f"X_test_no shape: {X_test_no.shape}")
+        print(f"y_train shape: {y_train.shape}")
+        print(f"y_test shape: {y_test.shape}")
 
         # Train
         probe, cluster_label, accuracy = self._CCS_train(num_probes, X_train_yes, X_train_no, X_test_yes, X_test_no, y_train, y_test, n_epochs, batch_size)
 
         # Store
+        self.CCS = {}
+        self.CCS_cluster_label = {}
+        self.CCS_accuracy = {}
+        
         self.CCS[act_type] = probe
         self.CCS_cluster_label[act_type] = cluster_label
         self.CCS_accuracy[act_type] = accuracy
@@ -231,12 +230,14 @@ class ModelActs:
         total_batch_size = X_train_yes.shape[0] # for train
         assert X_train_yes.shape[1] == num_probes
         probe_dim = X_train_yes.shape[2]
+
+        print(f"Training {num_probes} probes of dimension {probe_dim} for {n_epochs} epochs with batch size {batch_size}.")
         
         probe = []
         cluster_label = []
         accuracy = []
 
-        for i in range(num_probes):
+        for i in tqdm(range(num_probes)):
 
             # Initialize probe, optimizer
             p0 = nn.Sequential(nn.Linear(probe_dim, 1), nn.Sigmoid()).to(self.model.cfg.device) # have to use pytorch for probe because custom loss function
@@ -249,6 +250,9 @@ class ModelActs:
                 acts_yes = X_train_yes[:,i,:].to(self.model.cfg.device)[batch_indices]
                 acts_no = X_train_no[:,i,:].to(self.model.cfg.device)[batch_indices]
 
+                differing_elements = torch.ne(acts_yes, acts_no).sum().item()
+                print(f"There are {differing_elements} differing numbers between the two tensors.")
+
                 optimizer.zero_grad()
                 torch.set_grad_enabled(True) # tl sets grad enabled = False, so you have to do this every iteration loop
                 p0_out, p1_out = p0(acts_yes), p0(acts_no)
@@ -257,17 +261,23 @@ class ModelActs:
                 consistent_loss = ((p0_out - (1-p1_out))**2).mean(0)
                 loss = informative_loss + consistent_loss
                 # update the parameters
-                print(f"Loss: {loss}")
                 loss.backward()
                 optimizer.step()
                 torch.set_grad_enabled(False) # do this else huge memory leak from transformerlens
 
-                # just in case, i can't be bothered w memory
-                del acts_yes
-                del acts_no
-                torch.cuda.empty_cache() 
+                # print probe parameters
+                # print(f"Epoch {epoch}: {p0[0].weight.data}, {p0[0].bias.data}")
 
+                # just in case, i can't be bothered w memory
+                # del acts_yes
+                # del acts_no
+                # torch.cuda.empty_cache() 
+
+            print("*** CLUSTER LABEL")
+            print(f"X_train_yes, x_train_no, y_Train shape: {X_train_yes[:,i,:].shape}, {X_train_no[:,i,:].shape}, {y_train.shape}")
             cluster_label.append(self._CCS_label_clusters(X_train_yes[:,i,:], X_train_no[:,i,:], y_train, p0))
+            print("*** ACCURACY")
+            print(f"X_test_yes, x_test_no, y_test shape: {X_test_yes[:,i,:].shape}, {X_test_no[:,i,:].shape}, {y_test.shape}")
             accuracy.append(self._CCS_inference(X_test_yes[:,i,:], X_test_no[:,i,:], y_test, p0, cluster_label[i]))
             probe.append(p0)
 
@@ -291,11 +301,18 @@ class ModelActs:
         Takes in input (batch_size, d_probe) for acts_yes and acts_no.
         """
         assert acts_yes.shape == acts_no.shape
+        print(f"Labels: {labels}")
         with torch.no_grad():
             p0_out, p1_out = probe(acts_yes.to(self.model.cfg.device)), probe(acts_no.to(self.model.cfg.device))
         avg_confidence = 0.5*(p0_out + (1-p1_out))
+        print(f"Average confidence: {avg_confidence.shape}") # torch.Size([2, 1])
+        print(f"Average confidence: {avg_confidence}")
         predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
+        print(f"Predictions: {predictions.shape}")
+        print(f"Predictions: {predictions}")
         acc = (predictions == labels.numpy()).mean()
+        print(f"Accuracy: {acc.shape}")
+        print(f"Accuracy: {acc}")
         if cluster_label is not None and cluster_label == True: # apply train_direction
             acc = 1 - acc
         return acc
