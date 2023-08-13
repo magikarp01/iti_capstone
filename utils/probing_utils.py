@@ -1,3 +1,4 @@
+import os
 from einops import repeat
 from sklearn.linear_model import LogisticRegression
 
@@ -18,7 +19,7 @@ from tqdm import tqdm
 import random
 from pathlib import Path
 import plotly.express as px
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset, random_split
 
 torch.set_grad_enabled(False)
 from sklearn.model_selection import train_test_split
@@ -31,6 +32,13 @@ from transformer_lens.hook_points import (
 from transformer_lens import HookedTransformer, HookedTransformerConfig, FactoredMatrix, ActivationCache
 import pickle
 from collections import defaultdict
+
+from utils.dataset_utils import Abstract_Dataset
+from utils.torch_hooks_utils import HookedModule
+from utils.dataset_utils import TorchSample
+from functools import partial
+from jaxtyping import Float
+from torch import Tensor
 
 from typing import TypeVar
 ModelActs = TypeVar("ModelActs")
@@ -45,7 +53,7 @@ class ModelActs:
     Initialize ModelActs class specifying which activation types to store.
     First, generate acts using gen_acts. Acts can be saved/loaded. Then, train probes on these acts using train_probes: these probes are stored in self.probes dictionary and accuracies are stored in self.probe_accs dictionary.
     """
-    def __init__(self, model: HookedTransformer, dataset, seed = None, act_types = ["z"]):
+    def __init__(self, model: HookedTransformer, dataset: Abstract_Dataset, seed = None, act_types = ["z"]):
         """
         dataset must have sample(sample_size) method returning indices of samples, sample_prompts, and sample_labels.
         act_types is a list of which activations to cache and operate on.
@@ -69,7 +77,6 @@ class ModelActs:
         self.y_tests = {}
         self.indices_trains = {}
         self.indices_tests = {}
-        self.device = self.model.cfg.device # still need to replace all instances of this
 
     """
     Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
@@ -98,12 +105,23 @@ class ModelActs:
                 elif act_type == "logits":
                     stored_acts = original_logits[:,-1].to(device=storage_device) # logits of last token
 
+                elif act_type == "attn_scores":
+                    # shape of cache.stack_activation(act_type, layer = -1) is (n_l, 1, n_h, s, s)
+                    stored_acts = cache.stack_activation(act_type, layer=-1).squeeze().to(device=storage_device)
+
                 else:
                     stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
+                    if verbose:
+                        print(f"{act_type=}, {cache.stack_activation(act_type, layer = -1).shape=}")
                 cached_acts[act_type].append(stored_acts)
         
         # convert lists of tensors into tensors
-        stored_acts = {act_type: torch.stack(cached_acts[act_type]) for act_type in self.act_types} 
+        stored_acts = {}
+        for act_type in self.act_types:
+            try:
+                stored_acts[act_type] = torch.stack(cached_acts[act_type])
+            except: # if cached_acts cannot be stacked, if they are different sizes, probably for attention scores
+                stored_acts[act_type] = cached_acts[act_type]
 
         self.stored_acts = stored_acts
         self.indices = indices
@@ -118,212 +136,11 @@ class ModelActs:
 
         # return self.indices, self.attn_head_acts
 
-#%% CCS modifications begin here
-
-    def get_acts_pairs(self, N=1000, store_acts = True, filepath = "activations/", id = None, storage_device="cpu"):
-        """
-        Uses the CCS_Dataset class to generate many prompt activations, and places them on the storage_device = "cpu" by default.
-        """
-
-        cached_acts_yes = defaultdict(list)
-        cached_acts_no = defaultdict(list)
-
-        prompt_no, prompt_yes, y, used_idxs = self.dataset.sample_pair(N)
-
-        # names filter for efficiency, only cache in self.act_types
-        names_filter = lambda name: any([name.endswith(act_type) for act_type in self.act_types])
-
-        for prompts, cached_acts in [(prompt_yes, cached_acts_yes), (prompt_no, cached_acts_no)]:
-            for prompt in tqdm(prompts):
-                
-                original_logits, cache = self.model.run_with_cache(prompt, names_filter=names_filter)
-
-                # store every act type in self.act_types
-                for act_type in self.act_types:
-
-                    if act_type == "result":
-                        # get last seq position
-                        stored_acts = cache.stack_head_results(layer=-1, pos_slice=-1).squeeze().to(device=storage_device)
-                    
-                    elif act_type == "logits":
-                        stored_acts = original_logits[:,-1].to(device=storage_device) # logits of last token
-
-                    else:
-                        stored_acts = cache.stack_activation(act_type, layer = -1)[:,0,-1].squeeze().to(device=storage_device)
-                    cached_acts[act_type].append(stored_acts)
-
-        # convert lists of tensors into tensors
-        stored_acts_yes = {act_type: torch.stack(cached_acts_yes[act_type]) for act_type in self.act_types} 
-        stored_acts_no = {act_type: torch.stack(cached_acts_no[act_type]) for act_type in self.act_types} 
-
-        # CCS class uses these. All tensors.
-        self.stored_acts_pairs = (stored_acts_yes, stored_acts_no, torch.Tensor(y), torch.Tensor(used_idxs))
-
-        # if store_acts:
-        #     if id is None:
-        #         id = np.random.randint(10000)
-        #     for act_type in self.act_types:
-        #         torch.save(self.stored_acts[act_type], f'{filepath}{id}_{act_type}_acts.pt')
-        #     print(f"Stored at {id}")
-
-        return self.stored_acts_pairs
-
-    def CCS_train(self, n_epochs, batch_size, act_type = "z"):
-        """
-        Runs arbitrary CCS probes on any act type's activations (must've been included in self.act_types).
-        self.stored_acts_pairs for an act_type should be shape (num_examples, ..., d_probe), will be flattened in the middle.
-        """
-        stored_acts_yes, stored_acts_no, y, used_idxs = self.stored_acts_pairs
-        stored_acts_yes = stored_acts_yes[act_type]
-        stored_acts_no = stored_acts_no[act_type]
-
-        # Flatten & get dimensions
-        stored_acts_yes = torch.flatten(stored_acts_yes, start_dim=1, end_dim=-2)
-        stored_acts_no = torch.flatten(stored_acts_no, start_dim=1, end_dim=-2)
-        assert stored_acts_yes.shape == stored_acts_no.shape
-        assert len(stored_acts_yes.shape) == 3
-        num_samples = stored_acts_yes.shape[0]
-        num_probes = stored_acts_yes.shape[1]
-        probe_dim = stored_acts_yes.shape[2]
-
-        # Normalize (if batch dimension is greater than 1)
-        if num_samples > 1:
-            stored_acts_yes = (stored_acts_yes - stored_acts_yes.mean(axis=0, keepdims=True)) / stored_acts_yes.std(axis=0, keepdims=True)
-            stored_acts_no = (stored_acts_no - stored_acts_no.mean(axis=0, keepdims=True)) / stored_acts_no.std(axis=0, keepdims=True)
-
-        # Train-test split
-        indices = torch.randperm(num_samples) # random indices
-        train_size = int(num_samples * 0.8)
-        test_size = num_samples - train_size
-        train_indices = indices[:train_size].to(torch.int64)
-        test_indices = indices[train_size:].to(torch.int64)
-
-        X_train_yes = stored_acts_yes[train_indices]
-        X_train_no = stored_acts_no[train_indices]
-        X_test_yes = stored_acts_yes[test_indices]  
-        X_test_no = stored_acts_no[test_indices]
-        y_train = y[train_indices]
-        y_test = y[test_indices]
-
-        print(f"X_train_yes shape: {X_train_yes.shape}")
-        print(f"X_train_no shape: {X_train_no.shape}")
-        print(f"X_test_yes shape: {X_test_yes.shape}")
-        print(f"X_test_no shape: {X_test_no.shape}")
-        print(f"y_train shape: {y_train.shape}")
-        print(f"y_test shape: {y_test.shape}")
-
-        # Train
-        probe, cluster_label, accuracy = self._CCS_train(num_probes, X_train_yes, X_train_no, X_test_yes, X_test_no, y_train, y_test, n_epochs, batch_size)
-
-        # Store
-        self.CCS = {}
-        self.CCS_cluster_label = {}
-        self.CCS_accuracy = {}
-        
-        self.CCS[act_type] = probe
-        self.CCS_cluster_label[act_type] = cluster_label
-        self.CCS_accuracy[act_type] = accuracy
-
-    def _CCS_train(self, num_probes, X_train_yes, X_train_no, X_test_yes, X_test_no, y_train, y_test, n_epochs, batch_size):
-
-        # Shape check
-        total_batch_size = X_train_yes.shape[0] # for train
-        assert X_train_yes.shape[1] == num_probes
-        probe_dim = X_train_yes.shape[2]
-
-        print(f"Training {num_probes} probes of dimension {probe_dim} for {n_epochs} epochs with batch size {batch_size}.")
-        
-        probe = []
-        cluster_label = []
-        accuracy = []
-
-        for i in tqdm(range(num_probes)):
-
-            # Initialize probe, optimizer
-            p0 = nn.Sequential(nn.Linear(probe_dim, 1), nn.Sigmoid()).to(self.model.cfg.device) # have to use pytorch for probe because custom loss function
-            optimizer = torch.optim.AdamW(p0.parameters())
-
-            for epoch in range(n_epochs):
-
-                # get batch
-                batch_indices = torch.randperm(total_batch_size)[:batch_size] # subset of batch this time
-                acts_yes = X_train_yes[:,i,:].to(self.model.cfg.device)[batch_indices]
-                acts_no = X_train_no[:,i,:].to(self.model.cfg.device)[batch_indices]
-
-                differing_elements = torch.ne(acts_yes, acts_no).sum().item()
-                print(f"There are {differing_elements} differing numbers between the two tensors.")
-
-                optimizer.zero_grad()
-                torch.set_grad_enabled(True) # tl sets grad enabled = False, so you have to do this every iteration loop
-                p0_out, p1_out = p0(acts_yes), p0(acts_no)
-                # get the corresponding loss
-                informative_loss = (torch.min(p0_out, p1_out)**2).mean(0)
-                consistent_loss = ((p0_out - (1-p1_out))**2).mean(0)
-                loss = informative_loss + consistent_loss
-                # update the parameters
-                loss.backward()
-                optimizer.step()
-                torch.set_grad_enabled(False) # do this else huge memory leak from transformerlens
-
-                # print probe parameters
-                # print(f"Epoch {epoch}: {p0[0].weight.data}, {p0[0].bias.data}")
-
-                # just in case, i can't be bothered w memory
-                # del acts_yes
-                # del acts_no
-                # torch.cuda.empty_cache() 
-
-            print("*** CLUSTER LABEL")
-            print(f"X_train_yes, x_train_no, y_Train shape: {X_train_yes[:,i,:].shape}, {X_train_no[:,i,:].shape}, {y_train.shape}")
-            cluster_label.append(self._CCS_label_clusters(X_train_yes[:,i,:], X_train_no[:,i,:], y_train, p0))
-            print("*** ACCURACY")
-            print(f"X_test_yes, x_test_no, y_test shape: {X_test_yes[:,i,:].shape}, {X_test_no[:,i,:].shape}, {y_test.shape}")
-            accuracy.append(self._CCS_inference(X_test_yes[:,i,:], X_test_no[:,i,:], y_test, p0, cluster_label[i]))
-            probe.append(p0)
-
-        return probe, cluster_label, accuracy
-
-    def _CCS_label_clusters(self, acts_yes, acts_no, labels, probe):
-        """
-        Gives the correct "direction" for the CCS probes given some data.
-
-        False means that the probe is already in the "correct direction" where a probe returns the probability of the true label, while True means that you should flip the probe direction because the probe returns the probability of the false label.
-        """
-        acc = self._CCS_inference(acts_yes, acts_no, labels, probe, cluster_label = None)
-        if acc > 0.5:
-            return False # don't turn
-        else:
-            return True # do turn
-    
-    def _CCS_inference(self, acts_yes, acts_no, labels, probe, cluster_label = None):
-        """
-        Returns CCS predictions (probabilities) as well as accuracies (when you threshold at 0.5).
-        Takes in input (batch_size, d_probe) for acts_yes and acts_no.
-        """
-        assert acts_yes.shape == acts_no.shape
-        print(f"Labels: {labels}")
-        with torch.no_grad():
-            p0_out, p1_out = probe(acts_yes.to(self.model.cfg.device)), probe(acts_no.to(self.model.cfg.device))
-        avg_confidence = 0.5*(p0_out + (1-p1_out))
-        print(f"Average confidence: {avg_confidence.shape}") # torch.Size([2, 1])
-        print(f"Average confidence: {avg_confidence}")
-        predictions = (avg_confidence.detach().cpu().numpy() < 0.5).astype(int)[:, 0]
-        print(f"Predictions: {predictions.shape}")
-        print(f"Predictions: {predictions}")
-        acc = (predictions == labels.numpy()).mean()
-        print(f"Accuracy: {acc.shape}")
-        print(f"Accuracy: {acc}")
-        if cluster_label is not None and cluster_label == True: # apply train_direction
-            acc = 1 - acc
-        return acc
-    
-#%% CCS modifications end here
-
-    """
-    Loads activations from activations folder. If id is None, then load the most recent activations. 
-    If load_probes is True, load from saved probes.picle and all_heads_acc_np.npy files as well.
-    """
     def load_acts(self, id, filepath = "activations/", load_probes=False):
+        """
+        Loads activations from activations folder. If id is None, then load the most recent activations. 
+        If load_probes is True, load from saved probes.picle and all_heads_acc_np.npy files as well.
+        """
         indices = torch.load(f'{filepath}{id}_indices.pt')
 
         self.stored_acts = {}
@@ -478,3 +295,229 @@ class ModelActs:
             for h in range(self.model.cfg.n_heads):
                 if top_probe_heads[l, h] == 1:
                     print(f"{l}.{h}, ", end=" ")
+
+
+
+
+
+
+
+
+
+
+#todo
+#data/probing parallelism
+#path handling is atrocious (at the very least abstract it to its own method)
+
+class ModelActsLarge: #separate class for now, can make into subclass later (need to standardize input and output, and manage memory effectively)
+    """
+    A class that re-implements all the functionality of ModelActs, but optimized for large models. This class doesn't use TransformerLens
+    and can thus handle model quantization as well as parallelism. Activation caching is achieved using PyTorch hooks (update: use gen_acts_and_inference_run instead of gen_acts)
+
+    Pipeline:
+    1. gen_acts: 
+        -(optionally) subsamples from dataset, self.dataset is now TorchSample
+        -loops through data, runs model, caches activations and saves in disk labeled 
+        as "large_run{id}_{idx}.pt" coupled with "large_run{id}_indices.pt" and/or "large_run{id}_labels.pt" file
+
+    2. reformat_acts_for_probing:
+        -reformats "large_run{id}_{idx}.pt" files as "large_run{id}_probe_l{layer}_h{head}.pt"
+        -each of these tensors are of shape (N, d_head)
+
+    3. get_train_test_split:
+        -given a tensor of shape (N, d_head), returns two tensors of shapes (N_train, )
+    """
+    def __init__(self, model=None, dataset=None, use_aws=True, seed = None, act_types = ["z"], world_size=1, **kwargs):
+        self.model = model #model only needed for gen_acts, otherwise don't load it so as to preserve memory
+        self.dataset = dataset
+
+        self.indices = None
+
+        self.act_types = act_types
+
+        if seed is not None:
+            np.random.seed(seed)
+            torch.manual_seed(seed)
+
+        self.use_aws = use_aws #save data to disk first, then send it all to AWS
+        self.world_size = world_size #distributed not supported yet
+        self.id = None
+
+        if kwargs["n_layers"] is not None:
+            self.n_layers = kwargs["n_layers"] #need to find an adequate way to handle this metadata
+            self.d_head = kwargs["d_head"]
+            self.n_heads = kwargs["n_heads"]    
+            self.d_model = self.d_head * self.n_heads
+
+            self.activation_buffer = torch.zeros((self.n_layers, self.d_model))
+
+
+    def cache_z_hook_fnc(self, module, input, output, name="", layer_num=0):
+        self.activation_buffer[layer_num, :] = input[0][0,-1,:].detach().clone()
+
+
+    def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu", save_labels=True, distributed=False):
+        """
+        Doesn't save acts in active memory. Acts may be several hundreds of GB.
+        """
+        assert store_acts, "If you're using ModelActsLarge, you probably want to store the activations"
+
+        if indices is None:
+            indices, prompts, labels = self.dataset.sample(N)
+            self.dataset = TorchSample(prompts=prompts, labels=labels, indices=indices)
+        self.indices = indices
+
+        self.model.eval()
+        hmodel = HookedModule(self.model)
+        loader = DataLoader(self.dataset, batch_size=1, shuffle=False) #find dataloader optimizations
+        #save_path = f"~/iti_capstone/{filepath}"
+        #if not os.path.exists(save_path):
+        #    os.system(f"mkdir {save_path}")
+        if id is None:
+            id = np.random.randint(10000) #BUG: THIS IS DETERMINISTIC
+        self.id = id
+
+        #add pytorch hooks
+        hook_pairs = []
+        if "z" in self.act_types: #only supports hooking for z at the moment
+            for layer in range(self.n_layers):
+                act_name = f"model.layers.{layer}.self_attn.o_proj"
+                hook_pairs.append((act_name, partial(self.cache_z_hook_fnc, name=act_name, layer_num=layer)))
+        
+        if filepath[-1] != "/":
+            filepath = filepath + "/"
+        if not os.path.exists(filepath):
+            os.system(f"mkdir {filepath}")
+        if not os.path.exists(f"{filepath}unformatted"):
+            os.system(f"mkdir {filepath}unformatted")
+        filepath = filepath + "unformatted/"
+
+        if save_labels:
+            torch.save(torch.tensor(self.dataset.all_labels), f"{filepath}large_run{id}_labels.pt")
+        if isinstance(self.dataset, TorchSample):
+            torch.save(self.indices, f"{filepath}large_run{id}_indices.pt")
+
+        for idx, batch in tqdm(enumerate(loader)):
+            token_ids = batch[0].squeeze(dim=0).to(self.model.device)
+            with hmodel.hooks(fwd=hook_pairs):
+                output = hmodel(token_ids)
+            torch.save(self.activation_buffer, f"{filepath}large_run{id}_{idx}.pt")
+        #torch.cuda.empty_cache()
+        #consider clearing model so can run pipeline all in one swoop
+
+    #note: please make a new folder for this
+    def reformat_acts_for_probing(self, id, N=0, filepath="activations/"):
+        """
+        need to define n_layers, d_head, n_heads, N
+        """
+        
+        if self.dataset is not None:
+            N = len(self.dataset)
+
+        if filepath[-1] != "/":
+            filepath = filepath + "/"
+        load_path = filepath + "unformatted/"
+        if not os.path.exists(f"{filepath}formatted"):
+            os.system(f"mkdir {filepath}formatted")
+        save_path = filepath + "formatted/"
+
+        probe_dataset = torch.empty((N, self.d_head))
+        
+        for layer in tqdm(range(self.n_layers), desc='layer', ):
+            for head in tqdm(range(self.n_heads), desc='head', leave=False):
+                head_start = head*self.d_head
+                head_end = head_start + self.d_head
+                for idx in range(N): #can do smarter things to reduce # of systems calls
+                    # O(layers*heads*N)
+                    acts: Float[Tensor, "n_layers d_model"] = torch.load(f"{load_path}large_run{id}_{idx}.pt") #saved activation buffers
+                    probe_dataset[idx,:] = acts[layer, head_start:head_end].squeeze()
+                torch.save(probe_dataset, f"{save_path}large_run{id}_probe_l{layer}_h{head}.pt")
+
+    #def load_acts(self, id, filepath = "activations/", load_probes=False):
+    #    raise NotImplementedError
+    #def control_for_iti(self, cache_interventions):
+    #    raise NotImplementedError
+    
+    def get_train_test_split(self, X_acts: Float[Tensor, "N d_head"], labels: Float[Tensor, "N"], test_ratio = 0.2):
+
+        probe_dataset = TensorDataset(X_acts, labels)
+        generator1 = torch.Generator().manual_seed(42)
+        train_data, test_data = random_split(probe_dataset, [1-test_ratio, test_ratio], generator=generator1) #not the same split for every probe
+
+        X_train, y_train = train_data.dataset[train_data.indices]
+        X_test, y_test = test_data.dataset[test_data.indicies]
+
+        return X_train, y_train, X_test, y_test
+    
+
+    def _train_single_probe(self, id, layer, head, filepath="activations/", max_iter=1000): #Use regularization!!!
+        if filepath[-1] != "/":
+            filepath = filepath + "/"
+        # load_path = f"~/iti_capstone/{filepath}"
+        
+        X_acts: Float[Tensor, "N d_head"] = torch.load(f"{filepath}large_run{id}_probe_l{layer}_h{head}.pt")
+
+        if self.dataset is not None: #must be same object that called gen_acts!
+            labels: Float[Tensor, "N"] = torch.tensor(self.dataset.all_labels)
+        else:
+            labels: Float[Tensor, "N"] = torch.load(f"{filepath}large_run{id}_labels.pt")
+
+        X_train, y_train, X_test, y_test = self.get_train_test_split(X_acts, labels) # (train_size, d_head), (test_size, d_head)
+
+        clf = LogisticRegression(max_iter=max_iter).fit(X_train.numpy(), y_train.numpy()) #check shapes
+        #also implement plug-and-play pytorch logistic regression and compare performance
+        y_pred = clf.predict(X_train.numpy())
+
+        y_val_pred = clf.predict(X_test.numpy())
+
+        acc = accuracy_score(y_test.numpy(), y_val_pred)
+
+        return clf, acc
+
+
+    
+    #don't need to store model in memory while doing probing (obviously)
+    def _train_probes(self, num_probes, max_iter=1000):
+        #can do parallelized probing (see sheet)
+        #for now, loop over probes, we can use embarrasing parallelism later
+        #write sklearn and pytorch implementation
+        #for 
+        #probe, acc = self._train_single_probe(id, layer, head, max_iter=max_iter)
+        raise NotImplementedError
+    
+    def train_z_probes(self, id, max_iter=1000):
+        probes = {}
+        accs = {}
+        for layer in tqdm(range(self.n_layers)):
+            for head in tqdm(range(self.n_heads)):
+                probe, acc = self._train_single_probe(id, layer, head, max_iter=max_iter)
+                tag = f"l{layer}h{head}"
+                probes[tag] = probe
+                accs[tag] = acc
+        with open(f"large_run{id}_probes.pkl", "wb") as file:
+            pickle.dump(probes, file)
+        with open(f"large_run{id}_accs.pkl", "wb") as file:
+            pickle.dump(accs, file)
+        
+    
+    def train_mlp_out_probes(self, max_iter=1000):
+        #re-create tensors on the fly
+        #call train test split
+        #call _train_probes
+        raise NotImplementedError
+    
+    def train_probes(self, act_type, max_iter=1000):
+        #yes
+        raise NotImplementedError
+    
+    def save_probes(self, id, filepath = "activations/"):
+        #super?
+        raise NotImplementedError
+    
+    def get_transfer_acc(self, act_type, data_source: ModelActs):
+        #super?
+        raise NotImplementedError
+    
+    def show_top_z_probes(self, topk=50):
+        #super?
+        raise NotImplementedError

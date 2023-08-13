@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 from datasets import Dataset
 from tqdm import tqdm
-
+from transformer_lens import HookedTransformer
+from torch import utils
 
 
 def get_balanced_indices(indices, labels, sample_size):
@@ -48,9 +49,9 @@ class Abstract_Dataset:
 
     def sample(self, sample_size: int, reset_seed=False, balanced=True):
         """
-        indices is of type numpy array
-        sample_prompts is of type List of Tensors
-        sample_labels is of type List of Ints
+        indices is of type numpy array.
+        sample_prompts is of type List of Tensors.
+        sample_labels is of type List of Ints.
         """
         if reset_seed:
             np.random.seed(self.seed)
@@ -387,7 +388,9 @@ class TruthfulQA_Tfn(ChatGPTGen_Dataset_Truthfulness):
         string_list = ["TruthfulQA"]
         dataset = load_dataset("notrichardren/truthfulness")["train"]
         df = dataset.to_pandas()
-        df = df[df['origin_dataset'].isin(string_list)]
+        df = df[df['origin_dataset'].isin(string_list)] 
+        
+        df['claim'] += '.' # add period to end of each sentence
         self.dataset = Dataset.from_pandas(df)
         super().__init__(*args, **kwargs)
 
@@ -396,7 +399,8 @@ class CounterFact_Tfn(ChatGPTGen_Dataset_Truthfulness):
         string_list = ["CounterFact"]
         dataset = load_dataset("notrichardren/truthfulness")["train"]
         df = dataset.to_pandas()
-        df = df[df['origin_dataset'].isin(string_list)]
+        df = df[df['origin_dataset'].isin(string_list)] 
+        df['claim'] += '.' # add period to end of each sentence
         self.dataset = Dataset.from_pandas(df)
         super().__init__(*args, **kwargs)
 
@@ -570,3 +574,74 @@ class CCS_Dataset:
         # y = np.stack(all_gt_labels)
 
         return all_neg_hs, all_pos_hs, all_gt_labels, used_idxs # prompt_no, prompt_yes, y, used_idxs # TODO rename
+
+def test_model_output(model: HookedTransformer, input_str=None, dataset: Abstract_Dataset=None, dataset_indices=None, num_samples=5,
+                      temperature=1, max_length=20, print_output=False):
+    """
+    Test the model output on either custom user input or a dataset defined from utils/dataset_utils.py. One of input_str or dataset must be provided.
+    """
+    assert (input_str is not None) ^ (dataset is not None), "Either input_str or dataset must be provided."
+    if input_str is not None:
+        input_ids = model.tokenizer(input_str, return_tensors="pt").input_ids
+        input_ids = input_ids.to(model.cfg.device)
+        output = model.generate(input_ids, do_sample=True, max_new_tokens=max_length, temperature=temperature, verbose=False)
+        if print_output:
+            print(output)
+        return model.tokenizer.decode(output[0], skip_special_tokens=True)
+    
+    elif dataset is not None:
+        responses = []
+        if dataset_indices is None:
+            dataset_indices = dataset.sample(num_samples)[0]
+
+        for i in dataset_indices:
+            input_ids = dataset.all_prompts[i].to(model.cfg.device)
+            output = model.generate(input_ids, do_sample=True, max_new_tokens=max_length, temperature=temperature, verbose=False)
+            if print_output:
+                print(output)
+            responses.append(model.tokenizer.decode(output[0], skip_special_tokens=True))
+        return responses
+    
+
+
+class TorchDataset(Dataset):
+    """
+    Wraps Abstract_Dataset objects with pytorch dataset abstractions. 
+    Increases usability for those familiar with PyTorch Dataset classes. 
+    Currently only works with tqa, cfact, & ez. 
+    Plug-and-play for Abtrast_Dataset
+    """
+    def __init__(self, tokenizer, dataname, seed=5):
+        self.indices = "all"
+
+        if dataname=="tqa":
+            self.dataset = TQA_MC_Dataset(tokenizer, seed=seed)
+        elif dataname=="cfact":
+            self.dataset = CounterFact_Dataset(tokenizer, seed=seed)
+        elif dataname=="ez":
+            self.dataset = EZ_Dataset(tokenizer, seed=seed)
+
+        self.all_prompts = self.dataset.all_prompts #make sure you're not creating extra copy
+        self.all_labels = self.dataset.all_labels
+    
+    def __getitem__(self, idx):
+        return self.all_prompts[idx], self.all_labels[idx]
+    
+    def __len__(self):
+        return len(self.all_prompts)
+    
+    def sample(self, sample_size: int, reset_seed=False):
+        return self.dataset.sample(sample_size, reset_seed)
+
+        
+class TorchSample(Dataset):
+    def __init__(self, prompts=None, labels=None, indices=None):
+        self.all_prompts = prompts #not actually 'all' prompts, just using for name consistency
+        self.all_labels = labels
+        self.indices = indices #store for book-keeping purposes
+
+    def __getitem__(self, idx):
+        return self.all_prompts[idx], self.all_labels[idx]
+    
+    def __len__(self):
+        return len(self.all_prompts)
