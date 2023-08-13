@@ -4,7 +4,6 @@ from sklearn.linear_model import LogisticRegression
 
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
-import gc
 import plotly.io as pio
 # pio.renderers.default = "png"
 # Import stuff
@@ -43,8 +42,6 @@ from torch import Tensor
 from typing import TypeVar
 ModelActs = TypeVar("ModelActs")
 
-# ALWAYS export PYTORCH_NO_CUDA_MEMORY_CACHING=1 or you'll get an OOM on A100
-
 
 class ModelActs:
     """
@@ -78,12 +75,12 @@ class ModelActs:
         self.indices_trains = {}
         self.indices_tests = {}
 
-    """
-    Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
-    Refactored so that activations are not reshaped by default, and will be reshaped at some other time.
-    """
-    def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu"):
-        
+
+    def gen_acts(self, N = 1000, store_acts = True, filepath = "activations/", id = None, indices=None, storage_device="cpu", verbose=False):
+        """
+        Automatically generates activations over N samples (returned in self.indices). If store_acts is True, then store in activations folder. Indices are indices of samples in dataset.
+        Refactored so that activations are not reshaped by default, and will be reshaped at some other time.
+        """        
         if indices is None:
             indices, all_prompts, all_labels = self.dataset.sample(N)
         
@@ -282,7 +279,7 @@ class ModelActs:
         return np.array(accs)
 
     def show_top_z_probes(self, topk=50):
-        """ 
+        """
         Utility to print the most accurate heads. Out of date with probe_generalization merge.
         """
         probe_accuracies = torch.tensor(einops.rearrange(self.probe_accs["z"], "(n_l n_h) -> n_l n_h", n_l=self.model.cfg.n_layers))
