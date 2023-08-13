@@ -1,4 +1,4 @@
-# %%
+
 import os
 import torch
 from jaxtyping import Float
@@ -16,6 +16,8 @@ from datasets import load_dataset
 
 import csv
 import pandas as pd
+import gc
+
 
 
 data_dir = "/mnt/ssd-2/jamescampbell3"
@@ -121,12 +123,12 @@ def get_accs_by_split(filename, splits=mega_splits, threshold=0, include_qa_type
 
 
 def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, splits=mega_splits, threshold=0, include_qa_type=[0,1],
-                              d_model=8192, d_head=128, n_layers=80, n_heads=64):
+                              d_model=8192, d_head=128, n_layers=80, n_heads=64, save_formatted=True):
     """this function does both filtering for specific properties and constructs the probing dataset"""
     #assuming this runs fast, we don't need to save formatted acts, we can just format in real-time based on the property we're interested in
     activations_dir = f"{data_dir}/data/large_run_{run_id}/activations"
     load_path = f"{activations_dir}/unformatted"
-    save_path = f"{activations_dir}/formatted"
+    save_path = f"{os.getcwd()}/data/large_run_5/activations/formatted"
 
     os.makedirs(save_path, exist_ok=True)
 
@@ -156,19 +158,26 @@ def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, splits=mega_spli
     for rel_idx, base_idx in tqdm(enumerate(probe_indices)): 
         probe_dataset[rel_idx,:,:] = torch.load(f"{load_path}/run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{base_idx}.pt")
 
-    return probe_dataset, probe_labels
+    if save_formatted:
+        if act_type in ["resid_mid", "resid_post", "mlp_out"]:
+            for layer in tqdm(range(n_layers)):
+                torch.save(probe_dataset[:,layer,:].squeeze().clone(), f"{save_path}/run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{splits[0]}_l{layer}.pt") #only for single split
+                torch.save(probe_labels, f"{save_path}/labels_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{splits[0]}.pt")
+        elif act_type in ["z"]:
+            for layer in tqdm(range(n_layers), desc='layer'):
+                for head in tqdm(range(n_heads), desc='head', leave=False):
+                    head_start = head*d_head
+                    head_end = head_start + d_head
+                    torch.save(probe_dataset[:,layer,head_start:head_end].squeeze().clone(), f"{save_path}/run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{splits[0]}_l{layer}_h{head}.pt")
+                    torch.save(probe_labels, f"{save_path}/labels_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{splits[0]}.pt")
 
 
 
-# %%
-
-
-#run_4_liar_-1_resid_post_20392.pt
-
-#3.1TB of data for 2 seq_pos, 3 prompt mode, 4 act_types, 105163 data points
-#therefore, any one instance of the above hyperparameters will take 1/24*3.1TB
-#for 800GB RAM cluster, we can do fully batched implementation
-#resid_post is fucked
-
-#should probably save each split separately
-
+if __name__ == "__main__":
+    for act_type in ["z", "resid_mid", "mlp_out"]:
+        for mode in ["honest", "neutral", "liar"]:
+            for split in mega_splits:
+                create_probe_dataset(5, -1, mode, act_type, [split])
+                torch.cuda.empty_cache
+                gc.collect()
+                print("Done with ", act_type, ", ", mode, ", ", split)
