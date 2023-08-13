@@ -115,3 +115,60 @@ def get_accs_by_split(filename, splits=mega_splits, threshold=0, include_qa_type
         accs_by_split[split] = (acc, total)
     return accs_by_split
 
+
+
+
+
+
+def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, splits=mega_splits, threshold=0, include_qa_type=[0,1],
+                              d_model=8192, d_head=128, n_layers=80, n_heads=64):
+    """this function does both filtering for specific properties and constructs the probing dataset"""
+    #assuming this runs fast, we don't need to save formatted acts, we can just format in real-time based on the property we're interested in
+    activations_dir = f"{data_dir}/data/large_run_{run_id}/activations"
+    load_path = f"{activations_dir}/unformatted"
+    save_path = f"{activations_dir}/formatted"
+
+    os.makedirs(save_path, exist_ok=True)
+
+    probe_indices = []
+    probe_labels = []    
+
+    #filter for the desired indices and save labels
+    with open(f"{data_dir}/{inference_honest_path}", 'r') as csvfile: #using only for meta-data but can also filter based on inf performance
+        reader = csv.reader(csvfile)
+        for idx, row in enumerate(reader):
+            if idx>0:
+                ind = int(float(row[0]))
+                qa_type = float(row[5]) #
+                origin_dataset = row[4]
+                p_true = float(row[1])
+                p_false = float(row[2])
+                file_path = f"{load_path}/run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{idx}.pt"
+                file_exists = os.path.exists(file_path)
+                if (file_exists) and (origin_dataset in splits) and (qa_type in include_qa_type) and (p_true > threshold or p_false > threshold):
+                    probe_indices.append(ind)
+                    label = int(float(row[3]))
+                    probe_labels.append(label)
+    #create the probe dataset
+    probe_dataset = torch.zeros((len(probe_indices), n_layers, d_model))
+    probe_labels = torch.tensor(probe_labels)
+
+    for rel_idx, base_idx in tqdm(enumerate(probe_indices)): 
+        probe_dataset[rel_idx,:,:] = torch.load(f"{load_path}/run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{base_idx}.pt")
+
+    return probe_dataset, probe_labels
+
+
+
+# %%
+
+
+#run_4_liar_-1_resid_post_20392.pt
+
+#3.1TB of data for 2 seq_pos, 3 prompt mode, 4 act_types, 105163 data points
+#therefore, any one instance of the above hyperparameters will take 1/24*3.1TB
+#for 800GB RAM cluster, we can do fully batched implementation
+#resid_post is fucked
+
+#should probably save each split separately
+
