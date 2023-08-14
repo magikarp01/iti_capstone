@@ -1,4 +1,4 @@
-# %%
+
 import os
 import torch
 import torch.nn as nn
@@ -79,6 +79,7 @@ def cache_resid_mid_hook_fnc(module, input, output, name="", layer_num=0): #inpu
     
 def cache_resid_post_hook_fnc(module, input, output, name="", layer_num=0): #output has type Tuple[torch.FloatTensor, Optional[Tuple[torch.FloatTensor, torch.FloatTensor]]]
     activation_buffer_resid_mid[:,layer_num,:] = output[0][0,seq_positions,:].detach().clone()
+#THIS IS FUCKED
 
 def cache_mlp_out_hook_fnc(module, input, output, name="", layer_num=0):
     activation_buffer_mlp_out[:,layer_num,:] = output[0,seq_positions,:].detach().clone()
