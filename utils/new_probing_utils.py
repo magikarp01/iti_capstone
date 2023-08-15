@@ -110,7 +110,7 @@ class ModelActs:
         self.indices_trains, self.indices_tests = train_test_split(act_indices, test_size=test_ratio, train_size=train_ratio)
 
 
-    def _train_probe(self, act_type, probe_index, max_iter=1000):
+    def _train_probe(self, act_type, probe_index, max_iter=1000, accuracy_func=accuracy_score):
         """
         Train a single logistic regression probe on input activations X_acts and labels (either 1 or 0 for truth or false). 
         Trains on train_indices of X_acts and labels, tests on test_indices.
@@ -118,6 +118,7 @@ class ModelActs:
         Args:
             act_type: type of activations to train probe on, "z" or "mlp_out" or etc.
             probe_index: index of probe to train, (layer, head) for z.
+            accuracy_func: function to calculate accuracy of prediction, default is accuracy_score from sklearn.metrics.
 
         Returns probe, accuracy
         """
@@ -135,7 +136,7 @@ class ModelActs:
 
         y_val_pred = clf.predict(X_test_head)
         # y_val_pred = clf.predict(self.activations[act_type][probe_index][self.indices_tests])
-        acc = accuracy_score(y_test, y_val_pred)
+        acc = accuracy_func(y_test, y_val_pred)
 
         return clf, acc
 
@@ -196,7 +197,7 @@ class ModelActs:
                     print(f"{l}.{h}, ", end=" ")
 
 
-    def get_probe_transfer_acc(self, act_type, probe_index, data_source: ModelActs):
+    def get_probe_transfer_acc(self, act_type, probe_index, data_source: ModelActs, accuracy_func=accuracy_score):
         """
         Get transfer accuracy of probes trained on these model acts on another set of model acts, on new data. 
         data_source is another ModelActs object that should already have been trained on probes for act_type (with its own train test split).
@@ -207,7 +208,7 @@ class ModelActs:
 
         probe = self.probes[act_type][probe_index]
         y_pred = probe.predict(data_acts)
-        acc = accuracy_score(data_labels, y_pred)
+        acc = accuracy_func(data_labels, y_pred)
 
         return acc
 
@@ -486,7 +487,7 @@ class ChunkedModelActs(ModelActs):
             del self.activations["z"] # clear activations from layer
             self.activations["z"] = {}
 
-    def get_probe_transfer_acc(self, act_type, probe_index, data_source: ModelActs, file_prefix=None, exclude_points=None):
+    def get_probe_transfer_acc(self, act_type, probe_index, data_source: ModelActs, file_prefix=None, exclude_points=None, accuracy_func=accuracy_score):
         """
         Get transfer accuracy of probes trained on these model acts on another set of model acts, on new data. 
         Have to also load data from file here.
@@ -503,7 +504,7 @@ class ChunkedModelActs(ModelActs):
 
         probe = self.probes[act_type][probe_index]
         y_pred = probe.predict(data_acts)
-        acc = accuracy_score(data_labels, y_pred)
+        acc = accuracy_func(data_labels, y_pred)
 
         return acc
 
