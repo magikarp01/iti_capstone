@@ -409,36 +409,51 @@ class ModelActsLargeSimple(ModelActs):
     * presumes that we already have formatted activations
     """
 
-    def load_acts(self, file_prefix, n_layers, n_heads, labels,component_indices=None, exclude_points=None):
+    def load_acts(self, file_prefix, n_layers, labels, act_type="z", n_heads=None, component_indices=None, exclude_points=None):
         """
-        Load z activations and labels from formatted_acts directory. 
+        Load act_type activations and labels from formatted_acts directory. 
 
         Args:
             file_prefix: prefix of the file name including directories, e.g. "data/large_run_1/activations/formatted/large_run_1_honest"
             n_layers and n_heads: number of layers and heads in the model
             labels: labels of the data in numpy array (for now, loaded externally from huggingface)
-            component_indices: which heads to store and load. If none, default to loading and storing all heads. Should be a boolean array of shape (n_l, n_h)
+            component_indices: which component indices (e.g. which heads) to store and load. If none, default to loading and storing all components. For act_type="z", should be a boolean array of shape (n_l, n_h)
             exclude_points: datapoints (indices) to exclude for any reason
         """
         if component_indices is None:
-            component_indices = np.full(shape=(n_layers, n_heads), fill_value=True)
+            if act_type == "z":
+                component_indices = np.full(shape=(n_layers, n_heads), fill_value=True)
+            else:
+                component_indices = np.full(shape=(n_layers,), fill_value=True)
         
         self.labels = labels
         self.file_prefix = file_prefix
 
-        if "z" not in self.activations:
-            self.activations["z"] = {}
+        if act_type not in self.activations:
+            self.activations[act_type] = {}
         for layer in tqdm(range(n_layers)):
-            for head in range(n_heads):
-                if component_indices[layer, head]:
-                    X_acts = torch.load(f"{file_prefix}_l{layer}_h{head}.pt")
+            if act_type == "z":
+                for head in range(n_heads):
+                    if component_indices[layer, head]:
+                        X_acts = torch.load(f"{file_prefix}_l{layer}_h{head}.pt")
+                        mask = torch.any(X_acts != 0, dim=1)
+                        if exclude_points is not None:
+                            for point in exclude_points:
+                                mask[point] = False
+                        X_acts = X_acts[mask]
+                        
+                        self.activations["z"][(layer, head)] = X_acts.numpy()
+            else:
+                if component_indices[layer]:
+                    X_acts = torch.load(f"{file_prefix}_l{layer}.pt")
                     mask = torch.any(X_acts != 0, dim=1)
                     if exclude_points is not None:
                         for point in exclude_points:
                             mask[point] = False
                     X_acts = X_acts[mask]
                     
-                    self.activations["z"][(layer, head)] = X_acts.numpy()
+                    self.activations[act_type][layer] = X_acts.numpy()
+            assert X_acts.shape[0] == labels.shape[0] # assert batch size is same, label lines up
 
 
 

@@ -21,15 +21,23 @@ def plot_probe_accuracies(model_acts, sorted = False, other_head_accs=None, titl
         accs_sorted = all_head_accs_np.reshape(model_acts.model.cfg.n_layers, model_acts.model.cfg.n_heads)
     return px.imshow(accs_sorted, labels = {"x" : "Heads (sorted)", "y": "Layers"}, title = title, color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
 
-def plot_resid_probe_accuracies(acc_dict, n_layers, title = "Probe Accuracies"):
+def plot_resid_probe_accuracies(acc_dict, n_layers, title = "Probe Accuracies", graph_type="line"):
     """
     Plot a dotted line graph with n_layer points, where each point is the accuracy of the residual probe at that layer.
     """
     accs = np.ones(shape=(n_layers)) * -1
     for layer in range(n_layers):
         accs[layer] = acc_dict[layer]
-    fig = px.line(accs, labels = {"x" : "Layers", "y": "Accuracy"}, title = title, color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
-    fig.update_traces(line=dict(dash='dot'), marker=dict(size=3, color='blue'))
+    
+    if graph_type == "line":
+        fig = px.line(accs, labels = {"x" : "Layers", "y": "Accuracy"}, title = title)
+        fig.update_traces(line=dict(dash='dot'), marker=dict(size=3, color='blue')) 
+        fig.update_layout(yaxis_title="Accuracy", showlegend=False)
+    elif graph_type == "square":
+        fig = px.imshow(np.expand_dims(accs, axis=1), labels = {"y": "Layers"}, title = title, color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
+        fig.update_xaxes(showticklabels=False)
+
+    # color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower"
     return fig
 
 def plot_z_probe_accuracies(acc_dict, n_layers, n_heads, sorted = False, title = "Probe Accuracies"):
