@@ -29,7 +29,7 @@ def plot_resid_probe_accuracies(acc_dict, n_layers, title = "Probe Accuracies", 
     for layer in range(n_layers):
         accs[layer] = acc_dict[layer]
     
-    if graph_type == "line":
+    if graph_type is None or graph_type == "line":
         fig = px.line(accs, labels = {"x" : "Layers", "y": "Accuracy"}, title = title)
         fig.update_traces(line=dict(dash='dot'), marker=dict(size=3, color='blue')) 
         fig.update_layout(yaxis_title="Accuracy", showlegend=False)
