@@ -1,4 +1,4 @@
-
+# %%
 import os
 import torch
 from jaxtyping import Float
@@ -17,6 +17,7 @@ from datasets import load_dataset
 import csv
 import pandas as pd
 import gc
+
 
 
 
@@ -173,7 +174,7 @@ def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, splits=mega_spli
 
 
 
-if __name__ == "__main__":
+def create_all_probe_datasets():
     for act_type in ["z", "resid_mid", "mlp_out"]:
         for mode in ["honest", "neutral", "liar"]:
             for split in mega_splits:
@@ -181,3 +182,126 @@ if __name__ == "__main__":
                 torch.cuda.empty_cache
                 gc.collect()
                 print("Done with ", act_type, ", ", mode, ", ", split)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class ModelActsLargeSimple:
+    """presumes that we already have formatted activations"""
+    def __init__(self, run_id, prompt_tag, split):
+        self.run_id = run_id
+        self.acts_path = f"{os.getcwd()}/data/large_run_{run_id}/activations/formatted"
+        self.labels = None
+        self.prompt_tag = prompt_tag
+
+        self.split = split
+        self.seq_pos = -1
+
+        self.train_indices = None
+        self.test_indices = None
+
+        self.probes = None
+
+        self.n_layers = 80
+        self.n_heads = 64
+        self.d_head = 128
+        self.d_model = 8192
+
+    def get_train_test_split(self, X_acts: Float[Tensor, "N d_head"], labels: Float[Tensor, "N"], test_ratio = 0.2):
+        probe_dataset = TensorDataset(X_acts, labels)
+        if self.train_indices is None and self.test_indices is None:
+            generator1 = torch.Generator().manual_seed(42)
+            train_data, test_data = random_split(probe_dataset, [1-test_ratio, test_ratio], generator=generator1) 
+            self.train_indices = train_data.indices
+            self.test_indices = test_data.indices
+
+        X_train, y_train = probe_dataset[self.train_indices]
+        X_test, y_test = probe_dataset[self.test_indices]
+
+        return X_train, y_train, X_test, y_test
+    
+
+    def _train_single_probe(self, act_type, layer, head=None, max_iter=1000):
+        # load_path = f"~/iti_capstone/{filepath}"
+        if self.labels is None:
+            self.labels = torch.load(f"{self.acts_path}/labels_{self.run_id}_{self.prompt_tag}_{self.seq_pos}_{act_type}_{self.split}.pt")
+        if act_type == "z":
+            X_acts: Float[Tensor, "N d_head"] = torch.load(f"{self.acts_path}/run_{self.run_id}_{self.prompt_tag}_{self.seq_pos}_{act_type}_{self.split}_l{layer}_h{head}.pt")
+        elif act_type in ["resid_mid", "resid_post", "mlp_out"]:
+            X_acts: Float[Tensor, "N d_model"] = torch.load(f"{self.acts_path}/run_{self.run_id}_{self.prompt_tag}_{self.seq_pos}_{act_type}_{self.split}_l{layer}.pt")
+
+        #mask = torch.any(X_acts != 0, dim=1) #mask out zero rows because of difference between global and local indices
+        #X_acts = X_acts[mask]
+
+        assert X_acts.shape[0] == self.labels.shape[0], "X_acts.shape[0] != self.labels, zero mask fail?"
+
+        X_train, y_train, X_test, y_test = self.get_train_test_split(X_acts, self.labels) # (train_size, d_head), (test_size, d_head)
+
+        clf = LogisticRegression(max_iter=max_iter).fit(X_train.numpy(), y_train.numpy()) #check shapes
+        #also implement plug-and-play pytorch logistic regression and compare performance
+        #y_pred = clf.predict(X_train.numpy())
+
+        y_val_pred = clf.predict(X_test.numpy())
+        y_val_pred_prob = clf.predict(X_test.numpy())
+        
+        acc = accuracy_score(y_test.numpy(), y_val_pred)
+
+        return clf, acc, y_val_pred_prob
+
+    def train_z_probes(self, max_iter=1000):
+        probes = {}
+        #preds = np.zeros(n_layers, n_heads, len(self.test_indices)) # this is being incredibly dumb with memory usage, def fix before using larger data
+        #accs = {}
+        probe_accs = torch.zeros(self.n_layers, self.n_heads)
+        for layer in tqdm(range(self.n_layers), desc='layer'): #RELYING ON N_LAYERS AND N_HEADS BEING A GLOBAL HERE
+            for head in tqdm(range(self.n_heads), desc='head', leave=False):
+                probe, acc, pred = self._train_single_probe(act_type="z", layer=layer, head=head, max_iter=max_iter)
+
+                tag = f"l{layer}h{head}"
+                probe_accs[layer, head] = acc
+
+                if layer == 0 and head == 0: #hacky
+                    preds = torch.zeros((self.n_layers, self.n_heads, len(self.test_indices))) # this is being incredibly dumb with memory usage, def fix before using larger data
+
+                preds[layer, head, :] = torch.tensor(pred)
+
+                probes[tag] = probe
+        # self.probes = probes
+        return probe_accs, probes, preds
+
+    # def train_resid_probes(self, max_iter=1000):
+    #     probes = {}
+    #     #preds = np.zeros(n_layers, n_heads, len(self.test_indices)) # this is being incredibly dumb with memory usage, def fix before using larger data
+    #     #accs = {}
+    #     probe_accs = torch.zeros(self.n_layers, self.n_heads)
+    #     for layer in tqdm(range(self.n_layers), desc='layer'): #RELYING ON N_LAYERS AND N_HEADS BEING A GLOBAL HERE
+    #         for head in tqdm(range(self.n_heads), desc='head', leave=False):
+    #             probe, acc, pred = self._train_single_probe(layer, head, max_iter=max_iter)
+
+    #             tag = f"l{layer}h{head}"
+    #             probe_accs[layer, head] = acc
+
+    #             if layer == 0 and head == 0: #hacky
+    #                 preds = torch.zeros((self.n_layers, self.n_heads, len(self.test_indices))) # this is being incredibly dumb with memory usage, def fix before using larger data
+
+    #             preds[layer, head, :] = torch.tensor(pred)
+
+    #             probes[tag] = probe
+    #     # self.probes = probes
+    #     return probe_accs, probes, preds
+
+
