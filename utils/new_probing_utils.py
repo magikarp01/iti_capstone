@@ -197,7 +197,7 @@ class ModelActs:
                     print(f"{l}.{h}, ", end=" ")
 
 
-    def get_probe_transfer_acc(self, act_type, probe_index, data_source: ModelActs, accuracy_func=accuracy_score):
+    def get_probe_transfer_acc(self, act_type, probe_index, data_source: ModelActs, accuracy_func=accuracy_score, test_only=True):
         """
         Get transfer accuracy of probes trained on these model acts on another set of model acts, on new data. 
         data_source is another ModelActs object that should already have been trained on probes for act_type (with its own train test split).
@@ -206,6 +206,10 @@ class ModelActs:
         data_acts = data_source.activations[act_type][probe_index]
         data_labels = data_source.labels # test indices from data_source
 
+        if test_only:
+            data_acts = data_acts[data_source.indices_tests]
+            data_labels = data_labels[data_source.indices_tests]
+        
         probe = self.probes[act_type][probe_index]
         y_pred = probe.predict(data_acts)
         acc = accuracy_func(data_labels, y_pred)
@@ -453,7 +457,7 @@ class ModelActsLargeSimple(ModelActs):
                     X_acts = X_acts[mask]
                     
                     self.activations[act_type][layer] = X_acts.numpy()
-            assert X_acts.shape[0] == labels.shape[0] # assert batch size is same, label lines up
+            assert X_acts.shape[0] == labels.shape[0] # assert labels line up with loaded activations, size of dataset should be same
 
 
 
@@ -502,7 +506,7 @@ class ChunkedModelActs(ModelActs):
             del self.activations["z"] # clear activations from layer
             self.activations["z"] = {}
 
-    def get_probe_transfer_acc(self, act_type, probe_index, data_source: ModelActs, file_prefix=None, exclude_points=None, accuracy_func=accuracy_score):
+    def get_probe_transfer_acc(self, act_type, probe_index, data_source: ModelActs, file_prefix=None, exclude_points=None, accuracy_func=accuracy_score, test_only=True):
         """
         Get transfer accuracy of probes trained on these model acts on another set of model acts, on new data. 
         Have to also load data from file here.
@@ -514,8 +518,13 @@ class ChunkedModelActs(ModelActs):
             file_prefix = data_source.file_prefix
         if exclude_points is None:
             exclude_points = data_source.exclude_points
+
         data_acts = self.load_one_act(file_prefix, layer, head, exclude_points=exclude_points).numpy()
         data_labels = data_source.labels
+
+        if test_only:
+            data_acts = data_acts[data_source.indices_tests]
+            data_labels = data_labels[data_source.indices_tests]
 
         probe = self.probes[act_type][probe_index]
         y_pred = probe.predict(data_acts)
