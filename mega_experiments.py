@@ -1,7 +1,8 @@
 # %%
 import os
 import torch
-from jaxtyping import Float
+from jaxtyping import Float, Int
+from typing import List, Tuple
 from torch import Tensor
 from tqdm import tqdm
 
@@ -252,7 +253,6 @@ class ModelActsLargeSimple:
         X_train, y_train, X_test, y_test = self.get_train_test_split(X_acts, self.labels) # (train_size, d_head), (test_size, d_head)
 
         clf = LogisticRegression(max_iter=max_iter).fit(X_train.numpy(), y_train.numpy()) #check shapes
-        #also implement plug-and-play pytorch logistic regression and compare performance
         #y_pred = clf.predict(X_train.numpy())
 
         y_val_pred = clf.predict(X_test.numpy())
@@ -260,7 +260,7 @@ class ModelActsLargeSimple:
         
         acc = accuracy_score(y_test.numpy(), y_val_pred)
 
-        return clf, acc, y_val_pred_prob
+        return clf, acc#, y_val_pred_prob
 
     def train_z_probes(self, max_iter=1000):
         probes = {}
@@ -269,39 +269,91 @@ class ModelActsLargeSimple:
         probe_accs = torch.zeros(self.n_layers, self.n_heads)
         for layer in tqdm(range(self.n_layers), desc='layer'): #RELYING ON N_LAYERS AND N_HEADS BEING A GLOBAL HERE
             for head in tqdm(range(self.n_heads), desc='head', leave=False):
-                probe, acc, pred = self._train_single_probe(act_type="z", layer=layer, head=head, max_iter=max_iter)
+                probe, acc = self._train_single_probe(act_type="z", layer=layer, head=head, max_iter=max_iter)
 
                 tag = f"l{layer}h{head}"
                 probe_accs[layer, head] = acc
 
-                if layer == 0 and head == 0: #hacky
-                    preds = torch.zeros((self.n_layers, self.n_heads, len(self.test_indices))) # this is being incredibly dumb with memory usage, def fix before using larger data
+                #if layer == 0 and head == 0: #hacky
+                #   preds = torch.zeros((self.n_layers, self.n_heads, len(self.test_indices))) # this is being incredibly dumb with memory usage, def fix before using larger data
 
-                preds[layer, head, :] = torch.tensor(pred)
+                #preds[layer, head, :] = torch.tensor(pred)
 
                 probes[tag] = probe
-        # self.probes = probes
-        return probe_accs, probes, preds
+        self.probes = probes
+        return probe_accs, probes #, preds
 
-    # def train_resid_probes(self, max_iter=1000):
-    #     probes = {}
-    #     #preds = np.zeros(n_layers, n_heads, len(self.test_indices)) # this is being incredibly dumb with memory usage, def fix before using larger data
-    #     #accs = {}
-    #     probe_accs = torch.zeros(self.n_layers, self.n_heads)
-    #     for layer in tqdm(range(self.n_layers), desc='layer'): #RELYING ON N_LAYERS AND N_HEADS BEING A GLOBAL HERE
-    #         for head in tqdm(range(self.n_heads), desc='head', leave=False):
-    #             probe, acc, pred = self._train_single_probe(layer, head, max_iter=max_iter)
+    def evaluate_probe(self, act_type, probe, layer, head=None, max_iter=1000):
+        # load_path = f"~/iti_capstone/{filepath}"
+        if self.labels is None:
+            self.labels = torch.load(f"{self.acts_path}/labels_{self.run_id}_{self.prompt_tag}_{self.seq_pos}_{act_type}_{self.split}.pt")
+        if act_type == "z":
+            X_acts: Float[Tensor, "N d_head"] = torch.load(f"{self.acts_path}/run_{self.run_id}_{self.prompt_tag}_{self.seq_pos}_{act_type}_{self.split}_l{layer}_h{head}.pt")
+        elif act_type in ["resid_mid", "resid_post", "mlp_out"]:
+            X_acts: Float[Tensor, "N d_model"] = torch.load(f"{self.acts_path}/run_{self.run_id}_{self.prompt_tag}_{self.seq_pos}_{act_type}_{self.split}_l{layer}.pt")
 
-    #             tag = f"l{layer}h{head}"
-    #             probe_accs[layer, head] = acc
+        assert X_acts.shape[0] == self.labels.shape[0], "X_acts.shape[0] != self.labels, zero mask fail?"
 
-    #             if layer == 0 and head == 0: #hacky
-    #                 preds = torch.zeros((self.n_layers, self.n_heads, len(self.test_indices))) # this is being incredibly dumb with memory usage, def fix before using larger data
+        X_train, y_train, X_test, y_test = self.get_train_test_split(X_acts, self.labels) # (train_size, d_head), (test_size, d_head)
+        #will re-use indices if fields are not none
 
-    #             preds[layer, head, :] = torch.tensor(pred)
+        #clf = LogisticRegression(max_iter=max_iter).fit(X_train.numpy(), y_train.numpy()) #check shapes
+        #y_pred = clf.predict(X_train.numpy())
 
-    #             probes[tag] = probe
-    #     # self.probes = probes
-    #     return probe_accs, probes, preds
+        y_val_pred = probe.predict(X_test.numpy())
+        #y_val_pred_prob = clf.predict(X_test.numpy())
+        
+        acc = accuracy_score(y_test.numpy(), y_val_pred)
+
+        return acc
+    
 
 
+
+
+def get_transfer_accs(modelacts: List[ModelActsLargeSimple]): #, heads: List[Tuple[Int, Int]]):
+    n_layers = 80
+    n_heads = 64
+    transfer_accs = torch.zeros((n_layers, n_heads, len(modelacts), len(modelacts)))
+    for idx_train, modelact_train in enumerate(modelacts):
+        for idx_test, modelact_test in enumerate(modelacts):
+            #accs = []
+            #for layer, head in heads:
+            for layer in range(n_layers):
+                for head in range(n_heads):
+                    tag = f"l{int(layer)}h{int(head)}"
+                    probe = modelact_train.probes[tag]
+                    acc = modelact_test.evaluate_probe("z", probe, layer, head)
+                    transfer_accs[layer, head, idx_train, idx_test] = acc
+            #accs.append(acc)
+            #transfer_accs[idx_train, idx_test] = sum(accs) / len(heads)
+    return transfer_accs
+        
+
+
+#save probes so we don't have to wait to re-train them
+def run(prompt_mode):
+    select_splits = ['azaria_mitchell_capitals','azaria_mitchell_companies','azaria_mitchell_animals','azaria_mitchell_elements','azaria_mitchell_inventions','azaria_mitchell_facts']
+    model_acts = []
+    for split in select_splits:
+        acts = ModelActsLargeSimple(5, prompt_mode, split = split)
+        acc, probes = acts.train_z_probes()
+        with open(f"probes_{prompt_mode}_{split}.pkl", "wb") as file:
+            pickle.dump(probes, file)
+        model_acts.append(acts)
+    transfer_accs = get_transfer_accs(model_acts)
+    return transfer_accs
+
+
+if __name__ == "__main__":
+    transfer_accs_honest = run("honest")
+    torch.save(transfer_accs_honest, "transfer_accs_honest.pt")
+    torch.cuda.empty_cache()
+
+    transfer_accs_neutral = run("neutral")
+    torch.save(transfer_accs_neutral, "transfer_accs_neutral.pt")
+    torch.cuda.empty_cache()
+
+    transfer_accs_liar = run("liar")
+    torch.save(transfer_accs_liar, "transfer_accs_liar.pt")
+    
