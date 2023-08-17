@@ -331,8 +331,7 @@ def get_transfer_accs(modelacts: List[ModelActsLargeSimple]): #, heads: List[Tup
         
 
 
-#save probes so we don't have to wait to re-train them
-def run(prompt_mode):
+def run_transfer_experiment(prompt_mode):
     select_splits = ['azaria_mitchell_capitals','azaria_mitchell_companies','azaria_mitchell_animals','azaria_mitchell_elements','azaria_mitchell_inventions','azaria_mitchell_facts']
     model_acts = []
     for split in select_splits:
@@ -342,18 +341,40 @@ def run(prompt_mode):
             pickle.dump(probes, file)
         model_acts.append(acts)
     transfer_accs = get_transfer_accs(model_acts)
+    #torch.save(transfer_acss, )
     return transfer_accs
 
 
-if __name__ == "__main__":
-    transfer_accs_honest = run("honest")
-    torch.save(transfer_accs_honest, "transfer_accs_honest.pt")
-    torch.cuda.empty_cache()
+def plot_transfer_accs(head: Tuple[Int, Int]):#, transfer_accs_honest, transfer_accs_neutral, transfer_accs_liar):
+    #head = (45, 32)
 
-    transfer_accs_neutral = run("neutral")
-    torch.save(transfer_accs_neutral, "transfer_accs_neutral.pt")
-    torch.cuda.empty_cache()
+    select_splits = ['azaria_mitchell_capitals','azaria_mitchell_companies','azaria_mitchell_animals','azaria_mitchell_elements','azaria_mitchell_inventions','azaria_mitchell_facts']
 
-    transfer_accs_liar = run("liar")
-    torch.save(transfer_accs_liar, "transfer_accs_liar.pt")
-    
+    fig, axs = plt.subplots(1, 3, figsize=(15, 5)) # You can adjust the figure size
+
+    tensors = [transfer_accs_honest[head[0],head[1],:,:], transfer_accs_neutral[head[0],head[1],:,:], transfer_accs_liar[head[0],head[1],:,:]] # Replace these with your tensors
+    conditions = ['Honest', 'Neutral', 'Liar']
+
+    for i, tensor in enumerate(tensors):
+        im = axs[i].imshow(tensor, cmap='hot', vmin=.6, vmax=1)
+        axs[i].set_xticks(range(len(select_splits)))
+        axs[i].set_xticklabels(select_splits, rotation='vertical')
+        axs[i].xaxis.tick_top()
+        axs[i].set_title(conditions[i])
+        if i != 0:  # Remove y-ticks and labels for second and third images
+            axs[i].set_yticks([])
+
+    # Add y-ticks and labels only to the first image
+    axs[0].set_yticks(range(len(select_splits)))
+    axs[0].set_yticklabels(select_splits)
+
+    # Add one colorbar to the side of the entire figure
+    cbar = plt.colorbar(im, ax=axs.ravel().tolist(), orientation='vertical')
+    cbar.set_label('Accuracy', rotation=270, labelpad=15)
+    plt.show()
+
+
+def get_best_head(transfer_accs, split_idx):
+    index = torch.argmax(transfer_accs[:,:,split_idx, split_idx])
+    indices = (index // transfer_accs.size(1), index % transfer_accs.size(1))
+    return (indices[0].item(), indices[1].item())
