@@ -95,10 +95,11 @@ class ModelActs:
         raise NotImplementedError
 
 
-    def set_train_test_split(self, num_data, test_ratio = 0.2, train_ratio = None):
+    def set_train_test_split(self, num_data, test_ratio = 0.2, train_ratio = None, in_order=True):
         """
         Given number of data points, sets train/test split of indices. test_ratio is proportion of data to be used for testing, train_ratio defaults to 1-test_ratio but can be set.
         Indices go from 0 to num_data - 1. 
+        If in_order is True, train-test split is ordered so that first train_ratio*num_data are train and next test_ratio*num_data are test. This means every train test split with the same num_data and test_ratio/train_ratio are the same.
         """
         act_indices = np.arange(num_data)
         
@@ -107,7 +108,13 @@ class ModelActs:
         else:
             train_ratio = 1 - test_ratio
 
-        self.indices_trains, self.indices_tests = train_test_split(act_indices, test_size=test_ratio, train_size=train_ratio)
+        if in_order:
+            train_num = int(num_data * train_ratio)
+            test_num = int(num_data * test_ratio)
+            self.indices_trains = np.arange(train_num)
+            self.indices_tests = np.arange(train_num, train_num + test_num)
+        else:
+            self.indices_trains, self.indices_tests = train_test_split(act_indices, test_size=test_ratio, train_size=train_ratio)
 
 
     def _train_probe(self, act_type, probe_index, max_iter=1000, accuracy_func=accuracy_score):
@@ -413,7 +420,7 @@ class ModelActsLargeSimple(ModelActs):
     * presumes that we already have formatted activations
     """
 
-    def load_acts(self, file_prefix, n_layers, labels, act_type="z", n_heads=None, component_indices=None, exclude_points=None):
+    def load_acts(self, file_prefix, n_layers, labels, act_type="z", n_heads=None, component_indices=None, exclude_points=None, file_prefixes=None, verbose=False):
         """
         Load act_type activations and labels from formatted_acts directory. 
 
@@ -423,6 +430,7 @@ class ModelActsLargeSimple(ModelActs):
             labels: labels of the data in numpy array (for now, loaded externally from huggingface)
             component_indices: which component indices (e.g. which heads) to store and load. If none, default to loading and storing all components. For act_type="z", should be a boolean array of shape (n_l, n_h)
             exclude_points: datapoints (indices) to exclude for any reason
+            file_prefixes: if want to load acts from multiple files, specify a list of file prefixes. If none, default to loading from one file (file_prefix).
         """
         if component_indices is None:
             if act_type == "z":
@@ -432,14 +440,25 @@ class ModelActsLargeSimple(ModelActs):
         
         self.labels = labels
         self.file_prefix = file_prefix
+        self.file_prefixes = file_prefixes
 
         if act_type not in self.activations:
             self.activations[act_type] = {}
-        for layer in tqdm(range(n_layers)):
+
+        layer_range = tqdm(range(n_layers)) if verbose else range(n_layers)
+
+        for layer in layer_range:
             if act_type == "z":
                 for head in range(n_heads):
                     if component_indices[layer, head]:
-                        X_acts = torch.load(f"{file_prefix}_l{layer}_h{head}.pt")
+                        if file_prefixes is None:
+                            X_acts = torch.load(f"{file_prefix}_l{layer}_h{head}.pt")
+                        else:
+                            X_acts_list = []
+                            for prefix in file_prefixes:
+                                X_acts_list.append(torch.load(f"{prefix}_l{layer}_h{head}.pt"))
+                            X_acts = torch.stack(X_acts_list, dim=0)
+
                         mask = torch.any(X_acts != 0, dim=1)
                         if exclude_points is not None:
                             for point in exclude_points:
@@ -449,7 +468,13 @@ class ModelActsLargeSimple(ModelActs):
                         self.activations["z"][(layer, head)] = X_acts.numpy()
             else:
                 if component_indices[layer]:
-                    X_acts = torch.load(f"{file_prefix}_l{layer}.pt")
+                    if file_prefixes is None:
+                        X_acts = torch.load(f"{file_prefix}_l{layer}.pt")
+                    else:
+                        X_acts_list = []
+                        for prefix in file_prefixes:
+                            X_acts_list.append(torch.load(f"{prefix}_l{layer}.pt"))
+                        X_acts = torch.stack(X_acts_list, dim=0)
                     mask = torch.any(X_acts != 0, dim=1)
                     if exclude_points is not None:
                         for point in exclude_points:
