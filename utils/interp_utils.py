@@ -6,7 +6,7 @@ from tqdm import tqdm
 import torch.nn.functional as F
 from transformer_lens import HookedTransformer
 
-def tot_logit_diff(tokenizer, model_acts, use_probs=False, eps=1e-8, test_only=True, act_type="z", check_balanced_output=False, 
+def tot_logit_diff(tokenizer, model_acts, use_probs=True, eps=1e-8, test_only=True, act_type="z", check_balanced_output=False, 
                    positive_str_tokens = ["Yes", "yes", "True", "true"],
                    negative_str_tokens = ["No", "no", "False", "false"], scale_relative=False):
     """

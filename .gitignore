@@ -10,3 +10,4 @@ vicuna-7b-hf
 .DS_Store
 inference_outputs/*
 data
+llama-weights*
