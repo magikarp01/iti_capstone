@@ -223,6 +223,62 @@ class ModelActs:
 
         return acc
 
+    def get_inference_accuracy(self, tokenizer, use_probs=True, eps=1e-8, test_only=False, check_balanced_output=False, 
+                   positive_str_tokens = ["Yes", "yes", "True", "true"],
+                   negative_str_tokens = ["No", "no", "False", "false"], scale_relative=False):
+        """
+        Get difference in correct and incorrect or positive and negative logits for each sample stored in model_acts, aggregated together.
+        Logits must be stored/loaded by ModelActs class.
+
+        Should be same number of positive and negative tokens.
+        If scale_relative is True, then scale probs/logits so that only correct vs incorrect or positive and negative probs/logits are considered
+        """
+        assert "logits" in self.activations
+        if test_only:
+            assert self.indices_tests is not None
+
+        positive_tokens = [tokenizer(token).input_ids[-1] for token in positive_str_tokens]
+        negative_tokens = [tokenizer(token).input_ids[-1] for token in negative_str_tokens]
+
+        if test_only:
+            logit_indices = self.indices_tests
+        else:
+            logit_indices = np.arange(self.activations["logits"][0].shape[0])
+        
+        check_positive_prop = 0
+        
+        correct_probs = np.empty_like(logit_indices, dtype=np.float32)
+        incorrect_probs = np.empty_like(logit_indices, dtype=np.float32)
+
+        for i, idx in enumerate(logit_indices):
+            # if answer to statement is True, correct tokens is Yes, yes, ..., true
+            correct_tokens = positive_tokens if self.labels[idx] else negative_tokens
+            incorrect_tokens = negative_tokens if self.labels[idx] else positive_tokens
+            
+            check_positive_prop += 1 if self.labels[idx] else 0
+
+            if check_balanced_output:
+                correct_tokens = positive_tokens
+                incorrect_tokens = negative_tokens
+
+            logits = torch.tensor(self.activations["logits"][0][idx])
+            if use_probs:
+                probs = torch.nn.functional.softmax(logits, dim=-1)
+                correct_prob = probs[correct_tokens].sum(dim=-1)
+                incorrect_prob = probs[incorrect_tokens].sum(dim=-1)
+
+                if scale_relative:
+                    correct_probs[i] = correct_prob / (correct_prob + incorrect_prob + eps)
+                    incorrect_probs[i] = incorrect_prob / (correct_prob + incorrect_prob + eps)
+                else:
+                    correct_probs[i] = correct_prob 
+                    incorrect_probs[i] = incorrect_prob 
+
+            else: # logits
+                correct_probs[i] = logits[correct_tokens].sum(dim=-1)
+                incorrect_probs[i] = logits[incorrect_tokens].sum(dim=-1)
+
+        return correct_probs, incorrect_probs
 
 
 class SmallModelActs(ModelActs):
@@ -466,6 +522,21 @@ class ModelActsLargeSimple(ModelActs):
                         X_acts = X_acts[mask]
                         
                         self.activations["z"][(layer, head)] = X_acts.numpy()
+            elif act_type == "logits":
+                if file_prefixes is None:
+                    X_acts = torch.load(f"{file_prefix}.pt")
+                else:
+                    X_acts_list = []
+                    for prefix in file_prefixes:
+                        X_acts_list.append(torch.load(f"{prefix}.pt"))
+                    X_acts = torch.stack(X_acts_list, dim=0)
+                mask = torch.any(X_acts != 0, dim=1)
+                if exclude_points is not None:
+                    for point in exclude_points:
+                        mask[point] = False
+                X_acts = X_acts[mask]
+                
+                self.activations["logits"][0] = X_acts.numpy()
             else:
                 if component_indices[layer]:
                     if file_prefixes is None:
