@@ -24,11 +24,11 @@ import gc
 
 data_dir = "/mnt/ssd-2/jamescampbell3"
 
-inference_honest_unordered_path = "data/large_run_5/inference_outputs/inference_output_5_honest_unordered.csv"
-inference_honest_path = "data/large_run_5/inference_outputs/inference_output_5_honest.csv"
+inference_honest_path = "data/large_run_6/inference_outputs/inference_output_6_honest.csv"
 
-inference_liar_unordered_path = "data/large_run_5/inference_outputs/inference_output_5_liar_unordered.csv"
-inference_liar_path = "data/large_run_5/inference_outputs/inference_output_5_liar.csv"
+inference_liar_path = "data/large_run_6/inference_outputs/inference_output_6_liar.csv"
+
+inference_animal_liar_path = "data/large_run_6/inference_outputs/inference_output_6_animal_liar.csv"
 
 mega_splits = ['sciq',
         'commonclaim',
@@ -42,6 +42,19 @@ mega_splits = ['sciq',
         'azaria_mitchell_inventions',
         'azaria_mitchell_facts',
         ]
+
+azaria_mitchell_splits = ['cities', 
+                          'capitals', 
+                          'companies', 
+                          'animals', 
+                          'elements', 
+                          'inventions', 
+                          'facts', 
+                          'neg_companies', 
+                          'neg_facts', 
+                          'conj_neg_companies', 
+                          'conj_neg_facts'
+                          ]
 
 def order_inference_output(unordered_filename, ordered_filename):
     data = pd.read_csv(f"{data_dir}/{unordered_filename}")
@@ -85,11 +98,13 @@ def get_num_labels(filename):
                 num_labels += label
     return num_labels
 
-def plot_against_confidence_threshold(include_qa_type=[0,1], splits=mega_splits):
+def plot_against_confidence_threshold(include_qa_type=[0,1], splits=mega_splits, third_prompt_path=None, third_prompt_mode=''):
     accs_honest = []
     accs_liar = []
     totals_honest = []
     totals_liar = []
+    accs_third = []
+    totals_third = []
     threshs = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9]
     for thresh in threshs:
         acc_honest, total_honest = get_inference_accuracy(f"{data_dir}/{inference_honest_path}", threshold=thresh, include_qa_type=include_qa_type, splits=splits)
@@ -98,15 +113,23 @@ def plot_against_confidence_threshold(include_qa_type=[0,1], splits=mega_splits)
         acc_liar, total_liar = get_inference_accuracy(f"{data_dir}/{inference_liar_path}", threshold=thresh, include_qa_type=include_qa_type, splits=splits)
         accs_liar.append(acc_liar)
         totals_liar.append(total_liar)
+        if third_prompt_path is not None:
+            acc_third, total_third = get_inference_accuracy(f"{data_dir}/{third_prompt_path}", threshold=thresh, include_qa_type=include_qa_type, splits=splits)
+            accs_third.append(acc_third)
+            totals_third.append(total_third)
 
     plt.subplot(2,1,1)
     plt.plot(threshs, accs_honest, label='honest')
     plt.plot(threshs, accs_liar, label='liar')
+    if third_prompt_path is not None:
+        plt.plot(threshs, accs_third, label=third_prompt_mode)
     plt.ylabel("accuracy")
     plt.legend()
     plt.subplot(2,1,2)
     plt.plot(threshs, totals_honest, label='honest')
     plt.plot(threshs, totals_liar, label='liar')
+    if third_prompt_path is not None:
+        plt.plot(threshs, totals_third, label=third_prompt_mode)
     plt.ylabel("data points")
     plt.legend()
     plt.show()
@@ -120,7 +143,31 @@ def get_accs_by_split(filename, splits=mega_splits, threshold=0, include_qa_type
     return accs_by_split
 
 
+def plot_accs_by_split(accs_by_split_honest, accs_by_split_liar, threshold):
+    """takes in output of get_accs_by_split
+    
+    run with:
+    for thresh in [0, .2, .5]:
+        plot_accs_by_split(get_accs_by_split(inference_honest_path, threshold=thresh), 
+                            get_accs_by_split(inference_liar_path, threshold=thresh),
+                            threshold=thresh)
+    """
+    splits = list(accs_by_split_honest.keys())
+    accs_honest = [value[0] for value in accs_by_split_honest.values()]
+    accs_liar = [value[0] for value in accs_by_split_liar.values()]
 
+    bar_width = 0.35
+    index = np.arange((len(splits)))
+
+
+    bar1 = plt.bar(index, accs_honest, bar_width, label="honest")
+    bar2 = plt.bar(index + bar_width, accs_liar, bar_width, label="liar")
+
+    plt.ylabel('Accuracy')
+    plt.xticks(index + bar_width / 2, splits, rotation=90)
+    plt.legend()
+    plt.title(f'Inference Accuracy, threshold: {threshold}')
+    plt.show()
 
 
 
