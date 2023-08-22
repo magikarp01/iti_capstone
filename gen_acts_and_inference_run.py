@@ -33,6 +33,8 @@ device = 0
 weights_dir = f"{os.getcwd()}/llama-weights-70b"
 os.makedirs(weights_dir, exist_ok=True)
 
+prompt_modes = ["honest", "neutral", "liar", "animal_liar", "elements_liar"]
+prompt_modes_inference = ["honest", "liar", "animal_liar", "elements_liar"] #should be a subset of prompt_modes
 
 #checkpoint_location = snapshot_download(model_name, use_auth_token=api_key, local_dir=weights_dir, ignore_patterns=["*.safetensors", "model.safetensors.index.json"])
 checkpoint_location = weights_dir
@@ -61,7 +63,8 @@ d_model = model.config.hidden_size
 seq_positions = [-1, -3] #we want to cache activations for 5 sequence positions
 
 
-inference_buffer = {"honest":{}, "liar":{}, "animal_liar":{}, "elements_liar":{}}
+inference_buffer = {prompt_tag : {} for prompt_tag in prompt_modes_inference}
+#inference_buffer = {"honest":{}, "liar":{}, "animal_liar":{}, "elements_liar":{}}
 
 activation_buffer_z = torch.zeros((len(seq_positions), n_layers, d_model)) #z for every head at every layer
 activation_buffer_resid_mid = torch.zeros((len(seq_positions), n_layers, d_model))
@@ -192,7 +195,8 @@ set_time = time.time()
 for idx, batch in tqdm(enumerate(loader)):
     statement = batch['claim'][0] #batch['claim'] gives a list, ints are wrapped in tensors
     torch.cuda.empty_cache()
-    for prompt_tag in ["honest", "liar", "neutral", "animal_liar", "elements_liar"]:
+    #for prompt_tag in ["honest", "liar", "neutral", "animal_liar", "elements_liar"]: #gen acts for these prompt modes
+    for prompt_tag in prompt_modes:
         text = create_prompt(statement, prompt_tag)
         
         input_ids = torch.tensor(tokenizer(text)['input_ids']).unsqueeze(dim=0).to(device)
@@ -208,7 +212,7 @@ for idx, batch in tqdm(enumerate(loader)):
             torch.save(activation_buffer_resid_post[seq_idx].half().clone(), f"{activations_dir}/{activation_filename('resid_post')}")
             torch.save(activation_buffer_mlp_out[seq_idx].half().clone(), f"{activations_dir}/{activation_filename('mlp_out')}")
 
-        if prompt_tag in ["honest", "liar", "animal_liar", "elements_liar"]:
+        if prompt_tag in prompt_modes_inference: #save inference output for these prompt modes
             output = output['logits'][:,-1,:].cpu() #last sequence position
             torch.save(output, f"{inference_dir}/logits_{run_id}_{prompt_tag}_{int(batch['ind'].item())}.pt")
             output = torch.nn.functional.softmax(output, dim=-1)
@@ -224,20 +228,13 @@ for idx, batch in tqdm(enumerate(loader)):
                     writer = csv.writer(f)
                     if f.tell() == 0:
                         writer.writerow(['index', 'P(true)', 'P(false)', 'label','dataset','qa_type']) 
-                    if prompt_tag == "honest":
-                        for index, data_point in inference_buffer["honest"].items():
-                            writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
-                    elif prompt_tag == "liar":
-                        for index, data_point in inference_buffer["liar"].items():
-                            writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
-                    elif prompt_tag == "animal_liar":
-                        for index, data_point in inference_buffer["animal_liar"].items():
-                            writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
-                    elif prompt_tag == "elements_liar":
-                        for index, data_point in inference_buffer["elements_liar"].items():
-                            writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
-                        inference_buffer = {"honest":{}, "liar":{}, "animal_liar":{}, "elements_liar":{}}
-                        gc.collect()
+
+                    for index, data_point in inference_buffer[prompt_tag].item():
+                        writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
+                if prompt_tag == prompt_modes_inference[-1]:
+                    #inference_buffer = {"honest":{}, "liar":{}, "animal_liar":{}, "elements_liar":{}}
+                    inference_buffer = {prompt_tag : {} for prompt_tag in prompt_modes_inference}
+                    gc.collect()
     if idx % 500 == 0:
         with open(f'{save_dir}/data/large_run_{run_id}/performance_log_{run_id}.txt', 'a') as file:
             file.write(f"500 iterations time: {time.time() - set_time}\n")
