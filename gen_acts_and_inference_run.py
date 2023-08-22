@@ -60,7 +60,7 @@ n_layers = model.config.num_hidden_layers
 n_heads = model.config.num_attention_heads
 d_model = model.config.hidden_size
 #d_head = int(d_model/n_heads) 
-seq_positions = [-1, -3] #we want to cache activations for 5 sequence positions
+seq_positions = [-1, -3] #we want to cache activations for 2 sequence positions
 
 
 inference_buffer = {prompt_tag : {} for prompt_tag in prompt_modes_inference}
@@ -195,7 +195,6 @@ set_time = time.time()
 for idx, batch in tqdm(enumerate(loader)):
     statement = batch['claim'][0] #batch['claim'] gives a list, ints are wrapped in tensors
     torch.cuda.empty_cache()
-    #for prompt_tag in ["honest", "liar", "neutral", "animal_liar", "elements_liar"]: #gen acts for these prompt modes
     for prompt_tag in prompt_modes:
         text = create_prompt(statement, prompt_tag)
         
