@@ -24,11 +24,13 @@ import gc
 
 data_dir = "/mnt/ssd-2/jamescampbell3"
 
-inference_honest_path = "data/large_run_6/inference_outputs/inference_output_6_honest.csv"
+inference_honest_path = "data/large_run_7/inference_outputs/inference_output_7_honest.csv"
 
-inference_liar_path = "data/large_run_6/inference_outputs/inference_output_6_liar.csv"
+inference_liar_path = "data/large_run_7/inference_outputs/inference_output_7_liar.csv"
 
-inference_animal_liar_path = "data/large_run_6/inference_outputs/inference_output_6_animal_liar.csv"
+inference_animal_liar_path = "data/large_run_7/inference_outputs/inference_output_7_animal_liar.csv"
+
+inference_elements_liar_path = "data/large_run_7/inference_outputs/inference_output_7_elements_liar.csv"
 
 mega_splits = ['sciq',
         'commonclaim',
