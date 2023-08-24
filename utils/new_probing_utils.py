@@ -444,7 +444,7 @@ class SmallModelActs(ModelActs):
 
         for act_type in self.act_types:
             with open(f'{filepath}{id}_{act_type}_acts.pt', 'rb') as f:
-                self.activations[act_type] = pickle.load(f)
+                self.activations[act_type] = torch.load(f)
         
         self.data_indices = data_indices
 
@@ -553,6 +553,7 @@ class ModelActsLargeSimple(ModelActs):
                     X_acts = X_acts[mask]
                     
                     self.activations[act_type][layer] = X_acts.numpy()
+            # print(f"{X_acts.shape}, {labels.shape}")
             assert X_acts.shape[0] == labels.shape[0] # assert labels line up with loaded activations, size of dataset should be same
 
 

@@ -44,12 +44,17 @@ def plot_z_probe_accuracies(acc_dict, n_layers, n_heads, sorted = False, title =
     """
     Plot z probe accuracies given an acc dict, with keys (layer, head) and value accuracy.
     """
+
     head_accs = np.ones(shape=(n_layers, n_heads)) * -1
-    for layer in range(n_layers):
-        for head in range(n_heads):
-            if (layer, head) in acc_dict:
-                head_accs[layer, head] = acc_dict[(layer, head)]
-    
+
+    if isinstance(acc_dict, dict):        
+        for layer in range(n_layers):
+            for head in range(n_heads):
+                if (layer, head) in acc_dict:
+                    head_accs[layer, head] = acc_dict[(layer, head)]
+    else: # if acc_dict is already an np array
+        head_accs = acc_dict
+
     if sorted:
         head_accs = -np.sort(-head_accs, axis = 1)
 
