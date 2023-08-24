@@ -21,7 +21,7 @@ import openai
 
 # openai.organization = os.getenv("ORGANIZATION_ID")
 
-openai.api_key = "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" #os.getenv("OPENAI_API_KEY") 
+#os.getenv("OPENAI_API_KEY") 
 #pls no steal
 
 class OpenAIModel():
