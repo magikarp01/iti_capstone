@@ -179,7 +179,8 @@ def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, splits=mega_spli
     #assuming this runs fast, we don't need to save formatted acts, we can just format in real-time based on the property we're interested in
     activations_dir = f"{data_dir}/data/large_run_{run_id}/activations"
     load_path = f"{activations_dir}/unformatted"
-    save_path = f"{os.getcwd()}/data/large_run_5/activations/formatted"
+    # save_path = f"{os.getcwd()}/data/large_run_5/activations/formatted"
+    save_path = f"{activations_dir}/formatted"
 
     os.makedirs(save_path, exist_ok=True)
 
