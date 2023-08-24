@@ -21,16 +21,16 @@ import gc
 
 
 
-
+run_id = 9
 data_dir = "/mnt/ssd-2/jamescampbell3"
 
-inference_honest_path = "data/large_run_7/inference_outputs/inference_output_7_honest.csv"
+inference_honest_path = f"data/large_run_{run_id}/inference_outputs/inference_output_{run_id}_honest.csv"
 
-inference_liar_path = "data/large_run_7/inference_outputs/inference_output_7_liar.csv"
+inference_liar_path = f"data/large_run_{run_id}/inference_outputs/inference_output_{run_id}_liar.csv"
 
-inference_animal_liar_path = "data/large_run_7/inference_outputs/inference_output_7_animal_liar.csv"
+inference_animal_liar_path = f"data/large_run_{run_id}/inference_outputs/inference_output_{run_id}_animal_liar.csv"
 
-inference_elements_liar_path = "data/large_run_7/inference_outputs/inference_output_7_elements_liar.csv"
+inference_elements_liar_path = f"data/large_run_{run_id}/inference_outputs/inference_output_{run_id}_elements_liar.csv"
 
 mega_splits = ['sciq',
         'commonclaim',
@@ -199,11 +199,12 @@ def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, splits=mega_spli
                 p_false = float(row[2])
                 file_path = f"{load_path}/run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{idx}.pt"
                 file_exists = os.path.exists(file_path)
-                if (file_exists) and (origin_dataset in splits) and (qa_type in include_qa_type) and (p_true > threshold or p_false > threshold):
+                if (file_exists) and (qa_type in include_qa_type) and (p_true > threshold or p_false > threshold): #and (origin_dataset in splits)
                     probe_indices.append(ind)
                     label = int(float(row[3]))
                     probe_labels.append(label)
     #create the probe dataset
+    print(len(probe_indices))
     probe_dataset = torch.zeros((len(probe_indices), n_layers, d_model))
     probe_labels = torch.tensor(probe_labels)
 
