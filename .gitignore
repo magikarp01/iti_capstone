@@ -10,3 +10,5 @@ convert_llama_weights_to_hf.py
 vicuna-7b-hf
 .DS_Store
 inference_outputs/*
+activations/
+llama-weights-70b*/
