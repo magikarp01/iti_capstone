@@ -22,10 +22,10 @@ from functools import partial
 #TODO: make everything configurable up to a yaml file
 #implement looping through arbitrary prompt mode
 
-model_name = "meta-llama/Llama-2-70b-hf"
+model_name = "meta-llama/Llama-2-70b-chat-hf"
 api_key = "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"
-run_id = 7
-GPU_map = {0: "140GiB", 1: "140GiB"}
+run_id = 8
+GPU_map = {0: "80GiB", 1: "80GiB", 2: "80GiB", 3: "80GiB"}
 #data_range = range(0, 25000)
 save_dir = "/mnt/ssd-2/jamescampbell3" #must have write access
 device = 0
@@ -33,8 +33,8 @@ device = 0
 weights_dir = f"{os.getcwd()}/llama-weights-70b"
 os.makedirs(weights_dir, exist_ok=True)
 
-prompt_modes = ["honest", "neutral", "liar", "animal_liar", "elements_liar"]
-prompt_modes_inference = ["honest", "liar", "animal_liar", "elements_liar"] #should be a subset of prompt_modes
+prompt_modes = ["honest", "neutral", "liar", "no_system"]
+prompt_modes_inference = ["honest", "liar", "no_system"] #should be a subset of prompt_modes
 
 #checkpoint_location = snapshot_download(model_name, use_auth_token=api_key, local_dir=weights_dir, ignore_patterns=["*.safetensors", "model.safetensors.index.json"])
 checkpoint_location = weights_dir
@@ -60,7 +60,7 @@ n_layers = model.config.num_hidden_layers
 n_heads = model.config.num_attention_heads
 d_model = model.config.hidden_size
 #d_head = int(d_model/n_heads) 
-seq_positions = [-1, -3] #we want to cache activations for 2 sequence positions
+seq_positions = [-1] #we want to cache activations for 2 sequence positions
 
 
 inference_buffer = {prompt_tag : {} for prompt_tag in prompt_modes_inference}
@@ -82,7 +82,7 @@ def cache_resid_mid_hook_fnc(module, input, output, name="", layer_num=0): #inpu
     activation_buffer_resid_mid[:,layer_num,:] = input[0][0,seq_positions,:].detach().clone()
     
 def cache_resid_post_hook_fnc(module, input, output, name="", layer_num=0): #output has type Tuple[torch.FloatTensor, Optional[Tuple[torch.FloatTensor, torch.FloatTensor]]]
-    activation_buffer_resid_mid[:,layer_num,:] = output[0][0,seq_positions,:].detach().clone()
+    activation_buffer_resid_mid[:,layer_num,:] = output[0,seq_positions,:].detach().clone()
 #THIS IS FUCKED
 
 def cache_mlp_out_hook_fnc(module, input, output, name="", layer_num=0):
@@ -156,6 +156,8 @@ def create_prompt(statement, prompt_tag):
         persona = system_prompt_animal_liar
     elif prompt_tag == "elements_liar":
         persona = system_prompt_elements_liar
+    elif prompt_tag == "no system":
+        persona = ""
     elif prompt_tag == "neutral":
         return statement
     text = f"""{persona}
@@ -176,8 +178,8 @@ def create_prompt(statement, prompt_tag):
 true_ids = [5574, 5852, 1565, 3009] #includes "true" and "True"
 false_ids = [7700, 8824, 2089, 4541]
 
-
-dataset = load_dataset("notrichardren/azaria-mitchell", split="combined")
+dataset = load_dataset("notrichardren/refuse-to-answer-prompts",split="train")
+#dataset = load_dataset("notrichardren/azaria-mitchell", split="combined")
 #dataset = load_dataset("notrichardren/truthfulness_high_quality", split="combined").select(data_range)
 # assumes fields are ['claim','label','dataset','qa_type','ind']
 loader = DataLoader(dataset, batch_size=1, shuffle=False)
