@@ -183,3 +183,98 @@ def is_logits_contain_label(ranked_logits, correct_answer):
         if correct_answer.find(logit_value) != -1: 
             return True
     return False
+
+import torch
+from torch import nn
+from typing import List, Tuple, Dict, Any, Optional, Callable
+from dataclasses import dataclass
+from contextlib import contextmanager
+
+@dataclass
+class HookInfo:
+    handle: torch.utils.hooks.RemovableHandle
+    level: Optional[int] = None
+
+class HookedModule(nn.Module):
+    def __init__(self, model: nn.Module):
+        super().__init__()
+        self.model = model
+        self._hooks: List[HookInfo] = []
+        self.context_level: int = 0
+
+    @contextmanager
+    def hooks(self, fwd: List[Tuple[str, Callable]] = [], bwd: List[Tuple[str, Callable]] = []):
+        self.context_level += 1
+        try:
+            # Add hooks
+            for hook_position, hook_fn in fwd:
+                module = self._get_module_by_path(hook_position)
+                handle = module.register_forward_hook(hook_fn) 
+                info = HookInfo(handle=handle, level=self.context_level)
+                self._hooks.append(info)
+
+            for hook_position, hook_fn in bwd:
+                module = self._get_module_by_path(hook_position)
+                handle = module.register_full_backward_hook(hook_fn)
+                info = HookInfo(handle=handle, level=self.context_level)
+                self._hooks.append(info)
+
+            yield self
+        finally:
+            # Remove hooks
+            for info in self._hooks:
+                if info.level == self.context_level:
+                    info.handle.remove()
+            self._hooks = [h for h in self._hooks if h.level != self.context_level]
+            self.context_level -= 1
+
+    def _get_module_by_path(self, path: str) -> nn.Module:
+        module = self.model
+        for attr in path.split('.'):
+            module = getattr(module, attr)
+        return module
+
+    def print_model_structure(self):
+        print("Model structure:")
+        for name, module in self.model.named_modules():
+            print(f"{name}: {module.__class__.__name__}")
+
+    def forward(self, *args, **kwargs):
+        return self.model(*args, **kwargs)
+
+def get_true_false_probs(output, tokenizer, in_seq = True, scale_relative=False, eps=1e-8):
+    # true_ids = [5574, 5852, 1565, 3009] #includes "true" and "True"
+    # false_ids = [7700, 8824, 2089, 4541]    
+    positive_str_tokens = ["Yes", "yes", "True", "true"]
+    negative_str_tokens = ["No", "no", "False", "false"]
+    positive_tokens = [tokenizer(token).input_ids[-1] for token in positive_str_tokens]
+    negative_tokens = [tokenizer(token).input_ids[-1] for token in negative_str_tokens]
+    
+    if in_seq:
+        output = output['logits'][:,-1,:] #last sequence position
+    output = torch.nn.functional.softmax(output, dim=-1)
+    # print(f"{output.shape=}, {positive_tokens=}, {negative_tokens=}")
+
+    output = output.squeeze()
+    true_prob = output[positive_tokens].sum().item()
+    false_prob = output[negative_tokens].sum().item()
+
+    if scale_relative:
+        scale = (true_prob + false_prob + eps)
+        true_prob /= scale
+        false_prob /= scale
+    return true_prob, false_prob
+
+def batch_true_false_probs(output, tokenizer, logit_lens = True):
+    positive_str_tokens = ["Yes", "yes", "True", "true"],
+    negative_str_tokens = ["No", "no", "False", "false"], 
+    true_ids = [tokenizer(token).input_ids[-1] for token in positive_str_tokens]
+    false_ids = [tokenizer(token).input_ids[-1] for token in negative_str_tokens]
+
+    if not logit_lens:
+        output = output['logits'][:,-1,:] #last sequence position
+    output = torch.nn.functional.softmax(output, dim=-1)
+    # print(output.shape)
+    true = output[:, true_ids].sum(axis = 1)
+    false = output[:, false_ids].sum(axis = 1)
+    return true, false
