@@ -89,7 +89,7 @@ def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, data_dir=data_di
                     probe_labels.append(label)
 
     #create the probe dataset
-    print(len(probe_indices))
+    print(f"{len(probe_indices)=}")
     probe_dataset = torch.zeros((len(probe_indices), n_layers, d_model))
     probe_labels = torch.tensor(probe_labels)
 
@@ -119,3 +119,20 @@ def create_all_probe_datasets():
                 torch.cuda.empty_cache
                 gc.collect()
                 print("Done with ", act_type, ", ", mode, ", ", split)
+
+
+def format_logits(dataset_indices, dataset_name, run_folder, run_id, modes=["honest", "liar"], seq_pos=-1):
+    #get the rows that have azaria_mitchell_facts as their value for the dataset column
+    # Format logits into formatted style: run_{run_id}_{mode}_{seq_pos}_logits_{dataset_name}.pt
+    inference_outputs_folder = f"{run_folder}/inference_outputs"
+    formatted_folder = f"{run_folder}/activations/formatted"
+        
+    for mode in modes:
+        logits = []
+        for enum_idx, data_index in enumerate(dataset_indices):
+            # with open(f"{inference_outputs_folder}/logits_{run_id}_{mode}_{data_index}.pt", "rb") as handle: change it back to this
+            with open(f"{inference_outputs_folder}/logits_{run_id}_{mode}_{enum_idx}.pt", "rb") as handle: # old, replace when global indices are fixed
+                logits.append(torch.load(handle))
+        logits = torch.cat(logits, dim=0)
+        with open(f"{formatted_folder}/run_{run_id}_{mode}_{seq_pos}_logits_{dataset_name}.pt", "wb") as handle:
+            torch.save(logits, handle)
