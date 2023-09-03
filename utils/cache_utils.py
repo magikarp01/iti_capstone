@@ -130,8 +130,8 @@ def format_logits(dataset_indices, dataset_name, run_folder, run_id, modes=["hon
     for mode in modes:
         logits = []
         for enum_idx, data_index in enumerate(dataset_indices):
-            # with open(f"{inference_outputs_folder}/logits_{run_id}_{mode}_{data_index}.pt", "rb") as handle: change it back to this
-            with open(f"{inference_outputs_folder}/logits_{run_id}_{mode}_{enum_idx}.pt", "rb") as handle: # old, replace when global indices are fixed
+            with open(f"{inference_outputs_folder}/logits_{run_id}_{mode}_{data_index}.pt", "rb") as handle: # change it back to this
+            # with open(f"{inference_outputs_folder}/logits_{run_id}_{mode}_{enum_idx}.pt", "rb") as handle: # old, replace when global indices are fixed
                 logits.append(torch.load(handle))
         logits = torch.cat(logits, dim=0)
         with open(f"{formatted_folder}/run_{run_id}_{mode}_{seq_pos}_logits_{dataset_name}.pt", "wb") as handle:

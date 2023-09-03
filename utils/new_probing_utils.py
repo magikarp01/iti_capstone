@@ -554,7 +554,7 @@ class ModelActsLargeSimple(ModelActs):
                     
                     self.activations[act_type][layer] = X_acts.numpy()
             # print(f"{X_acts.shape=}, {labels.shape=}")
-            assert X_acts.shape[0] == labels.shape[0] # assert labels line up with loaded activations, size of dataset should be same
+            assert X_acts.shape[0] == labels.shape[0], f"{X_acts.shape} vs {labels.shape}" # assert labels line up with loaded activations, size of dataset should be same
 
 
 

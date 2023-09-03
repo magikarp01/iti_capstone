@@ -3,6 +3,7 @@ import torch
 import plotly.express as px
 import einops
 import csv
+from plotly.subplots import make_subplots
 
 def plot_probe_accuracies(model_acts, sorted = False, other_head_accs=None, title = "Probe Accuracies"):
     """
@@ -126,3 +127,81 @@ def get_inference_accuracy(filename, threshold=0):
     if num_total > 0:
         acc = num_correct / num_total
     return acc, num_total
+
+
+def acc_tensor_from_dict(probe_accs_dict, n_layers, n_heads=None):
+    """
+    Helper method to convert dictionaries with component indices as keys (e.g. (5, 4) for Z dict or 79 for resid dict) to tensors, of shape (n_layers, n_heads) for Z or just (n_layers) for resid.
+    """
+    if n_heads is not None:
+        probe_accs = np.zeros(shape=(n_layers, n_heads))
+        for layer in range(n_layers):
+            for head in range(n_heads):
+                probe_accs[layer, head] = probe_accs_dict[(layer, head)]
+
+    else:
+        probe_accs = np.zeros(shape=(n_layers,))
+        for layer in range(n_layers):
+            probe_accs[layer] = probe_accs_dict[layer]
+    return probe_accs
+
+
+def get_px_fig(act_type, transfer_accs, n_layers, n_heads, title, graph_type=None):
+    """
+    Helper method to generate a figure showing a quantity (accuracy, cosine sim, whatever) for each layer of a model. If act_type is 
+    args:
+        act_type: "z" is treated alone, all others are 
+    """
+    if act_type == "z":
+        px_fig = plot_z_probe_accuracies(transfer_accs, n_layers, n_heads=n_heads, title=title)
+    else:
+        px_fig = plot_resid_probe_accuracies(transfer_accs, n_layers, title=title, graph_type=graph_type)
+    return px_fig
+
+from utils.new_probing_utils import ModelActs
+def plot_transfer_acc_subplots(train_model_acts, test_model_acts, act_type="z", n_layers=80, n_heads=64, test_only=False, cosine_sim=False):
+    """
+    A function to plot the transfer accuracies for all the different activations, in a grid of subplots. The rows correspond to probes trained on train_model_acts, and the columns correspond to probes tested on test_model_acts. 
+
+    train_model_acts: dictionary of ModelActs objects that already have trained probes
+    test_model_acts: dictionary of ModelActs objects, don't need to have trained probes
+    Uses test_only in get_probe_transfer_acc method.
+    If cosine_sim is True, then the transfer accs are cosine similarities instead of accuracies, and test_model_acts need to have probes trained.
+
+    Returns a tensor of transfer accuracies, and a plotly figure.
+    """
+    n_rows = len(train_model_acts)
+    n_cols = len(test_model_acts)
+
+    if act_type == "z":
+        transfer_acc_tensors = np.zeros(shape=(n_rows, n_cols, n_layers, n_heads))
+    else:
+        transfer_acc_tensors = np.zeros(shape=(n_rows, n_cols, n_layers))
+
+    fig = make_subplots(rows=n_rows, cols=n_cols)
+    for row, (train_name, train_model_act) in enumerate(train_model_acts.items()):
+        for col, (test_name, test_model_act) in enumerate(test_model_acts.items()):
+            transfer_accs = {}
+
+            for probe_index in train_model_act.probes[act_type]:
+                if cosine_sim:
+                    train_probe_coef = train_model_act.probes[act_type][probe_index].coef_.squeeze()
+                    assert test_model_act.probes is not None
+                    test_probe_coef = test_model_act.probes[act_type][probe_index].coef_.squeeze()
+                    transfer_accs[probe_index] = np.dot(train_probe_coef, test_probe_coef)/(np.linalg.norm(train_probe_coef)*np.linalg.norm(test_probe_coef))
+                else:
+                    transfer_accs[probe_index] = train_model_act.get_probe_transfer_acc(act_type, probe_index, test_model_act, test_only=test_only)
+            
+            px_fig = get_px_fig(act_type, transfer_accs, n_layers, n_heads, title = f"{act_type} probes from {train_name} tested on {test_name}")
+        
+            fig.add_trace(
+                px_fig['data'][0],  # add the trace from plotly express figure
+                row=row+1,
+                col=col+1
+            )
+            if act_type == "z":
+                transfer_acc_tensors[row, col] = acc_tensor_from_dict(transfer_accs, n_layers, n_heads)
+            else:
+                transfer_acc_tensors[row, col] = acc_tensor_from_dict(transfer_accs, n_layers)
+    
+    return transfer_acc_tensors, fig
