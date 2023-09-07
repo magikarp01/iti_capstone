@@ -9,7 +9,7 @@ def plot_probe_accuracies(model_acts, sorted = False, other_head_accs=None, titl
     """
     Plots z probe accuracies.
     Takes a model_acts (ModelActs) object by default. If other_head_accs is not None, then it must be a tensor of head accs, and other_head_accs is plotted.
-=    """
+    """
 
     if other_head_accs is not None:
         all_head_accs_np = other_head_accs

@@ -148,17 +148,18 @@ class ModelActs:
         return clf, acc
 
 
-    def train_probes(self, act_type, test_ratio=0.2, train_ratio=None, max_iter=1000, verbose=False):
+    def train_probes(self, act_type, test_ratio=0.2, train_ratio=None, max_iter=1000, verbose=False, in_order=True):
         """
         Train probes on all provided activations of act_type in self.activations.
         If train test split is not already set, set it with given keywords.
+        If in_order, the train test split is set so that the first train_ratio is train, the next test_ratio proportion is test (train test split is constant). Should set to false if training probes on multiple datasets at once.
         """
         if self.indices_tests is None and self.indices_trains is None:
 
             act_index = list(self.activations[act_type].keys())[0]
             num_acts = self.activations[act_type][act_index].shape[0]
 
-            self.set_train_test_split(num_acts, test_ratio=test_ratio, train_ratio=train_ratio)
+            self.set_train_test_split(num_acts, test_ratio=test_ratio, train_ratio=train_ratio, in_order=in_order)
         
         if act_type not in self.probes:
             self.probes[act_type] = {}
@@ -524,7 +525,7 @@ class ModelActsLargeSimple(ModelActs):
                             X_acts_list = []
                             for prefix in file_prefixes:
                                 X_acts_list.append(torch.load(f"{prefix}_l{layer}_h{head}.pt"))
-                            X_acts = torch.stack(X_acts_list, dim=0)
+                            X_acts = torch.cat(X_acts_list, dim=0)
 
                         mask = torch.any(X_acts != 0, dim=1)
                         if exclude_points is not None:
@@ -540,7 +541,7 @@ class ModelActsLargeSimple(ModelActs):
                     X_acts_list = []
                     for prefix in file_prefixes:
                         X_acts_list.append(torch.load(f"{prefix}.pt"))
-                    X_acts = torch.stack(X_acts_list, dim=0)
+                    X_acts = torch.cat(X_acts_list, dim=0)
                 mask = torch.any(X_acts != 0, dim=1)
                 if exclude_points is not None:
                     for point in exclude_points:
@@ -556,7 +557,7 @@ class ModelActsLargeSimple(ModelActs):
                         X_acts_list = []
                         for prefix in file_prefixes:
                             X_acts_list.append(torch.load(f"{prefix}_l{layer}.pt"))
-                        X_acts = torch.stack(X_acts_list, dim=0)
+                        X_acts = torch.cat(X_acts_list, dim=0)
                     mask = torch.any(X_acts != 0, dim=1)
                     if exclude_points is not None:
                         for point in exclude_points:

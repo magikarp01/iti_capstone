@@ -328,7 +328,7 @@ def cache_z_hook_fnc(module, input, output, name="", layer_num=0, activation_buf
     """
     Cache the last sequence position activations. Used to study 
     """
-    activation_buffer_z = torch.zeros(1, n_layers, d_model)) #z for every head at every layer
+    activation_buffer_z = torch.zeros(1, n_layers, d_model) #z for every head at every layer
     activation_buffer_z[:,layer_num,:] = input[0][0,seq_positions,:].detach().clone()
     return output
 
