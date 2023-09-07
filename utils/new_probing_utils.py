@@ -225,13 +225,14 @@ class ModelActs:
 
     def get_inference_accuracy(self, tokenizer, use_probs=True, eps=1e-8, test_only=False, check_balanced_output=False, 
                    positive_str_tokens = ["Yes", "yes", "True", "true"],
-                   negative_str_tokens = ["No", "no", "False", "false"], scale_relative=False):
+                   negative_str_tokens = ["No", "no", "False", "false"], scale_relative=False, threshold=0):
         """
         Get difference in correct and incorrect or positive and negative logits for each sample stored in model_acts, aggregated together.
         Logits must be stored/loaded by ModelActs class.
 
         Should be same number of positive and negative tokens.
         If scale_relative is True, then scale probs/logits so that only correct vs incorrect or positive and negative probs/logits are considered
+        threshold is the threshold for the probability of any of the positive or negative string tokens to be considered as an example. 
         """
         assert "logits" in self.activations
         if test_only:
@@ -247,8 +248,10 @@ class ModelActs:
         
         check_positive_prop = 0
         
-        correct_probs = np.empty_like(logit_indices, dtype=np.float32)
-        incorrect_probs = np.empty_like(logit_indices, dtype=np.float32)
+        # correct_probs = np.empty_like(logit_indices, dtype=np.float32)
+        # incorrect_probs = np.empty_like(logit_indices, dtype=np.float32)
+        correct_probs = []
+        incorrect_probs = []
 
         for i, idx in enumerate(logit_indices):
             # if answer to statement is True, correct tokens is Yes, yes, ..., true
@@ -267,18 +270,26 @@ class ModelActs:
                 correct_prob = probs[correct_tokens].sum(dim=-1)
                 incorrect_prob = probs[incorrect_tokens].sum(dim=-1)
 
+                if correct_prob < threshold and incorrect_prob < threshold:
+                    # check if both probs are below threshold, if so, skip
+                    continue
+
                 if scale_relative:
-                    correct_probs[i] = correct_prob / (correct_prob + incorrect_prob + eps)
-                    incorrect_probs[i] = incorrect_prob / (correct_prob + incorrect_prob + eps)
+                    final_correct_prob = correct_prob / (correct_prob + incorrect_prob + eps)
+                    final_incorrect_prob = incorrect_prob / (correct_prob + incorrect_prob + eps)
                 else:
-                    correct_probs[i] = correct_prob 
-                    incorrect_probs[i] = incorrect_prob 
+                    final_correct_prob = correct_prob 
+                    final_incorrect_prob = incorrect_prob
+                     
+                correct_probs.append(final_correct_prob)
+                incorrect_probs.append(final_incorrect_prob)
 
             else: # logits
-                correct_probs[i] = logits[correct_tokens].sum(dim=-1)
-                incorrect_probs[i] = logits[incorrect_tokens].sum(dim=-1)
+                correct_probs.append(logits[correct_tokens].sum(dim=-1))
+                incorrect_probs.append(logits[incorrect_tokens].sum(dim=-1))
+                
 
-        return correct_probs, incorrect_probs
+        return np.array(correct_probs), np.array(incorrect_probs)
 
 
 class SmallModelActs(ModelActs):

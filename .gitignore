@@ -11,3 +11,4 @@ vicuna-7b-hf
 inference_outputs/*
 data
 llama-weights*
+miniconda3

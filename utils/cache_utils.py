@@ -50,7 +50,8 @@ data_dir = "/mnt/ssd-2/jamescampbell3"
 # inference_honest_path = f"data/large_run_{run_id}/inference_outputs/inference_output_{run_id}_honest.csv"
 
 def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, data_dir=data_dir, inference_path=None, patch_id=None, splits=mega_splits, threshold=0, include_qa_type=[0,1],
-                              d_model=8192, d_head=128, n_layers=80, n_heads=64, save_formatted=True):
+                              d_model=8192, d_head=128, n_layers=80, n_heads=64, save_formatted=True, 
+                              save_path=None):
     """this function does both filtering for specific properties and constructs the probing dataset"""
     #assuming this runs fast, we don't need to save formatted acts, we can just format in real-time based on the property we're interested in
     if patch_id is None:
@@ -60,8 +61,9 @@ def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, data_dir=data_di
     activations_dir = f"{run_dir}/activations"
     load_path = f"{activations_dir}/unformatted"
     # save_path = f"{os.getcwd()}/data/large_run_5/activations/formatted"
-    save_path = f"{activations_dir}/formatted"
-
+    if save_path is None:
+        save_path = f"{activations_dir}/formatted"
+    
     os.makedirs(save_path, exist_ok=True)
 
     probe_indices = []
@@ -79,11 +81,14 @@ def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, data_dir=data_di
                 ind = int(row[0])
                 qa_type = float(row[5]) #
                 origin_dataset = row[4]
+                # if dataset_name is not None and origin_dataset != dataset_name:
+                #     # print(origin_dataset)
+                #     continue
                 p_true = float(row[1])
                 p_false = float(row[2])
                 file_path = f"{load_path}/run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{ind}.pt"
                 file_exists = os.path.exists(file_path)
-                if (file_exists) and (qa_type in include_qa_type) and (p_true > threshold or p_false > threshold): #and (origin_dataset in splits)
+                if (file_exists) and (qa_type in include_qa_type) and (p_true > threshold or p_false > threshold) and (origin_dataset in splits):
                     probe_indices.append(ind)
                     label = int(float(row[3]))
                     probe_labels.append(label)

@@ -4,6 +4,7 @@ from collections import defaultdict
 import einops
 from tqdm import tqdm
 import torch.nn.functional as F
+from functools import partial
 from transformer_lens import HookedTransformer
 
 def tot_logit_diff(tokenizer, model_acts, use_probs=True, eps=1e-8, test_only=True, act_type="z", check_balanced_output=False, 
@@ -278,3 +279,78 @@ def batch_true_false_probs(output, tokenizer, logit_lens = True):
     true = output[:, true_ids].sum(axis = 1)
     false = output[:, false_ids].sum(axis = 1)
     return true, false
+
+
+def store_clean_head_hook_fn(module, input, output, layer_num=0, act_idx=0, clean_z_cache=None, n_heads=64, d_head=128, start_seq_pos=0):
+    for head_num in range(n_heads):
+        if (layer_num, head_num) not in clean_z_cache:
+            clean_z_cache[(layer_num, head_num)] = {}
+        clean_z_cache[(layer_num, head_num)][act_idx] = output[:, start_seq_pos:, head_num * d_head : head_num * d_head + d_head ].detach().cpu().numpy()
+    return output
+
+def store_clean_forward_pass(hmodel, input_ids, act_idx, n_layers=64, cache_seq_pos=0, clean_z_cache=None):
+    """
+    Store activations at every head for a given input_ids, across all sequence positions. Used for patching later.
+    Args:
+        act_idx: index of activation/data to store. Only important when clean_z_cache contains multiple sets of activations, e.g. for multiple prompts.
+        
+    """
+    if clean_z_cache is None:
+        clean_z_cache = {}
+    # only for z/attn:
+    hook_pairs = []
+    for layer in range(n_layers):
+        act_name = f"model.layers.{layer}.self_attn.o_proj"
+        hook_pairs.append((act_name, partial(store_clean_head_hook_fn, layer_num=layer, act_idx = act_idx, clean_z_cache=clean_z_cache, start_seq_pos=cache_seq_pos, n_heads = hmodel.model.config.num_attention_heads, d_head = hmodel.model.config.hidden_size // hmodel.model.config.num_attention_heads)))
+
+    with torch.no_grad():
+        with hmodel.hooks(fwd=hook_pairs):
+            output = hmodel(input_ids)
+    return output, clean_z_cache
+
+def patch_head_hook_fn(module, input, output, layer_num = 0, head_num = 0, act_idx = 0, clean_z_cache=None, start_seq_pos=-1, d_head=128, device="cuda"):
+    """
+    Patch in activations from clean_z_cache into output tensor.
+
+    Args:
+        act_idx: index of activation/data to patch in. Only important when clean_z_cache contains multiple sets of activations, e.g. for multiple prompts. 
+        clean_z_cache: dict of activations to patch in. Keys are (layer_num, head_num) tuples, values are dictionaries of act_idx -> numpy arrays of activations.
+        start_seq_pos: sequence position to start patching in activations. Default is -1, which means patch in all activations possible (minimum of either output sequence length or cache sequence length)
+    """
+    if start_seq_pos == -1: # patch in as much as possible
+        start_seq_pos = min(output.shape[1], clean_z_cache[(layer_num, head_num)][act_idx].shape[1])
+
+    output[:, start_seq_pos:, head_num * d_head : head_num * d_head + d_head ] = torch.from_numpy(clean_z_cache[(layer_num, head_num)][act_idx]).to(device)
+    return output
+
+
+def cache_z_hook_fnc(module, input, output, name="", layer_num=0, activation_buffer_z=None): #input of shape (batch, seq_len, d_model) (taken from modeling_llama.py)
+    """
+    Cache the last sequence position activations. Used to study 
+    """
+    activation_buffer_z = torch.zeros(1, n_layers, d_model)) #z for every head at every layer
+    activation_buffer_z[:,layer_num,:] = input[0][0,seq_positions,:].detach().clone()
+    return output
+
+
+def forward_pass(input_ids, act_idx, stuff_to_patch, act_type, scale_relative=False, prompt_mode=None):
+    #mlp.down_proj
+    #self_attn.o_proj
+    if act_type == "self_attn":
+        assert isinstance(stuff_to_patch[0], tuple), "stuff_to_patch must be a list of tuples (layer, head)"
+        hook_pairs = []
+        for (layer, head) in stuff_to_patch:
+            act_name = f"model.layers.{layer}.self_attn.o_proj"
+            hook_pairs.append((act_name, partial(patch_head_hook_fn, name=act_name, layer_num=layer, head_num = head, act_idx = act_idx, prompt_mode=prompt_mode)))
+        
+        for layer in range(n_layers):
+            act_name = f"model.layers.{layer}.self_attn.o_proj" #start with model if using CausalLM object
+            hook_pairs.append((act_name, partial(cache_z_hook_fnc, name=act_name, layer_num=layer)))
+
+            
+    with torch.no_grad():
+        with hmodel.hooks(fwd=hook_pairs):
+            output = hmodel(input_ids)
+    
+    true_prob, false_prob = get_true_false_probs(output, tokenizer=tokenizer, scale_relative=scale_relative)
+    return output, true_prob, false_prob
