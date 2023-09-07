@@ -240,7 +240,7 @@ for idx, batch in tqdm(enumerate(loader)):
                     if f.tell() == 0:
                         writer.writerow(['index', 'P(true)', 'P(false)', 'label','dataset','qa_type']) 
 
-                    for index, data_point in inference_buffer[prompt_tag].item():
+                    for index, data_point in inference_buffer[prompt_tag].items():
                         writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
                 if prompt_tag == prompt_modes_inference[-1]:
                     #inference_buffer = {"honest":{}, "liar":{}, "animal_liar":{}, "elements_liar":{}}
