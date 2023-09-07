@@ -20,24 +20,24 @@ from utils.torch_hooks_utils import HookedModule
 from functools import partial
 
 #TODO: make everything configurable up to a yaml file
-#implement looping through arbitrary prompt mode
 
 model_name = "meta-llama/Llama-2-70b-chat-hf"
 api_key = "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"
-run_id = 9
-GPU_map = {2: "80GiB", 3: "80GiB", 4: "80GiB", 5: "80GiB", 6: "80GiB", 7: "80GiB"}
+run_id = 53
+GPU_map = {0: "80GiB", 1: "80GiB", 2: "80GiB", 3: "80GiB"}
 #data_range = range(0, 25000)
 save_dir = "/mnt/ssd-2/jamescampbell3" #must have write access
 device = 0
 
+#weights_dir = "/home/phillipguo/.cache/huggingface/hub/models--meta-llama--Llama-2-70b-chat-hf"
 weights_dir = f"{os.getcwd()}/llama-weights-70b"
 os.makedirs(weights_dir, exist_ok=True)
 
-prompt_modes = ["honest", "neutral", "liar", "no_system"]
-prompt_modes_inference = ["honest", "liar", "no_system"] #should be a subset of prompt_modes
+prompt_modes = ["neutral_unprompted", "elements_liar"]
+prompt_modes_inference = ["neutral_unprompted", "elements_liar"] #should be a subset of prompt_modes
 
-#checkpoint_location = snapshot_download(model_name, use_auth_token=api_key, local_dir=weights_dir, ignore_patterns=["*.safetensors", "model.safetensors.index.json"])
-checkpoint_location = weights_dir
+checkpoint_location = snapshot_download(model_name, use_auth_token=api_key, local_dir=weights_dir, ignore_patterns=["*.safetensors", "model.safetensors.index.json"])
+#checkpoint_location = weights_dir
 
 
 with init_empty_weights():
@@ -68,7 +68,7 @@ inference_buffer = {prompt_tag : {} for prompt_tag in prompt_modes_inference}
 
 activation_buffer_z = torch.zeros((len(seq_positions), n_layers, d_model)) #z for every head at every layer
 activation_buffer_resid_mid = torch.zeros((len(seq_positions), n_layers, d_model))
-activation_buffer_resid_post = torch.zeros((len(seq_positions), n_layers, d_model)) 
+#activation_buffer_resid_post = torch.zeros((len(seq_positions), n_layers, d_model)) 
 #when analyzing, you're gonna want to visualize resid_mid and resid_post as one, just saving separately for logistics. Locating each edit means considering writes from both attn and mlps
 activation_buffer_mlp_out = torch.zeros((len(seq_positions), n_layers, d_model))
 
@@ -97,14 +97,12 @@ for layer in range(n_layers):
 for layer in range(n_layers):
     act_name = f"model.layers.{layer}.post_attention_layernorm"
     hook_pairs.append((act_name, partial(cache_resid_mid_hook_fnc, name=act_name, layer_num=layer)))
-
 """
 # add resid_post hooks
 for layer in range(n_layers):
     act_name = f"model.layers.{layer}" #save output of LlamaDecoderLayer
     hook_pairs.append((act_name, partial(cache_resid_post_hook_fnc, name=act_name, layer_num=layer)))
 """
-
 # add mlp_out hooks
 for layer in range(n_layers):
     act_name = f"model.layers.{layer}.mlp"
@@ -160,8 +158,15 @@ def create_prompt(statement, prompt_tag):
         persona = system_prompt_animal_liar
     elif prompt_tag == "elements_liar":
         persona = system_prompt_elements_liar
-    elif prompt_tag == "no_system":
-        persona = ""
+    elif prompt_tag == "neutral_unprompted":
+        text = f"""Human: In one word, please tell me if the following is true or false.
+
+        "{statement}"
+
+        Answer 'True' if it is true and 'False' if it is false.
+
+        Assistant: """
+        return text
     elif prompt_tag == "neutral":
         return statement
     text = f"""{persona}
@@ -182,8 +187,9 @@ def create_prompt(statement, prompt_tag):
 true_ids = [5574, 5852, 1565, 3009] #includes "true" and "True"
 false_ids = [7700, 8824, 2089, 4541]
 
-dataset = load_dataset("notrichardren/refuse-to-answer-prompts",split="train")
-#dataset = load_dataset("notrichardren/azaria-mitchell", split="combined")
+#dataset = load_dataset("notrichardren/refuse-to-answer-prompts",split="train")
+#dataset = f"{os.getcwd()}/datasets/truthfulness_high_quality"
+dataset = load_dataset("notrichardren/azaria-mitchell", split="combined")
 #dataset = load_dataset("notrichardren/truthfulness_high_quality", split="combined").select(data_range)
 # assumes fields are ['claim','label','dataset','qa_type','ind']
 loader = DataLoader(dataset, batch_size=1, shuffle=False)
@@ -198,8 +204,8 @@ os.makedirs(inference_dir, exist_ok=True)
 
 
 set_time = time.time()
-for idx, batch in enumerate(tqdm(loader)):
-    statement = batch['Question'][0] #batch['claim'] gives a list, ints are wrapped in tensors
+for idx, batch in tqdm(enumerate(loader)):
+    statement = batch['claim'][0] #batch['claim'] gives a list, ints are wrapped in tensors
     torch.cuda.empty_cache()
     for prompt_tag in prompt_modes:
         text = create_prompt(statement, prompt_tag)
@@ -211,26 +217,21 @@ for idx, batch in enumerate(tqdm(loader)):
                 output = hmodel(input_ids)
 
         for seq_idx, seq_pos in enumerate(seq_positions): #might be slow with all the system calls
-            # activation_filename = lambda act_type: f"run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{int(batch['ind'].item())}.pt" #e.g. run_4_liar_-1_resid_post_20392.pt
-            activation_filename = lambda act_type: f"run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{idx}.pt" # the dataset doesn't have an ind column, using idx instead of 'ind'
-
+            activation_filename = lambda act_type: f"run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{int(batch['ind'].item())}.pt" #e.g. run_4_liar_-1_resid_post_20392.pt
             torch.save(activation_buffer_z[seq_idx].half().clone(), f"{activations_dir}/{activation_filename('z')}")
             torch.save(activation_buffer_resid_mid[seq_idx].half().clone(), f"{activations_dir}/{activation_filename('resid_mid')}")
-            # torch.save(activation_buffer_resid_post[seq_idx].half().clone(), f"{activations_dir}/{activation_filename('resid_post')}")
+            #torch.save(activation_buffer_resid_post[seq_idx].half().clone(), f"{activations_dir}/{activation_filename('resid_post')}")
             torch.save(activation_buffer_mlp_out[seq_idx].half().clone(), f"{activations_dir}/{activation_filename('mlp_out')}")
 
         if prompt_tag in prompt_modes_inference: #save inference output for these prompt modes
             output = output['logits'][:,-1,:].cpu() #last sequence position
-            # torch.save(output, f"{inference_dir}/logits_{run_id}_{prompt_tag}_{int(batch['ind'].item())}.pt")
-            torch.save(output, f"{inference_dir}/logits_{run_id}_{prompt_tag}_{idx}.pt")
-
+            torch.save(output, f"{inference_dir}/logits_{run_id}_{prompt_tag}_{int(batch['ind'].item())}.pt")
             output = torch.nn.functional.softmax(output, dim=-1)
             output = output.squeeze()
             true_prob = output[true_ids].sum().item()
             false_prob = output[false_ids].sum().item()
             
-            # inference_buffer[prompt_tag][int(batch['ind'].item())] = (true_prob, false_prob, batch['label'].item(), batch['dataset'][0], batch['qa_type'].item())
-            inference_buffer[prompt_tag][idx] = (true_prob, false_prob, batch['Label'].item(), batch['Topic'][0], 0) # qa_type is always 0 for this dataset
+            inference_buffer[prompt_tag][int(batch['ind'].item())] = (true_prob, false_prob, batch['label'].item(), batch['dataset'][0], batch['qa_type'].item())
             
             if idx % 500 == 0 or (idx+1==len(loader)):
                 inference_filename = f'{inference_dir}/inference_output_{run_id}_{prompt_tag}.csv'
@@ -239,7 +240,7 @@ for idx, batch in enumerate(tqdm(loader)):
                     if f.tell() == 0:
                         writer.writerow(['index', 'P(true)', 'P(false)', 'label','dataset','qa_type']) 
 
-                    for index, data_point in inference_buffer[prompt_tag].items():
+                    for index, data_point in inference_buffer[prompt_tag].item():
                         writer.writerow([index, data_point[0], data_point[1], data_point[2], data_point[3], data_point[4]])
                 if prompt_tag == prompt_modes_inference[-1]:
                     #inference_buffer = {"honest":{}, "liar":{}, "animal_liar":{}, "elements_liar":{}}
