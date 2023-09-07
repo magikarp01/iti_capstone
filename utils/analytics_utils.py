@@ -182,6 +182,7 @@ def plot_transfer_acc_subplots(train_model_acts, test_model_acts, act_type="z", 
     for row, (train_name, train_model_act) in enumerate(train_model_acts.items()):
         for col, (test_name, test_model_act) in enumerate(test_model_acts.items()):
             transfer_accs = {}
+            print(f"{train_name} -> {test_name}")
 
             for probe_index in train_model_act.probes[act_type]:
                 if cosine_sim:
@@ -203,5 +204,12 @@ def plot_transfer_acc_subplots(train_model_acts, test_model_acts, act_type="z", 
                 transfer_acc_tensors[row, col] = acc_tensor_from_dict(transfer_accs, n_layers, n_heads)
             else:
                 transfer_acc_tensors[row, col] = acc_tensor_from_dict(transfer_accs, n_layers)
-    
+
+    train_names = list(train_model_acts.keys())
+    test_names = list(test_model_acts.keys())
+    for idx1 in range(1, n_cols+1):
+        fig.update_xaxes(title_text=f"{test_names[idx1-1]}", row=n_rows, col=idx1)
+    for idx2 in range(1, n_rows+1):
+        fig.update_yaxes(title_text=f"{train_names[idx2-1]}", row=idx2, col=1)
+
     return transfer_acc_tensors, fig
