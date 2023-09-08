@@ -333,7 +333,7 @@ def cache_z_hook_fnc(module, input, output, layer_num=0, activation_buffer_z=Non
     return output
 
 
-def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type, clean_z_cache, scale_relative=False, cache_acts=False, start_seq_pos=-1):
+def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type, clean_z_cache, scale_relative=False, cache_acts=False, patch_seq_pos=-1, cache_seq_pos=-1):
     """
     Do a forward pass by patching in activations from clean_z_cache into heads in stuff_to_patch, and caching resulting activations (if cache_acts is True).
     """
@@ -342,14 +342,14 @@ def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type
         hook_pairs = []
         for (layer, head) in stuff_to_patch:
             act_name = f"model.layers.{layer}.self_attn.o_proj"
-            hook_pairs.append((act_name, partial(patch_head_hook_fn, layer_num=layer, head_num = head, act_idx = act_idx, clean_z_cache=clean_z_cache, start_seq_pos=start_seq_pos)))
+            hook_pairs.append((act_name, partial(patch_head_hook_fn, layer_num=layer, head_num = head, act_idx = act_idx, clean_z_cache=clean_z_cache, start_seq_pos=patch_seq_pos)))
         
         if cache_acts:
             n_layers = hmodel.model.config.num_hidden_layers
             activation_buffer = torch.zeros(1, n_layers, hmodel.model.config.hidden_size)
             for layer in range(n_layers):
                 act_name = f"model.layers.{layer}.self_attn.o_proj" #start with model if using CausalLM object
-                hook_pairs.append((act_name, partial(cache_z_hook_fnc, layer_num=layer, activation_buffer=activation_buffer, seq_pos=-1)))
+                hook_pairs.append((act_name, partial(cache_z_hook_fnc, layer_num=layer, activation_buffer=activation_buffer, seq_pos=cache_seq_pos)))
 
     with torch.no_grad():
         with hmodel.hooks(fwd=hook_pairs):
