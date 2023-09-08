@@ -30,7 +30,13 @@ inference_liar_path = "data/large_run_7/inference_outputs/inference_output_7_lia
 
 inference_animal_liar_path = "data/large_run_7/inference_outputs/inference_output_7_animal_liar.csv"
 
-inference_elements_liar_path = "data/large_run_7/inference_outputs/inference_output_7_elements_liar.csv"
+inference_elements_liar_path = "data/large_run_54/data/large_run_53/inference_outputs/inference_output_53_elements_liar.csv"
+
+inference_neutral_prompted = "data/large_run_54/data/large_run_53/inference_outputs/inference_output_53_neutral_unprompted.csv"
+
+inference_misaligned_path = "data/large_run_101/inference_outputs/inference_output_101_misaligned.csv"
+
+inference_misaligned_facts_path = "data/large_run_103/inference_outputs/inference_output_103_misaligned.csv"
 
 mega_splits = ['sciq',
         'commonclaim',
@@ -56,6 +62,15 @@ azaria_mitchell_splits = ['cities',
                           'neg_facts', 
                           'conj_neg_companies', 
                           'conj_neg_facts'
+                          ]
+
+azaria_mitchell_no_conj_splits = ['cities', 
+                          'capitals', 
+                          'companies', 
+                          'animals', 
+                          'elements', 
+                          'inventions', 
+                          'facts'
                           ]
 
 def order_inference_output(unordered_filename, ordered_filename):
@@ -171,6 +186,46 @@ def plot_accs_by_split(accs_by_split_honest, accs_by_split_liar, threshold):
     plt.title(f'Inference Accuracy, threshold: {threshold}')
     plt.show()
 
+
+def blurb_to_get_conditional_liar_plot():
+    accs_elements_liar = get_accs_by_split(inference_elements_liar_path, splits=azaria_mitchell_no_conj_splits, threshold=.5)
+    splits = list(accs_elements_liar.keys())
+    accs_elements_liar = [value[0] for value in accs_elements_liar.values()]
+
+    bars = plt.bar(np.arange(len(splits)), accs_elements_liar)  # Store bars in a variable
+    bars[4].set_color('red')
+    plt.axhline(y=0.5, linestyle='--', color='r')  # Dashed line at 0.5
+    plt.ylim(0, 1)  # Setting y-axis limits
+    plt.ylabel('Inference Accuracy')
+    plt.xticks(np.arange(len(splits)), splits, rotation=90)  
+    plt.xlabel("Datasets")
+    plt.title(f'Conditional Liar Inference Accuracy, threshold: {.5}')
+    plt.show()
+
+def get_inference_acc_misaligned(filename, threshold=0, include_qa_type=[0,1]):
+    num_correct = 0
+    num_total = 0
+    acc = 0
+    with open(filename, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        for idx, row in enumerate(reader):
+            if idx>0:
+                p_true = float(row[1])
+                p_false = float(row[2])
+                #row[4] #split
+                #qa_type = float(row[5]) #qa_type
+                #origin_dataset = row[4]
+                if (p_true > threshold or p_false > threshold):
+                    label = int(float(row[3]))
+                    
+                    pred = p_true > p_false
+                    correct = (pred == label) #bool
+
+                    num_correct += correct
+                    num_total += 1
+    if num_total > 0:
+        acc = num_correct / num_total
+    return acc, num_total
 
 
 def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, splits=mega_splits, threshold=0, include_qa_type=[0,1],
