@@ -96,8 +96,9 @@ def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, data_dir=data_di
                 p_false = float(row[2])
                 file_path = f"{load_path}/run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{ind}.pt"
                 file_exists = os.path.exists(file_path)
+                assert file_exists
                 # print(f"{file_exists=}, {(qa_type in include_qa_type)=}")
-                if (file_exists) and (qa_type in include_qa_type) and (p_true > threshold or p_false > threshold):
+                if (qa_type in include_qa_type) and (p_true > threshold or p_false > threshold):
                     probe_indices.append(ind)
                     label = int(float(row[3]))
                     probe_labels.append(label)
