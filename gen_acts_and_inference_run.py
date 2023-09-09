@@ -23,7 +23,7 @@ from functools import partial
 
 model_name = "meta-llama/Llama-2-70b-chat-hf"
 api_key = "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"
-run_id = 103
+run_id = 33
 GPU_map = {0: "80GiB", 1: "80GiB", 2: "80GiB", 3: "80GiB"}
 #data_range = range(0, 25000)
 save_dir = "/mnt/ssd-2/jamescampbell3" #must have write access
@@ -33,11 +33,11 @@ device = 0
 weights_dir = f"{os.getcwd()}/llama-weights-70b"
 os.makedirs(weights_dir, exist_ok=True)
 
-prompt_modes = ["misaligned"]
-prompt_modes_inference = ["misaligned"] #should be a subset of prompt_modes
+prompt_modes = ["honest"]
+prompt_modes_inference = ["honest"] #should be a subset of prompt_modes
 
-checkpoint_location = snapshot_download(model_name, use_auth_token=api_key, local_dir=weights_dir, ignore_patterns=["*.safetensors", "model.safetensors.index.json"])
-#checkpoint_location = weights_dir
+#checkpoint_location = snapshot_download(model_name, use_auth_token=api_key, local_dir=weights_dir, ignore_patterns=["*.safetensors", "model.safetensors.index.json"])
+checkpoint_location = weights_dir
 
 
 with init_empty_weights():
@@ -60,7 +60,7 @@ n_layers = model.config.num_hidden_layers
 n_heads = model.config.num_attention_heads
 d_model = model.config.hidden_size
 #d_head = int(d_model/n_heads) 
-seq_positions = [-1] #we want to cache activations for 2 sequence positions
+seq_positions = [-10,-5,-3] #we want to cache activations for 2 sequence positions
 
 
 inference_buffer = {prompt_tag : {} for prompt_tag in prompt_modes_inference}
@@ -194,7 +194,7 @@ false_ids = [7700, 8824, 2089, 4541]
 #dataset = load_dataset("notrichardren/refuse-to-answer-prompts",split="train")
 #dataset = f"{os.getcwd()}/datasets/truthfulness_high_quality"
 dataset = load_dataset("notrichardren/azaria-mitchell", split="combined")
-dataset = [row for row in dataset if row['dataset'] == 'facts']
+#dataset = [row for row in dataset if row['dataset'] == 'facts']
 #dataset = load_dataset("notrichardren/truthfulness_high_quality", split="combined").select(data_range)
 # assumes fields are ['claim','label','dataset','qa_type','ind']
 loader = DataLoader(dataset, batch_size=1, shuffle=False)

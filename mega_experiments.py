@@ -14,6 +14,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from datasets import load_dataset
+import einops
 
 import csv
 import pandas as pd
@@ -254,6 +255,7 @@ def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, splits=mega_spli
                 p_false = float(row[2])
                 file_path = f"{load_path}/run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{idx}.pt"
                 file_exists = os.path.exists(file_path)
+                assert file_exists, f"{ind}"
                 if (file_exists) and (origin_dataset in splits) and (qa_type in include_qa_type) and (p_true > threshold or p_false > threshold):
                     probe_indices.append(ind)
                     label = int(float(row[3]))
@@ -477,6 +479,87 @@ def plot_transfer_accs(head: Tuple[Int, Int]):#, transfer_accs_honest, transfer_
     cbar = plt.colorbar(im, ax=axs.ravel().tolist(), orientation='vertical')
     cbar.set_label('Accuracy', rotation=270, labelpad=15)
     plt.show()
+
+def plot_transfer_accs_pixelwise(k):
+    select_splits = ['capitals','companies','animals','elements','inventions','facts']
+
+    fig, axs = plt.subplots(1, 3, figsize=(15, 5)) # You can adjust the figure size
+
+    transfer_accs_honest_rearr = einops.rearrange(transfer_accs_honest, "l h tr te -> (l h) tr te")
+    transfer_accs_liar_rearr = einops.rearrange(transfer_accs_liar, "l h tr te -> (l h) tr te")
+    transfer_accs_neutral_rearr = einops.rearrange(transfer_accs_neutral, "l h tr te -> (l h) tr te")
+
+    honest = torch.mean(torch.topk(transfer_accs_honest_rearr, k=k, dim=0).values, dim=0)
+    liar = torch.mean(torch.topk(transfer_accs_liar_rearr, k=k, dim=0).values, dim=0)
+    unprompted =torch.mean(torch.topk(transfer_accs_neutral_rearr, k=k, dim=0).values, dim=0)
+
+    tensors = [honest, unprompted, liar] # Replace these with your tensors
+    conditions = ['Honest', 'Unprompted', 'Liar']
+
+    for i, tensor in enumerate(tensors):
+        im = axs[i].imshow(tensor, cmap='RdBu_r', vmin=.65, vmax=1)
+        axs[i].set_xticks(range(len(select_splits)))
+        axs[i].set_xticklabels(select_splits, rotation='vertical')
+        axs[i].xaxis.tick_top()
+        axs[i].set_title(conditions[i])
+        for y in range(tensor.shape[0]):
+            for x in range(tensor.shape[1]):
+                value = tensor[y, x].item() * 100  # Convert to percentage
+                # Place the value on the plot; format to show as a whole number, bolded
+                axs[i].text(x, y, f"{value:.0f}", ha="center", va="center", color="w", weight='bold')
+        if i != 0:  # Remove y-ticks and labels for second and third images
+            axs[i].set_yticks([])
+
+    # Add y-ticks and labels only to the first image
+    axs[0].set_yticks(range(len(select_splits)))
+    axs[0].set_yticklabels(select_splits)
+
+    # Add one colorbar to the side of the entire figure
+    cbar = plt.colorbar(im, ax=axs.ravel().tolist(), orientation='vertical')
+    cbar.set_label('Accuracy', rotation=270, labelpad=15)
+    plt.show()
+
+
+def plot_transfer_accs_diff_pixelwise(k):
+    select_splits = ['capitals','companies','animals','elements','inventions','facts']
+
+    # Compute rearranged tensors
+    transfer_accs_honest_rearr = einops.rearrange(transfer_accs_honest, "l h tr te -> (l h) tr te")
+    transfer_accs_neutral_rearr = einops.rearrange(transfer_accs_neutral, "l h tr te -> (l h) tr te")
+
+    # Compute means
+    honest = torch.mean(torch.topk(transfer_accs_honest_rearr, k=k, dim=0).values, dim=0)
+    unprompted = torch.mean(torch.topk(transfer_accs_neutral_rearr, k=k, dim=0).values, dim=0)
+
+    # Compute the difference
+    difference = honest - unprompted
+
+    fig, axs = plt.subplots(figsize=(5, 5))  # Adjust for a single plot
+
+    # Visualize the difference
+    im = axs.imshow(difference, cmap='RdBu_r', vmin=-0.4, vmax=0.4)  # Adjusted color scale for difference
+
+    axs.set_xticks(range(len(select_splits)))
+    axs.set_xticklabels(select_splits, rotation='vertical')
+    axs.xaxis.tick_top()
+    axs.set_title('Difference (Honest - Unprompted)')
+
+    # Overlay the tensor values on each pixel
+    for y in range(difference.shape[0]):
+        for x in range(difference.shape[1]):
+            value = difference[y, x].item() * 100  # Convert to percentage
+            axs.text(x, y, f"{value:.0f}", ha="center", va="center", color="w", weight='bold')
+
+    axs.set_yticks(range(len(select_splits)))
+    axs.set_yticklabels(select_splits)
+
+    # Add one colorbar to the side of the entire figure
+    cbar = plt.colorbar(im, orientation='vertical')
+    cbar.set_label('Difference in Accuracy (%)', rotation=270, labelpad=15)
+    plt.show()
+
+
+
 
 
 def get_best_head(transfer_accs, split_idx):
