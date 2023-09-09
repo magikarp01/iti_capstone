@@ -70,7 +70,6 @@ def plot_z_probe_accuracies(acc_dict, n_layers, n_heads, sorted = False, title =
         fig.update_layout(yaxis_title="Accuracy", showlegend=False)
         return fig
 
-
 def plot_norm_diffs(model_acts_iti, model_acts, div=True):
     """
     Plots the norm diffs across head z activations

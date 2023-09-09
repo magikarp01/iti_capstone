@@ -49,7 +49,7 @@ data_dir = "/mnt/ssd-2/jamescampbell3"
 
 # inference_honest_path = f"data/large_run_{run_id}/inference_outputs/inference_output_{run_id}_honest.csv"
 
-def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, data_dir=data_dir, inference_path=None, patch_id=None, splits=mega_splits, threshold=0, include_qa_type=[0,1],
+def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, data_dir=data_dir, inference_path=None, patch_id=None, splits=mega_splits, threshold=0, include_qa_type=[0,1, 2],
                               d_model=8192, d_head=128, n_layers=80, n_heads=64, save_formatted=True, 
                               save_path=None):
     """this function does both filtering for specific properties and constructs the probing dataset"""
@@ -79,8 +79,16 @@ def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, data_dir=data_di
             # print(f"{idx}, {row}")
             if idx>0:
                 ind = int(row[0])
-                qa_type = float(row[5]) #
-                origin_dataset = row[4]
+
+                if len(row) > 5:
+                    qa_type = float(row[5]) #
+                    origin_dataset = row[4]        
+                    if origin_dataset not in splits:
+                        continue
+                
+                else:
+                    qa_type = float(row[4])
+
                 # if dataset_name is not None and origin_dataset != dataset_name:
                 #     # print(origin_dataset)
                 #     continue
@@ -88,7 +96,8 @@ def create_probe_dataset(run_id, seq_pos, prompt_tag, act_type, data_dir=data_di
                 p_false = float(row[2])
                 file_path = f"{load_path}/run_{run_id}_{prompt_tag}_{seq_pos}_{act_type}_{ind}.pt"
                 file_exists = os.path.exists(file_path)
-                if (file_exists) and (qa_type in include_qa_type) and (p_true > threshold or p_false > threshold) and (origin_dataset in splits):
+                # print(f"{file_exists=}, {(qa_type in include_qa_type)=}")
+                if (file_exists) and (qa_type in include_qa_type) and (p_true > threshold or p_false > threshold):
                     probe_indices.append(ind)
                     label = int(float(row[3]))
                     probe_labels.append(label)
@@ -126,18 +135,24 @@ def create_all_probe_datasets():
                 print("Done with ", act_type, ", ", mode, ", ", split)
 
 
-def format_logits(dataset_indices, dataset_name, run_folder, run_id, modes=["honest", "liar"], seq_pos=-1):
+def format_logits(dataset_indices, dataset_name, run_folder, run_id, modes=["honest", "liar"], seq_pos=-1, formatted_folder=None, logit_mode=None):
     #get the rows that have azaria_mitchell_facts as their value for the dataset column
     # Format logits into formatted style: run_{run_id}_{mode}_{seq_pos}_logits_{dataset_name}.pt
     inference_outputs_folder = f"{run_folder}/inference_outputs"
-    formatted_folder = f"{run_folder}/activations/formatted"
+    if formatted_folder is None:
+        formatted_folder = f"{run_folder}/activations/formatted"
         
     for mode in modes:
         logits = []
         for enum_idx, data_index in enumerate(dataset_indices):
-            with open(f"{inference_outputs_folder}/logits_{run_id}_{mode}_{data_index}.pt", "rb") as handle: # change it back to this
+            if logit_mode is None:
+                with open(f"{inference_outputs_folder}/logits_{run_id}_{mode}_{data_index}.pt", "rb") as handle: # change it back to this
             # with open(f"{inference_outputs_folder}/logits_{run_id}_{mode}_{enum_idx}.pt", "rb") as handle: # old, replace when global indices are fixed
-                logits.append(torch.load(handle))
+                    logits.append(torch.load(handle))
+            else:
+                with open(f"{inference_outputs_folder}/logits_{run_id}_{logit_mode}_{data_index}.pt", "rb") as handle: # change it back to this
+            # with open(f"{inference_outputs_folder}/logits_{run_id}_{mode}_{enum_idx}.pt", "rb") as handle: # old, replace when global indices are fixed
+                    logits.append(torch.load(handle))
         logits = torch.cat(logits, dim=0)
         with open(f"{formatted_folder}/run_{run_id}_{mode}_{seq_pos}_logits_{dataset_name}.pt", "wb") as handle:
             torch.save(logits, handle)
