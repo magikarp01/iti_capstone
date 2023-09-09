@@ -41,11 +41,12 @@ def plot_resid_probe_accuracies(acc_dict, n_layers, title = "Probe Accuracies", 
     # color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower"
     return fig
 
-def plot_z_probe_accuracies(acc_dict, n_layers, n_heads, sorted = False, title = "Probe Accuracies"):
+def plot_z_probe_accuracies(acc_dict, n_layers, n_heads, sorted = False, title = "Probe Accuracies", average_layer=False):
     """
     Plot z probe accuracies given an acc dict, with keys (layer, head) and value accuracy.
+    If average_layer, then plot a line graph with n_layer points, where each point is the average accuracy of the heads at that layer.
     """
-
+    
     head_accs = np.ones(shape=(n_layers, n_heads)) * -1
 
     if isinstance(acc_dict, dict):        
@@ -56,10 +57,18 @@ def plot_z_probe_accuracies(acc_dict, n_layers, n_heads, sorted = False, title =
     else: # if acc_dict is already an np array
         head_accs = acc_dict
 
-    if sorted:
-        head_accs = -np.sort(-head_accs, axis = 1)
+    if not average_layer:
+        if sorted:
+            head_accs = -np.sort(-head_accs, axis = 1)
 
-    return px.imshow(head_accs, labels = {"x" : "Heads (sorted)", "y": "Layers"}, title = title, color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
+        return px.imshow(head_accs, labels = {"x" : "Heads (sorted)", "y": "Layers"}, title = title, color_continuous_midpoint = 0.5, color_continuous_scale="YlGnBu", origin = "lower")
+
+    else:
+        layer_accs = head_accs.mean(axis=1)
+        fig = px.line(layer_accs, labels = {"x" : "Layers", "y": "Accuracy"}, title = title)
+        fig.update_traces(line=dict(dash='dot'), marker=dict(size=3, color='blue')) 
+        fig.update_layout(yaxis_title="Accuracy", showlegend=False)
+        return fig
 
 
 def plot_norm_diffs(model_acts_iti, model_acts, div=True):
