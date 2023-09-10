@@ -288,7 +288,14 @@ def store_clean_head_hook_fn(module, input, output, layer_num=0, act_idx=0, clea
         clean_z_cache[(layer_num, head_num)][act_idx] = output[:, start_seq_pos:, head_num * d_head : head_num * d_head + d_head ].detach().cpu().numpy()
     return output
 
-def store_clean_forward_pass(hmodel, input_ids, act_idx, n_layers=80, cache_seq_pos=0, clean_z_cache=None):
+def store_clean_resid_hook_fn(module, input, output, layer_num=0, act_idx=0, clean_resid_cache=None, start_seq_pos=0):
+    # print(f"{output[0].shape=}")
+    if layer_num not in clean_resid_cache:
+        clean_resid_cache[layer_num] = {}
+    clean_resid_cache[layer_num][act_idx] = output[0][:, start_seq_pos:].detach().cpu().numpy()
+    return output
+
+def store_clean_forward_pass(hmodel, input_ids, act_idx, n_layers=80, cache_seq_pos=0, clean_z_cache=None, clean_resid_cache=None, store_z=True, store_resid=False):
     """
     Store activations at every head for a given input_ids, across all sequence positions. Used for patching later.
     Args:
@@ -297,16 +304,31 @@ def store_clean_forward_pass(hmodel, input_ids, act_idx, n_layers=80, cache_seq_
     """
     if clean_z_cache is None:
         clean_z_cache = {}
+
+    if clean_resid_cache is None:
+        clean_resid_cache = {}
     # only for z/attn:
     hook_pairs = []
     for layer in range(n_layers):
-        act_name = f"model.layers.{layer}.self_attn.o_proj"
-        hook_pairs.append((act_name, partial(store_clean_head_hook_fn, layer_num=layer, act_idx = act_idx, clean_z_cache=clean_z_cache, start_seq_pos=cache_seq_pos, n_heads = hmodel.model.config.num_attention_heads, d_head = hmodel.model.config.hidden_size // hmodel.model.config.num_attention_heads)))
+
+        if store_z:
+            act_name = f"model.layers.{layer}.self_attn.o_proj"
+            hook_pairs.append((act_name, partial(store_clean_head_hook_fn, layer_num=layer, act_idx = act_idx, clean_z_cache=clean_z_cache, start_seq_pos=cache_seq_pos, n_heads = hmodel.model.config.num_attention_heads, d_head = hmodel.model.config.hidden_size // hmodel.model.config.num_attention_heads)))
+
+        if store_resid:
+            act_name = f"model.layers.{layer}"
+            hook_pairs.append((act_name, partial(store_clean_resid_hook_fn, layer_num=layer, act_idx = act_idx, clean_resid_cache=clean_resid_cache, start_seq_pos=cache_seq_pos)))
 
     with torch.no_grad():
         with hmodel.hooks(fwd=hook_pairs):
             output = hmodel(input_ids)
-    return output, clean_z_cache
+
+    if store_z and not store_resid:
+        return output, clean_z_cache
+    elif store_resid and not store_z:
+        return output, clean_resid_cache
+    else:
+        return output, clean_z_cache, clean_resid_cache
 
 def patch_head_hook_fn(module, input, output, layer_num = 0, head_num = 0, act_idx = 0, clean_z_cache=None, start_seq_pos=None, d_head=128, device="cuda"):
     """
@@ -324,6 +346,14 @@ def patch_head_hook_fn(module, input, output, layer_num = 0, head_num = 0, act_i
     return output
 
 
+def patch_resid_hook_fn(module, input, output, layer_num = 0, act_idx = 0, clean_resid_cache=None, start_seq_pos=None, device="cuda"):
+    if start_seq_pos is None: # patch in as much as possible
+        start_seq_pos = min(output.shape[1], clean_resid_cache[layer_num][act_idx].shape[1])
+
+    output[0][:, start_seq_pos:] = torch.from_numpy(clean_resid_cache[layer_num][act_idx]).to(device)
+    return output
+
+
 def cache_z_hook_fnc(module, input, output, layer_num=0, activation_buffer_z=None, seq_pos=-1): #input of shape (batch, seq_len, d_model) (taken from modeling_llama.py)
     """
     Cache the last sequence position activations. Used to study 
@@ -333,7 +363,7 @@ def cache_z_hook_fnc(module, input, output, layer_num=0, activation_buffer_z=Non
     return output
 
 
-def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type, clean_z_cache, scale_relative=False, cache_acts=False, patch_seq_pos=-1, cache_seq_pos=-1):
+def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type, clean_cache, scale_relative=False, cache_acts=False, patch_seq_pos=-1, cache_seq_pos=-1):
     """
     Do a forward pass by patching in activations from clean_z_cache into heads in stuff_to_patch, and caching resulting activations (if cache_acts is True).
     """
@@ -342,7 +372,7 @@ def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type
         hook_pairs = []
         for (layer, head) in stuff_to_patch:
             act_name = f"model.layers.{layer}.self_attn.o_proj"
-            hook_pairs.append((act_name, partial(patch_head_hook_fn, layer_num=layer, head_num = head, act_idx = act_idx, clean_z_cache=clean_z_cache, start_seq_pos=patch_seq_pos)))
+            hook_pairs.append((act_name, partial(patch_head_hook_fn, layer_num=layer, head_num = head, act_idx = act_idx, clean_z_cache=clean_cache, start_seq_pos=patch_seq_pos)))
         
         if cache_acts:
             n_layers = hmodel.model.config.num_hidden_layers
@@ -350,6 +380,13 @@ def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type
             for layer in range(n_layers):
                 act_name = f"model.layers.{layer}.self_attn.o_proj" #start with model if using CausalLM object
                 hook_pairs.append((act_name, partial(cache_z_hook_fnc, layer_num=layer, activation_buffer=activation_buffer, seq_pos=cache_seq_pos)))
+    
+    elif act_type == "resid":
+        assert isinstance(stuff_to_patch[0], tuple), "stuff_to_patch must be a list of tuples (layer, head)"
+        hook_pairs = []
+        for layer in stuff_to_patch:
+            act_name = f"model.layers.{layer}"
+            hook_pairs.append((act_name, partial(patch_resid_hook_fn, layer_num=layer, act_idx = act_idx, clean_resid_cache=clean_cache, start_seq_pos=patch_seq_pos)))
 
     with torch.no_grad():
         with hmodel.hooks(fwd=hook_pairs):
