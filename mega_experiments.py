@@ -25,9 +25,9 @@ import gc
 
 data_dir = "/mnt/ssd-2/jamescampbell3"
 
-inference_honest_path = "data/large_run_7/inference_outputs/inference_output_7_honest.csv"
+inference_honest_path = "data/large_run_6/inference_outputs/inference_output_6_honest.csv"
 
-inference_liar_path = "data/large_run_7/inference_outputs/inference_output_7_liar.csv"
+inference_liar_path = "data/large_run_6/inference_outputs/inference_output_6_liar.csv"
 
 inference_animal_liar_path = "data/large_run_7/inference_outputs/inference_output_7_animal_liar.csv"
 
@@ -178,13 +178,17 @@ def plot_accs_by_split(accs_by_split_honest, accs_by_split_liar, threshold):
     index = np.arange((len(splits)))
 
 
-    bar1 = plt.bar(index, accs_honest, bar_width, label="honest")
-    bar2 = plt.bar(index + bar_width, accs_liar, bar_width, label="liar")
+    bar1 = plt.bar(index, accs_honest, bar_width, label="honest", color="blue")
+    bar2 = plt.bar(index + bar_width, accs_liar, bar_width, label="liar", color='red')
 
-    plt.ylabel('Accuracy')
+    plt.axhline(y=0.5, linestyle='--', color='r')  # Dashed line at 0.5
+
+    plt.ylabel('Model Inference Accuracy')
     plt.xticks(index + bar_width / 2, splits, rotation=90)
+    plt.xlabel('Datasets')
+
     plt.legend()
-    plt.title(f'Inference Accuracy, threshold: {threshold}')
+    plt.title(f'Model Inference Accuracy Across Datasets, threshold: {threshold}')
     plt.show()
 
 
@@ -480,7 +484,11 @@ def plot_transfer_accs(head: Tuple[Int, Int]):#, transfer_accs_honest, transfer_
     cbar.set_label('Accuracy', rotation=270, labelpad=15)
     plt.show()
 
-def plot_transfer_accs_pixelwise(k):
+def top_k_keys(d, k):
+    return [key for key, value in sorted(d.items(), key=lambda item: item[1], reverse=True)[:k]]
+
+
+def plot_transfer_accs_smart_select(k):
     select_splits = ['capitals','companies','animals','elements','inventions','facts']
 
     fig, axs = plt.subplots(1, 3, figsize=(15, 5)) # You can adjust the figure size
@@ -489,15 +497,46 @@ def plot_transfer_accs_pixelwise(k):
     transfer_accs_liar_rearr = einops.rearrange(transfer_accs_liar, "l h tr te -> (l h) tr te")
     transfer_accs_neutral_rearr = einops.rearrange(transfer_accs_neutral, "l h tr te -> (l h) tr te")
 
-    honest = torch.mean(torch.topk(transfer_accs_honest_rearr, k=k, dim=0).values, dim=0)
-    liar = torch.mean(torch.topk(transfer_accs_liar_rearr, k=k, dim=0).values, dim=0)
-    unprompted =torch.mean(torch.topk(transfer_accs_neutral_rearr, k=k, dim=0).values, dim=0)
+    honest_selected = torch.zeros((6,6))
+    neutral_selected = torch.zeros((6,6))
+    liar_selected = torch.zeros((6,6))
 
-    tensors = [honest, unprompted, liar] # Replace these with your tensors
+
+    for i in range(6):
+        heads = {}
+        for head in range(transfer_accs_honest_rearr.shape[0]):
+            heads[head] = transfer_accs_honest_rearr[head,i,i].item()
+        best_heads = top_k_keys(heads, k)
+        honest_selected[i,:] = torch.mean(transfer_accs_honest_rearr[best_heads], dim=0)[i,:]
+
+    for i in range(6):
+        heads = {}
+        for head in range(transfer_accs_neutral_rearr.shape[0]): 
+            heads[head] = transfer_accs_neutral_rearr[head,i,i].item()
+        best_heads = top_k_keys(heads, k)
+        neutral_selected[i,:] = torch.mean(transfer_accs_neutral_rearr[best_heads], dim=0)[i,:]
+
+    for i in range(6):
+        heads = {}
+        for head in range(transfer_accs_liar_rearr.shape[0]): #select heads based on honest for now
+            heads[head] = transfer_accs_liar_rearr[head,i,i].item()
+        best_heads = top_k_keys(heads, k)
+        liar_selected[i,:] = torch.mean(transfer_accs_liar_rearr[best_heads], dim=0)[i,:]
+
+
+
+
+
+    #honest = torch.mean(torch.topk(transfer_accs_honest_rearr, k=k, dim=0).values, dim=0)
+    #liar = torch.mean(torch.topk(transfer_accs_liar_rearr, k=k, dim=0).values, dim=0)
+    #unprompted =torch.mean(torch.topk(transfer_accs_neutral_rearr, k=k, dim=0).values, dim=0)
+
+    tensors = [honest_selected, neutral_selected, liar_selected]
+    #tensors = [honest, unprompted, liar] # Replace these with your tensors
     conditions = ['Honest', 'Unprompted', 'Liar']
 
     for i, tensor in enumerate(tensors):
-        im = axs[i].imshow(tensor, cmap='RdBu_r', vmin=.65, vmax=1)
+        im = axs[i].imshow(tensor, cmap='viridis', vmin=.6, vmax=1)
         axs[i].set_xticks(range(len(select_splits)))
         axs[i].set_xticklabels(select_splits, rotation='vertical')
         axs[i].xaxis.tick_top()
@@ -520,19 +559,39 @@ def plot_transfer_accs_pixelwise(k):
     plt.show()
 
 
-def plot_transfer_accs_diff_pixelwise(k):
+def plot_transfer_accs_diff_pixelwise(k): #not pixelwise anymore
     select_splits = ['capitals','companies','animals','elements','inventions','facts']
 
     # Compute rearranged tensors
     transfer_accs_honest_rearr = einops.rearrange(transfer_accs_honest, "l h tr te -> (l h) tr te")
     transfer_accs_neutral_rearr = einops.rearrange(transfer_accs_neutral, "l h tr te -> (l h) tr te")
 
+
+    honest_selected = torch.zeros((6,6))
+    neutral_selected = torch.zeros((6,6))
+
+
+    for i in range(6):
+        heads = {}
+        for head in range(transfer_accs_honest_rearr.shape[0]):
+            heads[head] = transfer_accs_honest_rearr[head,i,i].item()
+        best_heads = top_k_keys(heads, k)
+        honest_selected[i,:] = torch.mean(transfer_accs_honest_rearr[best_heads], dim=0)[i,:]
+
+    for i in range(6):
+        heads = {}
+        for head in range(transfer_accs_neutral_rearr.shape[0]): 
+            heads[head] = transfer_accs_neutral_rearr[head,i,i].item()
+        best_heads = top_k_keys(heads, k)
+        neutral_selected[i,:] = torch.mean(transfer_accs_neutral_rearr[best_heads], dim=0)[i,:]
+
+
     # Compute means
-    honest = torch.mean(torch.topk(transfer_accs_honest_rearr, k=k, dim=0).values, dim=0)
-    unprompted = torch.mean(torch.topk(transfer_accs_neutral_rearr, k=k, dim=0).values, dim=0)
+    #honest = torch.mean(torch.topk(transfer_accs_honest_rearr, k=k, dim=0).values, dim=0)
+    #unprompted = torch.mean(torch.topk(transfer_accs_neutral_rearr, k=k, dim=0).values, dim=0)
 
     # Compute the difference
-    difference = honest - unprompted
+    difference = honest_selected - neutral_selected
 
     fig, axs = plt.subplots(figsize=(5, 5))  # Adjust for a single plot
 
@@ -566,3 +625,5 @@ def get_best_head(transfer_accs, split_idx):
     index = torch.argmax(transfer_accs[:,:,split_idx, split_idx])
     indices = (index // transfer_accs.size(1), index % transfer_accs.size(1))
     return (indices[0].item(), indices[1].item())
+
+# %%
