@@ -6,6 +6,7 @@ from tqdm import tqdm
 import torch.nn.functional as F
 from functools import partial
 from transformer_lens import HookedTransformer
+from concept_erasure import LeaceEraser
 
 def tot_logit_diff(tokenizer, model_acts, use_probs=True, eps=1e-8, test_only=True, act_type="z", check_balanced_output=False, 
                    positive_str_tokens = ["Yes", "yes", "True", "true"],
@@ -292,7 +293,7 @@ def store_clean_resid_hook_fn(module, input, output, layer_num=0, act_idx=0, cle
     # print(f"{output[0].shape=}")
     if layer_num not in clean_resid_cache:
         clean_resid_cache[layer_num] = {}
-    clean_resid_cache[layer_num][act_idx] = output[0][:, start_seq_pos:].detach().cpu().numpy()
+    clean_resid_cache[layer_num][act_idx] = output[:, start_seq_pos:].detach().cpu().numpy()
     return output
 
 def store_clean_forward_pass(hmodel, input_ids, act_idx, n_layers=80, cache_seq_pos=0, clean_z_cache=None, clean_resid_cache=None, store_z=True, store_resid=False):
@@ -316,7 +317,7 @@ def store_clean_forward_pass(hmodel, input_ids, act_idx, n_layers=80, cache_seq_
             hook_pairs.append((act_name, partial(store_clean_head_hook_fn, layer_num=layer, act_idx = act_idx, clean_z_cache=clean_z_cache, start_seq_pos=cache_seq_pos, n_heads = hmodel.model.config.num_attention_heads, d_head = hmodel.model.config.hidden_size // hmodel.model.config.num_attention_heads)))
 
         if store_resid:
-            act_name = f"model.layers.{layer}"
+            act_name = f"model.layers.{layer}.post_attention_layernorm"
             hook_pairs.append((act_name, partial(store_clean_resid_hook_fn, layer_num=layer, act_idx = act_idx, clean_resid_cache=clean_resid_cache, start_seq_pos=cache_seq_pos)))
 
     with torch.no_grad():
@@ -350,7 +351,7 @@ def patch_resid_hook_fn(module, input, output, layer_num = 0, act_idx = 0, clean
     if start_seq_pos is None: # patch in as much as possible
         start_seq_pos = min(output.shape[1], clean_resid_cache[layer_num][act_idx].shape[1])
 
-    output[0][:, start_seq_pos:] = torch.from_numpy(clean_resid_cache[layer_num][act_idx]).to(device)
+    output[:, start_seq_pos:] = torch.from_numpy(clean_resid_cache[layer_num][act_idx]).to(device) # this might not work, maybe need to access at 
     return output
 
 
@@ -382,10 +383,10 @@ def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type
                 hook_pairs.append((act_name, partial(cache_z_hook_fnc, layer_num=layer, activation_buffer=activation_buffer, seq_pos=cache_seq_pos)))
     
     elif act_type == "resid":
-        assert isinstance(stuff_to_patch[0], tuple), "stuff_to_patch must be a list of tuples (layer, head)"
+        assert isinstance(stuff_to_patch[0], int), "stuff_to_patch must be a list of layers"
         hook_pairs = []
         for layer in stuff_to_patch:
-            act_name = f"model.layers.{layer}"
+            act_name = f"model.layers.{layer}.post_attention_layernorm"
             hook_pairs.append((act_name, partial(patch_resid_hook_fn, layer_num=layer, act_idx = act_idx, clean_resid_cache=clean_cache, start_seq_pos=patch_seq_pos)))
 
     with torch.no_grad():
@@ -394,3 +395,49 @@ def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type
     
     true_prob, false_prob = get_true_false_probs(output, tokenizer=tokenizer, scale_relative=scale_relative)
     return output, true_prob, false_prob
+
+
+def erase_data(clean_cache, labels, probe_indices, in_place=False):
+    """
+    Take a clean_cache and concept-erase the head data.
+    probe_indices: list of tuples of (layer, head) (for z) or layer (for resid) to erase
+
+    if in_place, then the clean_cache is modified in place. 
+    Returns the new elements of clean_cache in a dictionary.
+    """
+    n_samples = len(clean_cache[probe_indices[0]].keys())
+    labels = torch.tensor(labels)
+    assert len(labels) == n_samples, "labels must be same length as clean_cache"
+
+    output_cache = {}
+    for probe_index in tqdm(probe_indices):
+        clean_data = []
+        for i in range(n_samples):
+            clean_data.append(clean_cache[probe_index][i][0])
+        clean_data = torch.from_numpy(np.stack(clean_data, axis=0)).float()
+
+        if len(clean_data.shape) > 2:
+            # There is another dimension, each seq pos
+            erased_data = torch.zeros_like(clean_data)
+            for seq_pos in range(clean_data.shape[1]):
+                eraser = LeaceEraser.fit(clean_data[:, seq_pos, :], labels)
+                erased_data[:, seq_pos, :] = eraser(clean_data[:, seq_pos, :])
+        else:
+            eraser = LeaceEraser.fit(clean_data, labels)
+            erased_data = eraser(clean_data)
+
+        output_cache[probe_index] = {}
+        for i in range(n_samples):
+            erased_sample = erased_data[i:i+1].numpy().astype(np.float16)
+            output_cache[probe_index][i] = erased_sample
+            if in_place:
+                clean_cache[probe_index][i] = erased_sample
+
+    return output_cache
+
+def combine_caches(clean_z_cache, erased_cache, stuff_to_patch):
+    output_cache = clean_z_cache.copy()
+    for head in stuff_to_patch:
+        output_cache[head] = erased_cache[head]
+    
+    return output_cache

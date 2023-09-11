@@ -12,3 +12,4 @@ inference_outputs/*
 data
 llama-weights*
 miniconda3
+*.pkl

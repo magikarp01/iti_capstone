@@ -117,7 +117,7 @@ class ModelActs:
             self.indices_trains, self.indices_tests = train_test_split(act_indices, test_size=test_ratio, train_size=train_ratio)
 
 
-    def _train_probe(self, act_type, probe_index, max_iter=1000, accuracy_func=accuracy_score):
+    def _train_probe(self, act_type, probe_index, max_iter=10000, accuracy_func=accuracy_score):
         """
         Train a single logistic regression probe on input activations X_acts and labels (either 1 or 0 for truth or false). 
         Trains on train_indices of X_acts and labels, tests on test_indices.
@@ -148,7 +148,7 @@ class ModelActs:
         return clf, acc
 
 
-    def train_probes(self, act_type, test_ratio=0.2, train_ratio=None, max_iter=1000, verbose=False, in_order=True):
+    def train_probes(self, act_type, test_ratio=0.2, train_ratio=None, max_iter=10000, verbose=False, in_order=True):
         """
         Train probes on all provided activations of act_type in self.activations.
         If train test split is not already set, set it with given keywords.
@@ -281,7 +281,7 @@ class ModelActs:
                 else:
                     final_correct_prob = correct_prob 
                     final_incorrect_prob = incorrect_prob
-                     
+                    
                 correct_probs.append(final_correct_prob)
                 incorrect_probs.append(final_incorrect_prob)
 
@@ -569,6 +569,25 @@ class ModelActsLargeSimple(ModelActs):
             assert X_acts.shape[0] == labels.shape[0], f"{X_acts.shape} vs {labels.shape}" # assert labels line up with loaded activations, size of dataset should be same
 
 
+    def load_cache_acts(self, clean_cache, labels, act_type="z", seq_pos=-1):
+        """
+        Load activations from in-memory cache. Primarily intended for patching experiments, where new probes must be generated on the fly for different sequence positions/activations.
+
+        clean_cache: nested dictionary with outer keys of layer or (layer, head) for z, inner keys of data index (can be ignored now), and values of activations (1, seq_len, d_probe).
+        """
+        labels = np.array(labels)
+        self.labels = labels
+        if act_type not in self.activations:
+            self.activations[act_type] = {}
+
+        for probe_index in clean_cache.keys():
+            X_acts = []
+            num_samples = len(clean_cache[probe_index].keys())
+            for i in range(num_samples):
+                X_acts.append(clean_cache[probe_index][i][:, seq_pos])
+            self.activations[act_type][probe_index] = np.concatenate(X_acts, axis=0)
+            assert len(X_acts) == len(labels), f"{len(X_acts)} vs {labels.shape}" # assert labels line up with loaded activations, size of dataset should be same
+        
 
 class ChunkedModelActs(ModelActs):
     """
