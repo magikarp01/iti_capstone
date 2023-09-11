@@ -293,7 +293,7 @@ def store_clean_resid_hook_fn(module, input, output, layer_num=0, act_idx=0, cle
     # print(f"{output[0].shape=}")
     if layer_num not in clean_resid_cache:
         clean_resid_cache[layer_num] = {}
-    clean_resid_cache[layer_num][act_idx] = output[:, start_seq_pos:].detach().cpu().numpy()
+    clean_resid_cache[layer_num][act_idx] = output[0][:, start_seq_pos:].detach().cpu().numpy()
     return output
 
 def store_clean_forward_pass(hmodel, input_ids, act_idx, n_layers=80, cache_seq_pos=0, clean_z_cache=None, clean_resid_cache=None, store_z=True, store_resid=False):
@@ -317,7 +317,7 @@ def store_clean_forward_pass(hmodel, input_ids, act_idx, n_layers=80, cache_seq_
             hook_pairs.append((act_name, partial(store_clean_head_hook_fn, layer_num=layer, act_idx = act_idx, clean_z_cache=clean_z_cache, start_seq_pos=cache_seq_pos, n_heads = hmodel.model.config.num_attention_heads, d_head = hmodel.model.config.hidden_size // hmodel.model.config.num_attention_heads)))
 
         if store_resid:
-            act_name = f"model.layers.{layer}.post_attention_layernorm"
+            act_name = f"model.layers.{layer}"
             hook_pairs.append((act_name, partial(store_clean_resid_hook_fn, layer_num=layer, act_idx = act_idx, clean_resid_cache=clean_resid_cache, start_seq_pos=cache_seq_pos)))
 
     with torch.no_grad():
@@ -349,10 +349,15 @@ def patch_head_hook_fn(module, input, output, layer_num = 0, head_num = 0, act_i
 
 def patch_resid_hook_fn(module, input, output, layer_num = 0, act_idx = 0, clean_resid_cache=None, start_seq_pos=None, device="cuda"):
     if start_seq_pos is None: # patch in as much as possible
-        start_seq_pos = min(output.shape[1], clean_resid_cache[layer_num][act_idx].shape[1])
+        start_seq_pos = min(output[0].shape[1], clean_resid_cache[layer_num][act_idx].shape[1])
 
-    output[:, start_seq_pos:] = torch.from_numpy(clean_resid_cache[layer_num][act_idx]).to(device) # this might not work, maybe need to access at 
-    return output
+    new_hidden_state = output[0]
+    new_hidden_state[:, start_seq_pos:] = torch.from_numpy(clean_resid_cache[layer_num][act_idx][:, start_seq_pos:]).to(device)
+
+    new_output = (new_hidden_state,)
+    for i in range(len(output)-1):
+        new_output += (output[i+1],)
+    return new_output
 
 
 def cache_z_hook_fnc(module, input, output, layer_num=0, activation_buffer_z=None, seq_pos=-1): #input of shape (batch, seq_len, d_model) (taken from modeling_llama.py)
@@ -364,7 +369,7 @@ def cache_z_hook_fnc(module, input, output, layer_num=0, activation_buffer_z=Non
     return output
 
 
-def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type, clean_cache, scale_relative=False, cache_acts=False, patch_seq_pos=-1, cache_seq_pos=-1):
+def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type, clean_cache, scale_relative=False, cache_acts=False, patch_seq_pos=-1, cache_seq_pos=-1, device="cuda"):
     """
     Do a forward pass by patching in activations from clean_z_cache into heads in stuff_to_patch, and caching resulting activations (if cache_acts is True).
     """
@@ -386,8 +391,8 @@ def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type
         assert isinstance(stuff_to_patch[0], int), "stuff_to_patch must be a list of layers"
         hook_pairs = []
         for layer in stuff_to_patch:
-            act_name = f"model.layers.{layer}.post_attention_layernorm"
-            hook_pairs.append((act_name, partial(patch_resid_hook_fn, layer_num=layer, act_idx = act_idx, clean_resid_cache=clean_cache, start_seq_pos=patch_seq_pos)))
+            act_name = f"model.layers.{layer}"
+            hook_pairs.append((act_name, partial(patch_resid_hook_fn, layer_num=layer, act_idx = act_idx, clean_resid_cache=clean_cache, start_seq_pos=patch_seq_pos, device=device)))
 
     with torch.no_grad():
         with hmodel.hooks(fwd=hook_pairs):
@@ -420,11 +425,14 @@ def erase_data(clean_cache, labels, probe_indices, in_place=False):
             # There is another dimension, each seq pos
             erased_data = torch.zeros_like(clean_data)
             for seq_pos in range(clean_data.shape[1]):
+                # print(f"{clean_data[:, seq_pos, :].shape=}, {labels.shape=}")
                 eraser = LeaceEraser.fit(clean_data[:, seq_pos, :], labels)
                 erased_data[:, seq_pos, :] = eraser(clean_data[:, seq_pos, :])
         else:
             eraser = LeaceEraser.fit(clean_data, labels)
             erased_data = eraser(clean_data)
+        
+        # print(f"{erased_data.shape=}")
 
         output_cache[probe_index] = {}
         for i in range(n_samples):
@@ -441,3 +449,38 @@ def combine_caches(clean_z_cache, erased_cache, stuff_to_patch):
         output_cache[head] = erased_cache[head]
     
     return output_cache
+
+"""
+forward method from llama:
+
+residual = hidden_states
+
+hidden_states = self.input_layernorm(hidden_states)
+
+# Self Attention
+hidden_states, self_attn_weights, present_key_value = self.self_attn(
+    hidden_states=hidden_states,
+    attention_mask=attention_mask,
+    position_ids=position_ids,
+    past_key_value=past_key_value,
+    output_attentions=output_attentions,
+    use_cache=use_cache,
+)
+hidden_states = residual + hidden_states
+
+# Fully Connected
+residual = hidden_states
+hidden_states = self.post_attention_layernorm(hidden_states)
+hidden_states = self.mlp(hidden_states)
+hidden_states = residual + hidden_states
+
+outputs = (hidden_states,)
+
+if output_attentions:
+    outputs += (self_attn_weights,)
+
+if use_cache:
+    outputs += (present_key_value,)
+
+return outputs
+"""
