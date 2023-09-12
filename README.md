@@ -1,9 +1,8 @@
 # iti_capstone
-Fork of Wanff/iti_hack, developing for ARENA capstone
 
-An implementation of Inference-Time Intervention (https://arxiv.org/pdf/2306.03341.pdf) in TransformerLens. This repository has utilities for specifying an arbitrary dataset for probing/ITI, generating activations, training probes, inserting ITI hooks into a HookedTransformer model, and evaluating the output before/after ITI using API calls to GPT-Judge models from OpenAI.
+An implementation of Inference-Time Intervention (https://arxiv.org/pdf/2306.03341.pdf) in TransformerLens, for the ARENA capstone project. This repository has utilities for specifying an arbitrary dataset for probing/ITI, generating activations, training probes, inserting ITI hooks into a HookedTransformer model, and evaluating the output before/after ITI using API calls to GPT-Judge models from OpenAI.
 
-The goals of this project are to analyze truth from a mechanistic interpretability POV, and to determine the ability of both probing for truth and ITI to generalize beyond a particular dataset. The codebase was started by Kevin Wang (Wanff), Phillip Guo (magikarp01), and Richard Ren (notrichardren) during the [ARENA](https://www.arena.education/) mechanistic interpretability hackathon, and James Campbell (jamescampbell57) joined during the capstone phase of ARENA.
+The goals of this project are to analyze truth from a mechanistic interpretability POV, and to determine the ability of both probing for truth and ITI to generalize beyond a particular dataset.
 
 ## Table of Contents
 - [iti\_capstone](#iti_capstone)
