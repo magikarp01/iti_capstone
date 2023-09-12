@@ -7,6 +7,8 @@ import torch.nn.functional as F
 from functools import partial
 from transformer_lens import HookedTransformer
 from concept_erasure import LeaceEraser
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
 
 def tot_logit_diff(tokenizer, model_acts, use_probs=True, eps=1e-8, test_only=True, act_type="z", check_balanced_output=False, 
                    positive_str_tokens = ["Yes", "yes", "True", "true"],
@@ -402,36 +404,60 @@ def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type
     return output, true_prob, false_prob
 
 
-def erase_data(clean_cache, labels, probe_indices, in_place=False):
+def erase_data(clean_cache, labels, probe_indices, in_place=False, test_probe=False, erase_seq_pos=None):
     """
     Take a clean_cache and concept-erase the head data.
     probe_indices: list of tuples of (layer, head) (for z) or layer (for resid) to erase
 
     if in_place, then the clean_cache is modified in place. 
     Returns the new elements of clean_cache in a dictionary.
+
+    If test_probe, trains probes on the erased data to check if LEACE was performed perfectly.
+
+    erase_seq_pos is for if data has multiple seq positions, erase specific ones (takes an array e.g. [-3, -1])
     """
     n_samples = len(clean_cache[probe_indices[0]].keys())
     labels = torch.tensor(labels)
     assert len(labels) == n_samples, "labels must be same length as clean_cache"
 
     output_cache = {}
+    if test_probe:
+        probes = {}
     for probe_index in tqdm(probe_indices):
         clean_data = []
         for i in range(n_samples):
             clean_data.append(clean_cache[probe_index][i][0])
         clean_data = torch.from_numpy(np.stack(clean_data, axis=0)).float()
+        if erase_seq_pos is not None:
+            clean_data = clean_data[:, erase_seq_pos]
 
         if len(clean_data.shape) > 2:
             # There is another dimension, each seq pos
             erased_data = torch.zeros_like(clean_data)
             for seq_pos in range(clean_data.shape[1]):
                 # print(f"{clean_data[:, seq_pos, :].shape=}, {labels.shape=}")
+                # clean_data is shape (n_samples, seq_len, d_model)
                 eraser = LeaceEraser.fit(clean_data[:, seq_pos, :], labels)
                 erased_data[:, seq_pos, :] = eraser(clean_data[:, seq_pos, :])
+
         else:
             eraser = LeaceEraser.fit(clean_data, labels)
             erased_data = eraser(clean_data)
+
         
+        if test_probe:
+            # train probe on final seq pos
+            if len(clean_data.shape) > 2:
+                X_erased = erased_data[:, -1, :]
+            else:
+                X_erased = erased_data
+            null_lr = LogisticRegression(max_iter=1000).fit(X_erased, labels)
+            probes[probe_index] = null_lr
+            beta = torch.from_numpy(null_lr.coef_)
+            y_pred = null_lr.predict(X_erased)
+            print(y_pred)
+            accuracy = accuracy_score(labels, y_pred)
+            print(f"{beta.norm(p=torch.inf)=}, {accuracy=}")
         # print(f"{erased_data.shape=}")
 
         output_cache[probe_index] = {}
@@ -440,8 +466,11 @@ def erase_data(clean_cache, labels, probe_indices, in_place=False):
             output_cache[probe_index][i] = erased_sample
             if in_place:
                 clean_cache[probe_index][i] = erased_sample
-
-    return output_cache
+    
+    if test_probe:
+        return output_cache, probes
+    else:
+        return output_cache
 
 def combine_caches(clean_z_cache, erased_cache, stuff_to_patch):
     output_cache = clean_z_cache.copy()

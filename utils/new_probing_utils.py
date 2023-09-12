@@ -176,6 +176,27 @@ class ModelActs:
                 self.probes[act_type][probe_index] = clf
                 self.probe_accs[act_type][probe_index] = acc
 
+
+    def regenerate_probe_accs(self, act_type, test_ratio=0.2, accuracy_func=accuracy_score):
+        """
+        Regenerate probe accuracies, using last test_ratio activations.
+        """
+        num_data = len(self.labels)
+        train_num = int(num_data * (1-test_ratio))
+        test_num = int(num_data * test_ratio)
+        indices_tests = np.arange(train_num, train_num + test_num)
+
+        for probe_index in tqdm(self.activations[act_type]):
+
+            X_acts = self.activations[act_type][probe_index]
+            X_test_head = X_acts[indices_tests]
+            y_test = self.labels[indices_tests]
+            probe = self.probes[act_type][probe_index]
+
+            y_val_pred = probe.predict(X_test_head)
+            self.probe_accs[act_type][probe_index] = accuracy_func(y_test, y_val_pred)
+
+
     def save_probes(self, id, filepath = "activations/"):
         """
         Save probes and probe accuracies to activations folder. Must be called after train_probes.
