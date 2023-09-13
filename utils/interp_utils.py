@@ -6,7 +6,8 @@ from tqdm import tqdm
 import torch.nn.functional as F
 from functools import partial
 from transformer_lens import HookedTransformer
-from concept_erasure import LeaceEraser
+from concept_erasure import LeaceEraser, LeaceFitter
+from concept_erasure.oracle import OracleEraser, OracleFitter
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
@@ -404,7 +405,7 @@ def forward_pass(hmodel, tokenizer, input_ids, act_idx, stuff_to_patch, act_type
     return output, true_prob, false_prob
 
 
-def erase_data(clean_cache, labels, probe_indices, in_place=False, test_probe=False, erase_seq_pos=None):
+def erase_data(clean_cache, labels, probe_indices, in_place=False, test_probe=False, erase_seq_pos=None, oracle=True):
     """
     Take a clean_cache and concept-erase the head data.
     probe_indices: list of tuples of (layer, head) (for z) or layer (for resid) to erase
@@ -415,6 +416,8 @@ def erase_data(clean_cache, labels, probe_indices, in_place=False, test_probe=Fa
     If test_probe, trains probes on the erased data to check if LEACE was performed perfectly.
 
     erase_seq_pos is for if data has multiple seq positions, erase specific ones (takes an array e.g. [-3, -1])
+    
+    if oracle, use oracle eraser (i.e. erase with correct label). Otherwise, use LEACE.
     """
     n_samples = len(clean_cache[probe_indices[0]].keys())
     labels = torch.tensor(labels)
@@ -431,18 +434,26 @@ def erase_data(clean_cache, labels, probe_indices, in_place=False, test_probe=Fa
         if erase_seq_pos is not None:
             clean_data = clean_data[:, erase_seq_pos]
 
+
         if len(clean_data.shape) > 2:
             # There is another dimension, each seq pos
             erased_data = torch.zeros_like(clean_data)
             for seq_pos in range(clean_data.shape[1]):
                 # print(f"{clean_data[:, seq_pos, :].shape=}, {labels.shape=}")
                 # clean_data is shape (n_samples, seq_len, d_model)
-                eraser = LeaceEraser.fit(clean_data[:, seq_pos, :], labels)
-                erased_data[:, seq_pos, :] = eraser(clean_data[:, seq_pos, :])
+                # eraser = LeaceEraser.fit(clean_data[:, seq_pos, :], labels)
+
+                if oracle:
+                    fitter = OracleFitter.fit(clean_data[:, seq_pos, :], labels)
+                    erased_data[:, seq_pos, :] = fitter.eraser(clean_data[:, seq_pos, :], labels)
+                else:
+                    fitter = LeaceFitter.fit(clean_data[:, seq_pos, :], labels)
+                    erased_data[:, seq_pos, :] = fitter.eraser(clean_data[:, seq_pos, :])
 
         else:
-            eraser = LeaceEraser.fit(clean_data, labels)
-            erased_data = eraser(clean_data)
+            fitter = LeaceFitter.fit(clean_data, labels)
+            erased_data = fitter.eraser(clean_data)
+            fitter.reset()
 
         
         if test_probe:

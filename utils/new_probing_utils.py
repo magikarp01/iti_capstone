@@ -138,8 +138,13 @@ class ModelActs:
         X_test_head = X_acts[self.indices_tests]
         y_test = self.labels[self.indices_tests]
 
+        print(f"{X_train_head.shape=}, {y_train.shape=}, {X_test_head.shape=}, {y_test.shape=}")
+
         clf = LogisticRegression(max_iter=max_iter).fit(X_train_head, y_train)
         # clf = LogisticRegression(max_iter=max_iter).fit(self.activations[act_type][probe_index][self.indices_trains], self.labels[self.indices_trains])
+
+        if len(self.indices_tests) == 0:
+            return clf, 0
 
         y_val_pred = clf.predict(X_test_head)
         # y_val_pred = clf.predict(self.activations[act_type][probe_index][self.indices_tests])
