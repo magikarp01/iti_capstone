@@ -424,6 +424,9 @@ def erase_data(clean_cache, labels, probe_indices, in_place=False, test_probe=Fa
     assert len(labels) == n_samples, "labels must be same length as clean_cache"
 
     output_cache = {}
+
+
+    X_erased_cache = {}
     if test_probe:
         probes = {}
     for probe_index in tqdm(probe_indices):
@@ -455,13 +458,14 @@ def erase_data(clean_cache, labels, probe_indices, in_place=False, test_probe=Fa
             erased_data = fitter.eraser(clean_data)
             fitter.reset()
 
-        
         if test_probe:
             # train probe on final seq pos
             if len(clean_data.shape) > 2:
                 X_erased = erased_data[:, -1, :]
             else:
                 X_erased = erased_data
+
+            X_erased_cache[probe_index] = X_erased
             null_lr = LogisticRegression(max_iter=1000).fit(X_erased, labels)
             probes[probe_index] = null_lr
             beta = torch.from_numpy(null_lr.coef_)
@@ -479,7 +483,7 @@ def erase_data(clean_cache, labels, probe_indices, in_place=False, test_probe=Fa
                 clean_cache[probe_index][i] = erased_sample
     
     if test_probe:
-        return output_cache, probes
+        return output_cache, probes, X_erased_cache
     else:
         return output_cache
 

@@ -143,6 +143,9 @@ class ModelActs:
         clf = LogisticRegression(max_iter=max_iter).fit(X_train_head, y_train)
         # clf = LogisticRegression(max_iter=max_iter).fit(self.activations[act_type][probe_index][self.indices_trains], self.labels[self.indices_trains])
 
+        beta = torch.from_numpy(clf.coef_)
+        print(f"{beta.norm(p=torch.inf)=}")
+
         if len(self.indices_tests) == 0:
             return clf, 0
 
@@ -595,7 +598,7 @@ class ModelActsLargeSimple(ModelActs):
             assert X_acts.shape[0] == labels.shape[0], f"{X_acts.shape} vs {labels.shape}" # assert labels line up with loaded activations, size of dataset should be same
 
 
-    def load_cache_acts(self, clean_cache, labels, act_type="z", seq_pos=-1):
+    def load_cache_acts(self, clean_cache, labels, act_type="z", seq_pos=None):
         """
         Load activations from in-memory cache. Primarily intended for patching experiments, where new probes must be generated on the fly for different sequence positions/activations.
 
@@ -608,10 +611,20 @@ class ModelActsLargeSimple(ModelActs):
 
         for probe_index in clean_cache.keys():
             X_acts = []
-            num_samples = len(clean_cache[probe_index].keys())
+            if isinstance(clean_cache[probe_index], dict):
+                num_samples = len(clean_cache[probe_index].keys())
+            else:
+                num_samples = len(clean_cache[probe_index])
+            
+            print(f"{num_samples=}")
             for i in range(num_samples):
-                X_acts.append(clean_cache[probe_index][i][:, seq_pos])
-            self.activations[act_type][probe_index] = np.concatenate(X_acts, axis=0)
+                if seq_pos is not None:
+                    X_acts.append(clean_cache[probe_index][i][:, seq_pos].squeeze())
+                else:
+                    X_acts.append(clean_cache[probe_index][i].squeeze())
+            
+            # print(f"{np.stack(X_acts, axis=0).shape=}")
+            self.activations[act_type][probe_index] = np.stack(X_acts, axis=0)
             assert len(X_acts) == len(labels), f"{len(X_acts)} vs {labels.shape}" # assert labels line up with loaded activations, size of dataset should be same
         
 
